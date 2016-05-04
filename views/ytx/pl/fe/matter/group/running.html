@@ -1,0 +1,75 @@
+<div class='col-md-8'>
+    <div class='tile'>
+        <div class='form-group'>
+            <a  href='/rest/pl/fe/matter/group/setting?site={{siteId}}&id={{id}}' ng-bind='app.title'></a>
+        </div>
+    </div>
+    <div class='tile'>
+        <div class='list-group'>
+            <a class='list-group-item' ng-class="{'active':!editingRound}" ng-click="open(false)" style='text-align:center'>全部</a>
+            <a class='list-group-item' ng-class="{'active':r===editingRound}" ng-repeat='r in rounds' ng-click='open(r)'>
+                <span>{{r.title}}</span>
+            </a>
+        </div>
+        <table class='table table-bordered'>
+            <thead>
+                <tr>
+                    <th ng-if="!editingRound">轮次</th>
+                    <th>序号</th>
+                    <th>昵称</th>
+                    <th>姓名</th>
+                    <th>手机号</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="w in winners">
+                    <td ng-if="!editingRound">{{w.title}}</td>
+                    <td>{{$index+1}}</td>
+                    <td>{{w.nickname}}</td>
+                    <td>{{w.name}}</td>
+                    <td>{{w.mobile}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class='help-block'>分组结果</div>
+    </div>
+</div>
+<div class='col-md-4'>
+    <div class='tile'>
+        <button class='btn btn-block btn-default' ng-click="stop()">停止</button>
+    </div>
+    <div class='tile'>
+        <div class='form-group'>
+            <div>
+                <a href="javascript:void(0)" ng-click="gotoCode()">编辑页面</a>
+                <a href="javascript:void(0)" ng-click="resetCode()">重置页面</a>
+            </div>
+            <div class='form-control' ng-bind="opUrl" style="height:auto;word-break:break-all;"></div>
+            <div class='help-block'>投影地址</div>
+        </div>
+    </div>
+</div>
+<script type="text/ng-template" id="targetEditor.html">
+    <div class="modal-header">
+        <button class="close" type="button" ng-click="cancel()">×</button>
+        <h5 class="modal-title">抽取条件</h5>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal">
+            <div class="form-group" ng-repeat="s in schemas" ng-if="s.id.indexOf('member')!==0">
+                <label class="col-md-3 control-label">{{s.title}}</label>
+                <div class="col-md-9" ng-if="s.type!=='single'&&s.type!=='multiple'">
+                    <input type='text' class='form-control' ng-model="target[s.id]">
+                </div>
+                <div class="col-md-9" ng-if="s.type==='single'||s.type==='multiple'">
+                    <select class='form-control' ng-model="target[s.id]" ng-options="op.v as op.l for op in s.ops">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">确定</button>
+    </div>
+</script>

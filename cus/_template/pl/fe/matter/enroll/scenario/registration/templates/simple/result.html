@@ -1,0 +1,23 @@
+<div class="form-group wrap-inline wrap-splitline" wrap="static" ng-controller="ctrlRecord"><label>姓名</label>
+<div>{{Record.current.data.name}}</div>
+</div>
+<div class="form-group wrap-inline wrap-splitline" wrap="static" ng-controller="ctrlRecord"><label>手机</label>
+<div>{{Record.current.data.mobile}}</div>
+</div>
+<div class="form-group wrap-inline wrap-splitline" wrap="static" ng-controller="ctrlRecord"><label>邮箱</label>
+<div>{{Record.current.data.email}}</div>
+</div>
+<div ng-controller="ctrlRecord" wrap="static" class="form-group wrap-inline wrap-splitline"><label>性别</label>
+<div>{{value2Label("gender")}}</div>
+</div>
+<div class="form-group wrap-inline wrap-splitline" wrap="static" ng-controller="ctrlRecord"><label>部门</label>
+<div>{{Record.current.data.department}}</div>
+</div>
+<div class="form-group wrap-inline wrap-splitline" wrap="static" ng-controller="ctrlRecord"><label>职务</label>
+<div>{{Record.current.data.position}}</div>
+</div>
+<div class="form-group wrap-inline wrap-splitline" wrap="static" ng-controller="ctrlRecord"><label>登记时间</label>
+<div>{{Record.current.enroll_at*1000|date:'yy-MM-dd HH:mm'}}</div>
+</div>
+<div class="form-group" wrap="button"><button id="btnEditRecord" class="btn btn-primary btn-block btn-lg" ng-click="editRecord($event)"><span>修改信息</span></button></div>
+<div wrap="text" class="form-group" style="color:red">允许学员修改报名信息。</div>
