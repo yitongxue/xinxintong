@@ -1,23 +1,20 @@
 body{background:#f8f8f8;padding-top:71px;}
 .shortcut.navbar-nav{position:absolute;left:50%;margin-left:-58px;float:none;}
 .tile{position:relative;border:1px solid #ddd;border-radius:4px;padding:8px;background:#f8f8f8;margin-bottom:15px;}
-
-/*setting*/
 .tile .form-group,.tile .checkbox{padding:8px;background:#fff;border-radius:4px;}
 .help-block{margin-bottom:0;}
 .tile .form-group:last-child{margin-bottom:0;}
-div.mce-tinymce.mce-container.mce-panel{margin-top:0;border:1px solid #ccc;}
-div.mce-tinymce.mce-container.mce-panel.mce-fullscreen{margin-top:51px}
-div.mce-tinymce div.mce-edit-area{border:0!important;border-top:1px solid #ccc!important;}
-div.mce-tinymce .mce-menubtn.mce-fixed-width span{width:auto;}
+
+/*app*/
+#app-view .list-group-item.page{cursor:pointer;}
 
 /*pages*/
-.editor{position:relative;float:left;width:572px;}
-.editor .mce-tinymce{margin-right:44px!important}
-.editor .mce-tinymce.mce-container.mce-panel{border:1px solid #ccc;}
-.editor .mce-tinymce.mce-container.mce-panel.mce-fullscreen{margin-top:51px}
-.editor .mce-tinymce div.mce-edit-area{border:0!important;border-top:1px solid #ccc!important;}
-.editor .mce-tinymce .mce-menubtn.mce-fixed-width span{width:auto;}
-.editor .sidebar{width:44px;background:transparent;position:absolute;top:34px;right:0}
-.editor .sidebar button{color:black;border-radius:0;margin-left:-1px;margin-bottom:-1px}
-.editor .sidebar button:disabled{color:gray}
+.page-editor{position:relative;float:left;width:550px;}
+.page-editor .mce-tinymce{margin-right:44px!important}
+.page-editor .mce-tinymce.mce-container.mce-panel{border:1px solid #ccc;}
+.page-editor .mce-tinymce.mce-container.mce-panel.mce-fullscreen{margin-top:51px}
+.page-editor .mce-tinymce div.mce-edit-area{border:0!important;border-top:1px solid #ccc!important;}
+.page-editor .mce-tinymce .mce-menubtn.mce-fixed-width span{width:auto;}
+.page-editor .sidebar{width:44px;background:transparent;position:absolute;top:0;right:0;margin-top:35px;}
+.page-editor .sidebar button{height:36px;color:black;border-radius:0;margin-left:-1px;margin-bottom:-1px}
+.page-editor .sidebar button:disabled{color:gray}

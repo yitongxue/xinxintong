@@ -260,9 +260,12 @@ define(["require", "angular", "angular-sanitize", "xxt-share", "enroll-directive
         $scope.fetch = fnFetch;
     }]);
     ngApp.controller('ctrlRecord', ['$scope', 'Record', function($scope, Record) {
-        var facRecord, schemas;
-        schemas = JSON.parse($scope.Page.data_schemas);
-        schemas = schemas.record.schemas;
+        var facRecord, schemas = [],
+            dataSchemas = JSON.parse($scope.Page.data_schemas),
+            i;
+        for (i in dataSchemas) {
+            schemas.push(dataSchemas[i].schema);
+        }
         $scope.value2Label = function(key) {
             var val, i, j, s, aVal, aLab = [];
             if (schemas && facRecord.current.data) {

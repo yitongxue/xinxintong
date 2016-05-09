@@ -67,15 +67,15 @@
                         </div>
                         <div class='form-group'>
                             <input type="text" class="form-control" ng-model='editing.extattrs.customer' ng-change="update('extattrs')">
-                            <div class='help-block'>客户名称</div>
+                            <div class='help-block'>受训企业名称</div>
                         </div>
                         <div class='form-group'>
                             <input type="text" class="form-control" ng-model='editing.extattrs.contacter' ng-change="update('extattrs')">
-                            <div class='help-block'>联系人姓名</div>
+                            <div class='help-block'>项目联系人姓名</div>
                         </div>
                         <div class='form-group'>
                             <input type="text" class="form-control" ng-model='editing.extattrs.contact_phone' ng-change="update('extattrs')">
-                            <div class='help-block'>联系人电话</div>
+                            <div class='help-block'>项目联系人电话</div>
                         </div>
                     </div><!--tile-->
                 </div>
@@ -97,6 +97,11 @@
                             </div>
                         </div>
                     </div>
+                    <div class='col-md-6' ng-repeat='i in indicators'>
+                        <div class='thumbnail indicator' ng-click="addByIndicator(i)">
+                            <div><span class='glyphicon glyphicon-plus'></span>{{i.title}}</div>
+                        </div>
+                    </div>
                 </div>
                 <nav class="navbar navbar-default">
                     <div class="navbar-form">
@@ -113,22 +118,23 @@
                 <button class="close" ng-click="cancel()">×</button>
                 <h5 class="modal-title">选择模板</h5>
             </div>
-            <div class="modal-body template">
+            <div class="modal-body">
                 <div class='options'>
                     <div class='form-group'>
-                        <label>项目环节</label>
+                        <label>场景</label>
                         <select class='form-control' ng-disabled="fixedScenario" ng-model='data.scenario' ng-options='s as s.title for s in templates' ng-change='chooseScenario()'></select>
                     </div>
                     <div class='form-group'>
                         <label>模板</label>
                         <select class='form-control' ng-model='data.template' ng-options='t.title for t in data.scenario.templates' ng-change='chooseTemplate()'></select>
                     </div>
-                    <div class='form-group'>
-                        <button class="btn" ng-class="{'btn-default':!selected.template,'btn-success':data.template}" ng-click="ok()" ng-disabled='!data.template'>使用本模版创建</button>
+                    <div class='form-group' ng-if="data.scenario.name==='voting'">
+                        <button class='btn btn-default' ng-click='choosePage()'>重新生成页面</button>
                     </div>
-                    <div class='form-group'>
-                        <button class="btn btn-default" ng-click="blank()">不使用模版创建</button>
+                    <div class='form-group' ng-if="data.scenario.name==='voting'">
+                        <textarea id='schemaData' ng-model="data.simpleSchema"></textarea>
                     </div>
+                    
                 </div>
                 <div class='pages'>
                     <div class='form-group'>
@@ -139,14 +145,9 @@
                         <iframe id='simulator' src=""></iframe>
                     </div>
                 </div>
-                <div class='schema' ng-if="data.scenario.name==='voting'">
-                    <div class='form-group'>
-                        <button class='btn btn-default' ng-click='choosePage()'>重新生成页面</button>
-                    </div>
-                    <div class='form-group'>
-                        <textarea id='schemaData' ng-model="data.simpleSchema"></textarea>
-                    </div>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" ng-click="ok()" ng-disabled='!data.template'>编辑报名表</button>
             </div>
         </script>
         <script src="/static/js/jquery.min.js"></script>

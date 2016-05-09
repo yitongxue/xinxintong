@@ -14,11 +14,6 @@
 			"type": "mobile",
 			"showname": "placeholder"
 		}, {
-			"id": "email",
-			"title": "邮箱",
-			"type": "email",
-			"showname": "placeholder"
-		}, {
 			"id": "gender",
 			"title": "性别",
 			"type": "single",
@@ -44,6 +39,7 @@
 			"showname": "placeholder"
 		}],
 		"act_schemas": [{
+			"id": "act1",
 			"name": "submit",
 			"label": "提交信息",
 			"next": "result"
@@ -53,53 +49,87 @@
 		"title": "学员报名后展示页",
 		"type": "V",
 		"data_schemas": [{
-			"id": "name",
-			"title": "名称",
-			"type": "name",
-			"showname": "placeholder"
+			"id": "s1",
+			"pattern": "record",
+			"inline": "Y",
+			"splitLine": "Y",
+			"schema": {
+				"id": "name",
+				"title": "名称",
+				"type": "name",
+				"showname": "placeholder"
+			}
 		}, {
-			"id": "mobile",
-			"title": "手机",
-			"type": "mobile",
-			"showname": "placeholder"
+			"id": "s2",
+			"pattern": "record",
+			"inline": "Y",
+			"splitLine": "Y",
+			"schema": {
+				"id": "mobile",
+				"title": "手机",
+				"type": "mobile",
+				"showname": "placeholder"
+			}
 		}, {
-			"id": "email",
-			"title": "邮箱",
-			"type": "email",
-			"showname": "placeholder"
+			"id": "s3",
+			"pattern": "record",
+			"inline": "Y",
+			"splitLine": "Y",
+			"schema": {
+				"id": "gender",
+				"title": "性别",
+				"type": "single",
+				"showname": "label",
+				"component": "R",
+				"align": "H",
+				"ops": [{
+					"v": "v1",
+					"l": "男"
+				}, {
+					"v": "v2",
+					"l": "女"
+				}]
+			}
 		}, {
-			"id": "gender",
-			"title": "性别",
-			"type": "single",
-			"showname": "label",
-			"component": "R",
-			"align": "H",
-			"ops": [{
-				"v": "v1",
-				"l": "男"
-			}, {
-				"v": "v2",
-				"l": "女"
-			}]
+			"id": "s4",
+			"pattern": "record",
+			"inline": "Y",
+			"splitLine": "Y",
+			"schema": {
+				"id": "department",
+				"title": "部门",
+				"type": "shorttext",
+				"showname": "placeholder"
+			}
 		}, {
-			"id": "department",
-			"title": "部门",
-			"type": "shorttext",
-			"showname": "placeholder"
+			"id": "s5",
+			"pattern": "record",
+			"inline": "Y",
+			"splitLine": "Y",
+			"schema": {
+				"id": "department",
+				"title": "部门",
+				"type": "shorttext",
+				"showname": "placeholder"
+			}
 		}, {
-			"id": "position",
-			"title": "职务",
-			"type": "shorttext",
-			"showname": "placeholder"
+			"id": "s6",
+			"pattern": "record",
+			"inline": "Y",
+			"splitLine": "Y",
+			"schema": {
+				"id": "position",
+				"title": "职务",
+				"type": "shorttext",
+				"showname": "placeholder"
+			}
+		}],
+		"act_schemas": [{
+			"id": "act2",
+			"name": "editRecord",
+			"label": "修改报名信息",
+			"next": "enroll"
 		}]
-	}, {
-		"name": "signin",
-		"title": "签到页",
-		"type": "S"
-	}, {
-		"name": "signinsuccess",
-		"title": "签到成功页",
-		"type": "V"
 	}],
 	"schema": [{
 		"id": "name",
@@ -110,11 +140,6 @@
 		"id": "mobile",
 		"title": "手机",
 		"type": "mobile",
-		"showname": "placeholder"
-	}, {
-		"id": "email",
-		"title": "邮箱",
-		"type": "email",
 		"showname": "placeholder"
 	}, {
 		"id": "gender",
@@ -142,8 +167,7 @@
 		"showname": "placeholder"
 	}],
 	"scenarioConfig": {
-		"can_rounds": "D",
-		"can_signin": "Y"
+		"can_rounds": "D"
 	},
 	"entryRule": {
 		"otherwise": {
