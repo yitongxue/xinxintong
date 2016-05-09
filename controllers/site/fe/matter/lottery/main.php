@@ -35,37 +35,70 @@ class main extends \site\fe\base {
 		$modelLot = $this->model('matter\lottery');
 		$lot = $modelLot->byId($app);
 		$current = time();
-		/**
-		 * start?
-		 */
+		/* start? */
 		if ($current < $lot->start_at) {
 			\TPL::assign('title', $lot->title);
 			\TPL::assign('body', empty($lot->nostart_alert) ? '活动未开始' : $lot->nostart_alert);
 			\TPL::output('info');
 			exit;
 		}
-		/**
-		 * end?
-		 */
+		/* end? */
 		if ($current > $lot->end_at) {
 			\TPL::assign('title', $lot->title);
 			\TPL::assign('body', empty($lot->hasend_alert) ? '活动已结束' : $lot->hasend_alert);
 			\TPL::output('info');
 			exit;
 		}
-		/**
-		 * 当前访问用户
-		 */
-		$user = $this->who;
-		/**
-		 * 访问控制
-		 */
-		if ($lot->access_control === 'Y') {
-			$this->accessControl($site, $lot->id, $lot->authapis, $user->openid, $lot);
+		/* 限制公众帐号关注用户参与 */
+		if ($lot->fans_only === 'Y' || $lot->fans_enter_only === 'Y') {
+			if (!$this->afterSnsOAuth()) {
+				/* 检查是否需要第三方社交帐号OAuth */
+				$this->_requireSnsOAuth($site, $lot);
+			}
 		}
+
 		\TPL::assign('title', $lot->title);
 		\TPL::output('/site/fe/matter/lottery/play');
 		exit;
+	}
+	/**
+	 * 检查是否需要第三方社交帐号认证
+	 * 检查条件：
+	 * 0、应用是否设置了需要认证
+	 * 1、站点是否绑定了第三方社交帐号认证
+	 * 2、平台是否绑定了第三方社交帐号认证
+	 * 3、用户客户端是否可以发起认证
+	 *
+	 * @param string $site
+	 * @param object $app
+	 */
+	private function _requireSnsOAuth($siteid, &$app) {
+		if ($this->userAgent() === 'wx') {
+			if (!isset($this->who->sns->wx)) {
+				if ($wxConfig = $this->model('sns\wx')->bySite($siteid)) {
+					if ($wxConfig->joined === 'Y') {
+						$this->snsOAuth($wxConfig, 'wx');
+					}
+				}
+			}
+			if (!isset($this->who->sns->qy)) {
+				if ($qyConfig = $this->model('sns\qy')->bySite($siteid)) {
+					if ($qyConfig->joined === 'Y') {
+						$this->snsOAuth($qyConfig, 'qy');
+					}
+				}
+			}
+		} else if ($this->userAgent() === 'yx') {
+			if (!isset($this->who->sns->yx)) {
+				if ($yxConfig = $this->model('sns\yx')->bySite($siteid)) {
+					if ($yxConfig->joined === 'Y') {
+						$this->snsOAuth($yxConfig, 'yx');
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 	/**
 	 * 抽奖活动定义
@@ -73,9 +106,6 @@ class main extends \site\fe\base {
 	public function get_action($site, $app) {
 		/* user */
 		$user = $this->who;
-		/**/
-		$params = new \stdClass;
-		$params->user = $user;
 		/**
 		 * 抽奖活动定义
 		 */
@@ -84,8 +114,10 @@ class main extends \site\fe\base {
 		/**
 		 *
 		 */
-		$params->logs = $modelLot->getLog($app, $user, true);
-		$params->leftChance = $modelLot->getChance($app, $user);
+		$params = new \stdClass;
+		$params->user = $user;
+		$params->logs = $modelLot->getLog($lot->id, $user, true);
+		$params->leftChance = $modelLot->getChance($lot, $user);
 		$params->app = $lot;
 
 		$page = $this->model('code/page')->byId($lot->page_id);
@@ -117,12 +149,26 @@ class main extends \site\fe\base {
 		/**
 		 * define data.
 		 */
-		$lot = $modelLot->byId($app, array('cascaded' => array('award', 'plate', 'task')));
+		$lot = $modelLot->byId($app, array('cascaded' => array('award', 'plate')));
 		/**
-		 * 是否完成了指定内置任务
+		 * 如果仅限关注用户参与，获得openid
 		 */
-		if (count($lot->tasks)) {
-			foreach ($lot->tasks as $lotTask) {
+		if ($lot->fans_only === 'Y') {
+			$fan = $this->getSnsUser($site);
+			if (empty($fan)) {
+				return new \ResponseData(null, 302, $lot->nonfans_alert);
+			}
+		}
+		/**
+		 * 检查是否有奖励的抽奖机会
+		 */
+		$modelLot->freshEarnChance($lot, $user);
+		/**
+		 * 是否完成了前置任务
+		 */
+		$tasks = $modelTsk->byApp($lot->id, array('task_type' => 'can_play'));
+		if (count($tasks)) {
+			foreach ($tasks as $lotTask) {
 				$userTask = $modelTsk->getTaskByUser($user, $lot->id, $lotTask->tid);
 				if ($userTask === false) {
 					/*创建任务*/
@@ -140,13 +186,13 @@ class main extends \site\fe\base {
 		/**
 		 * 还有参加抽奖的机会吗？
 		 */
-		if (false === $modelRst->canPlay($app, $user, true)) {
+		if (false === $modelRst->canPlay($lot, $user, true)) {
 			return new \ResponseData(null, 301, $lot->nochance_alert);
 		}
 		/**
 		 * 抽奖
 		 */
-		list($selectedSlot, $selectedAwardID, $myAward) = $this->_drawAward($lot);
+		list($selectedSlot, $selectedAwardID, $myAward) = $this->_drawAward($lot, $user);
 
 		if (empty($myAward)) {
 			return new \ResponseData(null, 301, '对不起，没有奖品了！');
@@ -173,7 +219,7 @@ class main extends \site\fe\base {
 		/**
 		 * 检查剩余的机会
 		 */
-		$chance = $modelLot->getChance($lot->id, $user);
+		$chance = $modelLot->getChance($lot, $user);
 		/**
 		 * 清理冗余数据
 		 */
@@ -189,8 +235,6 @@ class main extends \site\fe\base {
 	 */
 	public function prize_action($site) {
 		$log = $this->getPostJson();
-
-		$user = $this->getUser($site);
 
 		$rst = $this->model()->update(
 			'xxt_lottery_log',
@@ -233,7 +277,7 @@ class main extends \site\fe\base {
 	 *
 	 * @param object $lot
 	 */
-	private function _drawAward(&$lot) {
+	private function _drawAward(&$lot, &$user) {
 		/**
 		 * arrange relateion between award and plate's slots.
 		 */
@@ -245,6 +289,18 @@ class main extends \site\fe\base {
 			 */
 			if ((int) $a->prob === 0 || ($a->period === 'A' && $a->type == 99 && ((int) $a->takeaway >= (int) $a->quantity))) {
 				continue;
+			}
+			/*限制了奖项的中奖次数*/
+			if ((int) $a->user_limit > 0) {
+				$q = array(
+					'count(*)',
+					'xxt_lottery_log',
+					"userid='$user->uid' and lid='$lot->id' and aid='$a->aid'",
+				);
+				$count = (int) $this->model()->query_val_ss($q);
+				if ($count >= (int) $a->user_limit) {
+					continue;
+				}
 			}
 			$awards[$a->aid] = array(
 				'aid' => $a->aid,

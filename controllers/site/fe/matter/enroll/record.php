@@ -286,13 +286,13 @@ class record extends base {
 		}
 		/* 创建登记记录*/
 		if (empty($ek)) {
-			$ek = $modelRec->add($site, $app, $user, (empty($posted->referrer) ? '' : $posted->referrer));
+			$ek = $modelRec->enroll($site, $app, $user, time(), (empty($posted->referrer) ? '' : $posted->referrer));
 			/**
 			 * 处理提交数据
 			 */
 			$data = $_GET;
 			unset($data['site']);
-			unset($data['aid']);
+			unset($data['app']);
 			if (!empty($data)) {
 				$data = (object) $data;
 				$rst = $modelRec->setData($user, $site, $app, $ek, $data);
@@ -304,7 +304,7 @@ class record extends base {
 		/*登记记录的URL*/
 		$url = '/rest/site/fe/matter/enroll';
 		$url .= '?site=' . $site;
-		$url .= '&aid=' . $app;
+		$url .= '&app=' . $app->id;
 		$url .= '&ek=' . $ek;
 
 		$rsp = new \stdClass;
@@ -654,12 +654,18 @@ class record extends base {
 		return new \ResponseData($remark);
 	}
 	/**
-	 *当前用户活动签到
+	 * 当前用户活动签到
+	 *
+	 * @param string $site
+	 * @param string $app
 	 */
 	public function signin_action($site, $app) {
-		$model = \TMS_APP::model('app\enroll');
-		$app = $model->byId($app);
-		$rst = $model->signin($site, $app->id, $openid);
+		$modelApp = $this->model('matter\enroll');
+		$modelRec = $this->model('matter\enroll\signin');
+
+		$user = $this->who;
+		$app = $modelApp->byId($app);
+		$rst = $modelRec->signin($site, $app, $user);
 		/**
 		 * 回复
 		 */

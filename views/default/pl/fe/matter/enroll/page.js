@@ -14,7 +14,6 @@
         } else {
             newWrap = dom.add(body, name, attrs, html);
         }
-        //activeEditor.save();
     };
     WrapLib.prototype.extractInputSchema = function(wrap) {
         var $label, def = {},
@@ -585,33 +584,33 @@
             }
             page.$$modified = page.html !== old.html;
         };
-        $scope.updPage = function(page, name) {
-            var editor, defer = $q.defer();
-            if (!angular.equals($scope.app, $scope.persisted)) {
-                if (name === 'html') {
-                    editor = tinymce.get(page.name);
-                    if ($(editor.getBody()).find('.active').length) {
-                        $(editor.getBody()).find('.active').removeClass('active');
-                        $scope.hasActiveWrap = false;
-                        page.html = $(editor.getBody()).html();
-                    }
+        $scope.updPage = function(page, names) {
+            var editor, defer = $q.defer(),
+                url, p = {};
+            angular.isString(names) && (names = [names]);
+            if (names.indexOf('html') !== -1) {
+                editor = tinymce.get(page.name);
+                if ($(editor.getBody()).find('.active').length) {
+                    $(editor.getBody()).find('.active').removeClass('active');
+                    $scope.hasActiveWrap = false;
                 }
-                $scope.$root.progmsg = '正在保存页面...';
-                var url, p = {};
-                p[name] = name === 'html' ? encodeURIComponent(page[name]) : page[name];
-                url = '/rest/pl/fe/matter/enroll/page/update';
-                url += '?site=' + $scope.siteId;
-                url += '&app=' + $scope.id;
-                url += '&pid=' + page.id;
-                url += '&pname=' + page.name;
-                url += '&cid=' + page.code_id;
-                http2.post(url, p, function(rsp) {
-                    $scope.persisted = angular.copy($scope.app);
-                    page.$$modified = false;
-                    $scope.$root.progmsg = '';
-                    defer.resolve();
-                });
+                page.html = $(editor.getBody()).html();
             }
+            $scope.$root.progmsg = '正在保存页面...';
+            angular.forEach(names, function(name) {
+                p[name] = name === 'html' ? encodeURIComponent(page[name]) : page[name];
+            });
+            url = '/rest/pl/fe/matter/enroll/page/update';
+            url += '?site=' + $scope.siteId;
+            url += '&app=' + $scope.id;
+            url += '&pid=' + page.id;
+            url += '&pname=' + page.name;
+            url += '&cid=' + page.code_id;
+            http2.post(url, p, function(rsp) {
+                page.$$modified = false;
+                $scope.$root.progmsg = '';
+                defer.resolve();
+            });
             return defer.promise;
         };
         $scope.delPage = function() {
@@ -648,21 +647,26 @@
         $scope.$watch('app.pages', function(pages) {
             var current = $location.search().page,
                 dataSchemas, others = [];
-            if (pages) {
-                angular.forEach(pages, function(p) {
-                    if (p.name === current) {
-                        $scope.ep = p;
+            if (!pages || pages.length === 0) return;
+            angular.forEach(pages, function(p) {
+                if (p.name === current) {
+                    $scope.ep = p;
+                    if (angular.isString($scope.ep.data_schemas)) {
                         dataSchemas = $scope.ep.data_schemas;
                         $scope.ep.data_schemas = dataSchemas && dataSchemas.length ? JSON.parse(dataSchemas) : [];
+                    }
+                    if (angular.isString($scope.ep.act_schemas)) {
                         actSchemas = $scope.ep.act_schemas;
                         $scope.ep.act_schemas = actSchemas && actSchemas.length ? JSON.parse(actSchemas) : [];
+                    }
+                    if (angular.isString($scope.ep.user_schemas)) {
                         userSchemas = $scope.ep.user_schemas;
                         $scope.ep.user_schemas = userSchemas && userSchemas.length ? JSON.parse(userSchemas) : [];
-                    } else {
-                        p !== $scope.ep && others.push(p);
                     }
-                });
-            };
+                } else {
+                    p !== $scope.ep && others.push(p);
+                }
+            });
             $scope.others = others;
         });
     }]);
@@ -716,92 +720,13 @@
             var activeEditor = tinymce.get($scope.ep.name);
             activeEditor.setContent('');
             activeEditor.save();
+            $scope.ep.data_schemas = [];
+            $scope.ep.act_schemas = [];
             $scope.ep.html = '';
-            $scope.onPageChange($scope.ep);
+            $scope.updPage($scope.ep, ['data_schemas', 'act_schemas', 'html']);
         };
     }]);
     ngApp.provider.controller('ctrlInputSchema', ['$scope', '$modal', function($scope, $modal) {
-        $scope.chooseSchema = function() {
-            $modal.open({
-                templateUrl: 'chooseDataSchema.html',
-                backdrop: 'static',
-                resolve: {
-                    schemas: function() {
-                        return $scope.app.data_schemas;
-                    }
-                },
-                controller: ['$scope', '$modalInstance', 'schemas', function($scope, $mi, schemas) {
-                    var choosed = [];
-                    $scope.schemas = angular.copy(schemas);
-                    $scope.choose = function(schema) {
-                        schema._selected ? choosed.push(schema) : choosed.splice(choosed.indexOf(schema), 1);
-                    };
-                    $scope.ok = function() {
-                        $mi.close(choosed);
-                    };
-                    $scope.cancel = function() {
-                        $mi.dismiss();
-                    };
-                }],
-            }).result.then(function(choosed) {
-                angular.forEach(choosed, function(schema) {
-                    var dataSchemas = $scope.ep.data_schemas,
-                        i = 0,
-                        l = dataSchemas.length;
-                    while (i < l && schema.id !== dataSchemas[i++].id) {};
-                    if (i === l) {
-                        delete schema._selected;
-                        dataSchemas.push(schema);
-                    }
-                });
-                $scope.updPage($scope.ep, 'data_schemas');
-            });
-        };
-        $scope.removeSchema = function(schema) {
-            var data_schemas = $scope.ep.data_schemas;
-            data_schemas.splice(data_schemas.indexOf(schema), 1);
-            $scope.updPage($scope.ep, 'data_schemas');
-        };
-        $scope.chooseAct = function() {
-            $modal.open({
-                templateUrl: 'chooseButton.html',
-                backdrop: 'static',
-                resolve: {
-                    app: function() {
-                        return $scope.app;
-                    },
-                    def: function() {
-                        return {
-                            name: '',
-                            label: '',
-                            next: ''
-                        };
-                    }
-                },
-                controller: _ctrlEmbedButton,
-            }).result.then(function(def) {
-                $scope.ep.act_schemas.push(def);
-                $scope.updPage($scope.ep, 'act_schemas');
-            });
-        };
-        $scope.makePage = function() {
-            var activeEditor = tinymce.get($scope.ep.name);
-            activeEditor.setContent('');
-            angular.forEach($scope.ep.user_schemas, function(schema) {
-                var def = {};
-                def[schema.name] = true;
-                window.wrapLib.embedUser($scope.ep, def);
-            });
-            angular.forEach($scope.ep.data_schemas, function(schema) {
-                window.wrapLib.embedInput($scope.ep, schema);
-            });
-            angular.forEach($scope.ep.act_schemas, function(schema) {
-                window.wrapLib.embedButton($scope.ep, schema);
-            });
-            activeEditor.save();
-        };
-    }]);
-    ngApp.provider.controller('ctrlSigninSchema', ['$scope', '$modal', function($scope, $modal) {
         $scope.chooseSchema = function() {
             $modal.open({
                 templateUrl: 'chooseDataSchema.html',
@@ -940,6 +865,11 @@
             schemas.splice(schemas.indexOf(schema), 1);
             $scope.updPage($scope.ep, 'data_schemas');
         };
+        $scope.removeList = function(list) {
+            var i = $scope.ep.data_schemas.list.indexOf(list);
+            $scope.ep.data_schemas.list.splice(i, 1);
+            $scope.updPage($scope.ep, 'data_schemas');
+        };
         $scope.chooseAct = function() {
             $modal.open({
                 templateUrl: 'chooseButton.html',
@@ -963,47 +893,24 @@
             });
         };
         $scope.makePage = function() {
-            var activeEditor = tinymce.get($scope.ep.name);
-            activeEditor.setContent('');
-            angular.forEach($scope.dataSchemas, function(schema, catelog) {
-                if (schema.enabled === 'Y') {
-                    console.log('schema', schema);
-                    wrapLib.embedShow($scope.ep, schema, catelog);
-                }
+            var editor = tinymce.activeEditor;
+            editor.setContent('');
+            wrapLib.embedShow($scope.ep, $scope.dataSchemas.record, 'record');
+            angular.forEach($scope.dataSchemas.list, function(list) {
+                wrapLib.embedShow($scope.ep, list, 'list');
             });
             angular.forEach($scope.actSchemas, function(schema) {
                 window.wrapLib.embedButton($scope.ep, schema);
             });
-            activeEditor.save();
+            editor.save();
         };
         $scope.$watch('ep', function(ep) {
             if (!ep) return;
-            if (ep.data_schemas.record === undefined) {
-                $scope.dataSchemas = {
-                    record: {
-                        enabled: 'N',
-                        inline: 'Y',
-                        splitLine: 'Y',
-                        schemas: []
-                    },
-                    list: {
-                        enabled: 'N',
-                        inline: 'Y',
-                        splitLine: 'Y',
-                        dataScope: 'U',
-                        canLike: 'N',
-                        autoload: 'N',
-                        onclick: '',
-                        schemas: []
-                    }
-                };
-            } else {
-                $scope.dataSchemas = ep.data_schemas;
-            }
+            $scope.dataSchemas = ep.data_schemas;
             $scope.actSchemas = ep.act_schemas;
         });
     }]);
-    ngApp.provider.controller('ctrlPageEditor', ['$scope', '$modal', 'mattersgallery', 'mediagallery', function($scope, $modal, mattersgallery, mediagallery) {
+    ngApp.provider.controller('ctrlPageEditor', ['$scope', '$modal', '$q', 'mattersgallery', 'mediagallery', function($scope, $modal, $q, mattersgallery, mediagallery) {
         $scope.activeWrap = false;
         var setActiveWrap = function(wrap) {
             var wrapType;
@@ -1041,6 +948,45 @@
                 }
             });
         });
+        $scope.chooseSchema = function(page) {
+            $modal.open({
+                templateUrl: 'chooseDataSchema.html',
+                backdrop: 'static',
+                resolve: {
+                    schemas: function() {
+                        return $scope.app.data_schemas;
+                    }
+                },
+                controller: ['$scope', '$modalInstance', 'schemas', function($scope, $mi, schemas) {
+                    var choosed = [];
+                    $scope.schemas = angular.copy(schemas);
+                    $scope.choose = function(schema) {
+                        schema._selected ? choosed.push(schema) : choosed.splice(choosed.indexOf(schema), 1);
+                    };
+                    $scope.ok = function() {
+                        $mi.close(choosed);
+                    };
+                    $scope.cancel = function() {
+                        $mi.dismiss();
+                    };
+                }],
+            }).result.then(function(choosed) {
+                var activeEditor = tinymce.get(page.name);
+                angular.forEach(choosed, function(schema) {
+                    var dataSchemas = page.data_schemas,
+                        i = 0,
+                        l = dataSchemas.length;
+                    while (i < l && schema.id !== dataSchemas[i++].id) {};
+                    if (i === l) {
+                        delete schema._selected;
+                        dataSchemas.push(schema);
+                    }
+                    window.wrapLib.embedInput(page, schema);
+                });
+                activeEditor.save();
+                $scope.updPage(page, 'data_schemas');
+            });
+        };
         $scope.embedInput = function(page) {
             $modal.open({
                 templateUrl: 'embedInputLib.html',
@@ -1106,7 +1052,6 @@
                         } else if ($scope.def.type === 'member') {
                             $scope.def.title = '';
                             $scope.def.id = '';
-                            $scope.def.member = {};
                         } else {
                             $scope.def.title = '';
                             $scope.def.id = id;
@@ -1120,7 +1065,7 @@
                     $scope.shiftMemberSchema = function() {
                         var schema = $scope.selectedMemberSchema.schema,
                             schemaAttrs = [];
-                        $scope.def.member.schema_id = schema.id;
+                        $scope.def.schema_id = schema.id;
                         schema.attr_name[0] === '0' && (schemaAttrs.push({
                             id: 'name',
                             label: '姓名'
