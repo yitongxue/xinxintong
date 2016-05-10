@@ -1,6 +1,6 @@
-if (/MicroMessenger/i.test(navigator.userAgent) && window.signPackage !== undefined) {
-    wx.ready(function() {
-        wx.showOptionMenu();
+if (/MicroMessenger/i.test(navigator.userAgent) && window.signPackage !== undefined && window.wx) {
+    window.wx.ready(function() {
+        window.wx.showOptionMenu();
     });
 } else if (/YiXin/i.test(navigator.userAgent)) {
     document.addEventListener('YixinJSBridgeReady', function() {
