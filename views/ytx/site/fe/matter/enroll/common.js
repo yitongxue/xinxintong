@@ -1,4 +1,4 @@
-if (/MicroMessenger/i.test(navigator.userAgent) && !window.signPackage && window.wx) {
+if (/MicroMessenger/i.test(navigator.userAgent) && window.signPackage && window.wx) {
     window.wx.ready(function() {
         window.wx.showOptionMenu();
     });
