@@ -606,6 +606,45 @@
 					editor.save();
 					$scope.updPage($scope.ep, ['data_schemas', 'html']);
 				});
+			} else if (/round-list/.test($active.attr('wrap'))) {
+				$modal.open({
+					templateUrl: '/views/default/pl/fe/matter/enroll/component/modifyRoundList.html?_=1',
+					backdrop: 'static',
+					resolve: {
+						app: function() {
+							return $scope.app;
+						},
+						config: function() {
+							var config = wrapLib.extractStaticSchema($active[0]),
+								config2;
+							if (config2 = $scope.ep.containStatic(config)) {
+								return config2;
+							}
+							return config;
+						}
+					},
+					controller: ['$scope', '$modalInstance', 'app', 'config', function($scope, $mi, app, config) {
+						var choosedSchemas = [];
+						$scope.config = config;
+						$scope.app = app;
+						$scope.ok = function() {
+							$mi.close($scope.config);
+						};
+						$scope.cancel = function() {
+							$mi.dismiss();
+						};
+					}]
+				}).result.then(function(config) {
+					var editor = tinymce.get('tinymce-page'),
+						$active = $(editor.getBody()).find('.active'),
+						newWrap;
+					config.pattern = 'round-list';
+					newWrap = wrapLib.embedRounds(editor, config);
+					$active.remove();
+					setActiveWrap(newWrap);
+					editor.save();
+					$scope.updPage($scope.ep, ['data_schemas', 'html']);
+				});
 			}
 		};
 		/*查找包含指定登记项的页面*/
@@ -617,9 +656,9 @@
 			return pages;
 		};
 		$scope.removeWrap = function() {
-			var editor, $active, schema,
-				editor = tinymce.get('tinymce-page');
-			$active = $(editor.getBody()).find('.active');
+			var schema, config,
+				editor = tinymce.get('tinymce-page'),
+				$active = $(editor.getBody()).find('.active');
 			if (/input/.test($active.attr('wrap'))) {
 				schema = wrapLib.extractInputSchema($active[0]);
 				/*从页面中删除，从页面的schema中删除*/
@@ -640,9 +679,30 @@
 				setActiveWrap(null);
 				$scope.updPage($scope.ep, ['act_schemas', 'html']);
 			} else if (/static/.test($active.attr('wrap'))) {
-				schema = wrapLib.extractStaticSchema($active[0]);
-			} else if (/record-list/.test($active.attr('wrap'))) {
-				schema = wrapLib.extractStaticSchema($active[0]);
+				config = wrapLib.extractStaticSchema($active[0]);
+				if (config.id || config.schema) {
+					if (config.id) {
+						$scope.ep.removeStatic(config);
+					} else {
+						$parent = $active.parents('[wrap]');
+						if ($parent.length) {
+							var config2 = wrapLib.extractStaticSchema($parent[0]);
+							config2.schema = config.schema;
+							$scope.ep.removeStatic(config2);
+						}
+					}
+					$active.remove();
+					editor.save();
+					setActiveWrap(null);
+					$scope.updPage($scope.ep, ['data_schemas', 'html']);
+				}
+			} else if (/record-list|round-list/.test($active.attr('wrap'))) {
+				config = wrapLib.extractStaticSchema($active[0]);
+				$scope.ep.removeStatic(config);
+				$active.remove();
+				editor.save();
+				setActiveWrap(null);
+				$scope.updPage($scope.ep, ['data_schemas', 'html']);
 			}
 		};
 		$scope.upWrap = function(page) {
@@ -677,8 +737,8 @@
 		};
 		$scope.embedMatter = function(page) {
 			mattersgallery.open($scope.siteId, function(matters, type) {
-				var editor, dom, mtype, fn;
-				var editor = tinymce.get('tinymce-page');
+				var editor = tinymce.get('tinymce-page'),
+					dom, mtype, fn;
 				dom = editor.dom;
 				angular.forEach(matters, function(matter) {
 					fn = "openMatter(" + matter.id + ",'" + mtype + "')";
@@ -696,8 +756,8 @@
 				singleMatter: true
 			});
 		};
-		$scope.gotoCode = function(codeid) {
-			window.open('/rest/code?pid=' + codeid, '_self');
+		$scope.gotoCode = function() {
+			window.open('/rest/code?pid=' + $scope.ep.code_id, '_self');
 		};
 		$scope.onPageChange = function() {
 			$scope.ep.$$modified = true;

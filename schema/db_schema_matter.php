@@ -47,6 +47,8 @@ $sql .= ",has_attachment char(1) not null default 'N'";
 $sql .= ",download_num int not null default 0"; // 附件下载数
 $sql .= ",media_id varchar(256) not null default ''";
 $sql .= ",upload_at int not null default 0";
+$sql .= ",use_site_header char(1) not null default 'Y'"; // 使用站点页眉
+$sql .= ",use_site_footer char(1) not null default 'Y'"; // 使用站点页脚
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');
@@ -358,6 +360,9 @@ $sql .= ",show_pic_in_page char(1) not null default 'Y'"; // 是否在页面中�
 $sql .= ",read_num int not null default 0"; // 阅读数
 $sql .= ",share_friend_num int not null default 0"; // 分享给好友数
 $sql .= ",share_timeline_num int not null default 0"; // 分享朋友圈数
+$sql .= ',style_page_id int not null default 0'; // 样式
+$sql .= ',header_page_id int not null default 0'; // 通用页头
+$sql .= ',footer_page_id int not null default 0'; // 通用页尾
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');

@@ -14,6 +14,8 @@ $sql .= ",asparent char(1) not null default 'N'"; // 是否作为父站点
 $sql .= ",site_id varchar(32) not null default ''"; // 父站点ID
 $sql .= ',state tinyint not null default 1'; // 1:正常, 0:停用
 $sql .= ',home_page_id int not null default 0'; // 站点主页
+$sql .= ',header_page_id int not null default 0'; // 通用页头
+$sql .= ',footer_page_id int not null default 0'; // 通用页尾
 $sql .= ',shift2pc_page_id int not null default 0'; // 引导到PC端完成
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
@@ -109,6 +111,7 @@ $sql .= ",type varchar(5) not null"; //inner,cus
 $sql .= ",valid char(1) not null default 'Y'";
 $sql .= ",used int not null default 0";
 $sql .= ",url text"; // 入口地址
+$sql .= ",passed_url text"; // 验证通过后进入的地址
 $sql .= ",validity int not null default 365"; // 认证有效期，以天为单位，最长一年
 $sql .= ",attr_mobile char(6) default '001000'";
 $sql .= ",attr_email char(6) default '001000'";

@@ -34,6 +34,13 @@ class main extends \pl\fe\matter\base {
 	/**
 	 * 返回视图
 	 */
+	public function config_action() {
+		\TPL::output('/pl/fe/matter/enroll/frame');
+		exit;
+	}
+	/**
+	 * 返回视图
+	 */
 	public function publish_action() {
 		\TPL::output('/pl/fe/matter/enroll/frame');
 		exit;
@@ -461,7 +468,7 @@ class main extends \pl\fe\matter\base {
 			return false;
 		}
 		$modelPage = $this->model('matter\enroll\page');
-		$modelCode = $this->model('code/page');
+		$modelCode = $this->model('code\page');
 		foreach ($pages as $page) {
 			$ap = $modelPage->add($siteId, $app, (array) $page);
 			$data = array(

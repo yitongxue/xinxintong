@@ -3,10 +3,17 @@ define(["require", "angular"], function(require, angular) {
     var loadCss = function(url) {
         var link, head;
         link = document.createElement('link');
-        link.href = url + '?_=4';
+        link.href = url;
         link.rel = 'stylesheet';
         head = document.querySelector('head');
         head.appendChild(link);
+    };
+    var loadDynaCss = function(css) {
+        var style, head;
+        style = document.createElement('style');
+        style.innerHTML = css;
+        head = document.querySelector('head');
+        head.appendChild(style);
     };
     var openPlugin = function(content, cb) {
         var frag, wrap, frm;
@@ -81,7 +88,6 @@ define(["require", "angular"], function(require, angular) {
             xxtShare.set($scope.article.title, sharelink, $scope.article.summary, $scope.article.pic);
         };
         var articleLoaded = function() {
-            loadCss("https://res.wx.qq.com/open/libs/weui/0.3.0/weui.min.css");
             window.loading.finish();
             $timeout(function() {
                 var audios;
@@ -92,25 +98,51 @@ define(["require", "angular"], function(require, angular) {
         var loadArticle = function() {
             var deferred = $q.defer();
             $http.get('/rest/site/fe/matter/article/get?site=' + siteId + '&id=' + id).success(function(rsp) {
-                var site = rsp.data.site;
-                $scope.article = rsp.data.article;
-                $scope.user = rsp.data.user;
+                var site = rsp.data.site,
+                    article = rsp.data.article,
+                    channels = article.channels;
                 if (site.header_page) {
+                    if (site.header_page.ext_css.length) {
+                        angular.forEach(site.header_page.ext_css, function(css) {
+                            loadCss(css.url);
+                        });
+                    }
+                    if (site.header_page.css.length) {
+                        loadDynaCss(site.header_page.css);
+                    }
                     (function() {
                         eval(site.header_page.js);
                     })();
                 }
                 if (site.footer_page) {
+                    if (site.footer_page.ext_css.length) {
+                        angular.forEach(site.footer_page.ext_css, function(css) {
+                            loadCss(css.url);
+                        });
+                    }
+                    if (site.footer_page.css.length) {
+                        loadDynaCss(site.footer_page.css);
+                    }
                     (function() {
                         eval(site.footer_page.js);
                     })();
                 }
+                if (channels && channels.length) {
+                    for (var i = 0, l = channels.length, channel; i < l; i++) {
+                        channel = channels[i];
+                        if (channel.style_page) {
+                            loadDynaCss(channel.style_page.css);
+                        }
+                    }
+                }
                 $scope.site = site;
+                $scope.article = article;
+                $scope.user = rsp.data.user;
                 window.wx || /Yixin/i.test(navigator.userAgent) && require(['xxt-share'], setMpShare);
-                $scope.article.can_picviewer === 'Y' && require(['picviewer']);
-                loadCss('/views/default/site/fe/matter/article/main.css');
+                //loadCss("https://res.wx.qq.com/open/libs/weui/0.3.0/weui.min.css");
+                article.can_picviewer === 'Y' && require(['picviewer']);
                 deferred.resolve();
-                $http.post('/rest/site/fe/matter/logAccess?site=' + siteId + '&id=' + id + '&type=article&title=' + $scope.article.title + '&shareby=' + shareby, {
+                $http.post('/rest/site/fe/matter/logAccess?site=' + siteId + '&id=' + id + '&type=article&title=' + article.title + '&shareby=' + shareby, {
                     search: location.search.replace('?', ''),
                     referer: document.referrer
                 });

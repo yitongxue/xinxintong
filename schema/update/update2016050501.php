@@ -2,7 +2,7 @@
 require_once '../../db.php';
 
 $sqls = array();
-$sqls[] = "alter table xxt_lottery_award add user_limit int not null default 0 after quantity";
+$sqls[] = "alter table xxt_lottery_award add user_limit int not null default 0 after home_page_id";
 
 foreach ($sqls as $sql) {
 	if (!$mysqli->query($sql)) {

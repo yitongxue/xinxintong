@@ -35,7 +35,15 @@ class main extends \site\fe\matter\base {
 		if (isset($article->access_control) && $article->access_control === 'Y' && !empty($article->authapis)) {
 			$this->accessControl($site, $id, $article->authapis, $user->uid, $article, false);
 		}
+		/* 单图文所属的频道 */
 		$article->channels = $this->model('matter\channel')->byMatter($id, 'article');
+		$modelCode = $this->model('code\page');
+		foreach ($article->channels as &$channel) {
+			if ($channel->style_page_id) {
+				$channel->style_page = $modelCode->byId($channel->style_page_id, 'html,css,js');
+			}
+		}
+		/* 单图文所属的标签 */
 		$article->tags = $modelArticle->tags($id);
 		if ($article->has_attachment === 'Y') {
 			$article->attachments = $this->model()->query_objs_ss(
@@ -51,14 +59,15 @@ class main extends \site\fe\matter\base {
 			$article->praised = $modelArticle->praised($user, $id);
 		} else if ($article->page_id) {
 			/* 定制页 */
-			$article->page = $this->model('code/page')->byId($article->page_id);
+			$article->page = $this->model('code\page')->byId($article->page_id);
 		}
 		$data['article'] = $article;
 		$data['user'] = $user;
-		/**
-		 * 站点号信息
-		 */
-		$site = $this->model('site')->byId($site);
+		/* 站点号信息 */
+		$site = $this->model('site')->byId(
+			$site,
+			array('cascaded' => 'header_page_id,footer_page_id')
+		);
 		$userAgent = $_SERVER['HTTP_USER_AGENT'];
 		if (preg_match('/yixin/i', $userAgent)) {
 			$site->yx = $this->model('sns\yx')->bySite($site->id, 'cardname,cardid');
