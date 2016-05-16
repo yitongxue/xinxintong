@@ -20,6 +20,7 @@ app.controller('ctrlConsole', ['$scope', '$modal', 'http2', function($scope, $mo
             case 'news':
             case 'channel':
             case 'enroll':
+            case 'signin':
             case 'group':
             case 'lottery':
             case 'contribute':
@@ -40,6 +41,11 @@ app.controller('ctrlConsole', ['$scope', '$modal', 'http2', function($scope, $mo
     var searchMatters = function(append) {
         var url = '/rest/pl/fe/matter/' + $scope.matterType + '/list?site=' + $scope.siteId + $scope.page.j();
         url += '&_=' + (new Date()).getTime();
+        switch ($scope.matterType) {
+            case 'channel':
+                url += '&cascade=N';
+                break;
+        }
         http2.get(url, function(rsp) {
             if (/article/.test($scope.matterType)) {
                 if (append) {
@@ -48,7 +54,7 @@ app.controller('ctrlConsole', ['$scope', '$modal', 'http2', function($scope, $mo
                     $scope.matters = rsp.data.articles;
                 }
                 $scope.page.total = rsp.data.total;
-            } else if (/enroll|group|contribute/.test($scope.matterType)) {
+            } else if (/enroll|signin|group|contribute/.test($scope.matterType)) {
                 if (append) {
                     $scope.matters = $scope.matters.concat(rsp.data.apps);
                 } else {
@@ -105,6 +111,9 @@ app.controller('ctrlConsole', ['$scope', '$modal', 'http2', function($scope, $mo
                 break;
             case 'enroll':
                 $scope.addEnrollByTemplate();
+                break;
+            case 'signin':
+                $scope.addSignin();
                 break;
             case 'group':
                 $scope.addGroup();
@@ -222,6 +231,11 @@ app.controller('ctrlConsole', ['$scope', '$modal', 'http2', function($scope, $mo
             http2.post(url, config, function(rsp) {
                 location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
             });
+        });
+    };
+    $scope.addSignin = function() {
+        http2.get('/rest/pl/fe/matter/signin/create?site=' + $scope.siteId, function(rsp) {
+            location.href = '/rest/pl/fe/matter/signin?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
     $scope.addGroup = function() {
