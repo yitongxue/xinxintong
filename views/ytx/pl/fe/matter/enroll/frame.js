@@ -5,13 +5,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 		directive: $compileProvider.directive
 	};
 	$routeProvider.when('/rest/pl/fe/matter/enroll/schema', {
-		templateUrl: '/views/default/pl/fe/matter/enroll/schema.html?_=3',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/schema.html?_=3',
 		controller: 'ctrlSchema',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/schema.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/schema.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -19,13 +19,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/enroll/page', {
-		templateUrl: '/views/default/pl/fe/matter/enroll/page.html?_=4',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/page.html?_=4',
 		controller: 'ctrlPage',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/page.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/page.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -33,13 +33,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/enroll/event', {
-		templateUrl: '/views/default/pl/fe/matter/enroll/event.html?_=2',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/event.html?_=2',
 		controller: 'ctrlEntry',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/event.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/event.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -47,13 +47,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/enroll/record', {
-		templateUrl: '/views/default/pl/fe/matter/enroll/record.html?_=3',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/record.html?_=3',
 		controller: 'ctrlRecord',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/record.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/record.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -61,13 +61,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/enroll/stat', {
-		templateUrl: '/views/default/pl/fe/matter/enroll/stat.html?_=1',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/stat.html?_=1',
 		controller: 'ctrlStat',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/stat.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/stat.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -75,13 +75,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/enroll/coin', {
-		templateUrl: '/views/default/pl/fe/matter/enroll/coin.html?_=1',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/coin.html?_=1',
 		controller: 'ctrlCoin',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/coin.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/coin.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -89,13 +89,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/enroll/publish', {
-		templateUrl: '/views/default/pl/fe/matter/enroll/publish.html?_=2',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/publish.html?_=2',
 		controller: 'ctrlRunning',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/publish.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/publish.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -103,13 +103,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).otherwise({
-		templateUrl: '/views/default/pl/fe/matter/enroll/app.html?_=2',
+		templateUrl: '/views/ytx/pl/fe/matter/enroll/app.html?_=2',
 		controller: 'ctrlApp',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/enroll/app.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/enroll/app.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -259,6 +259,7 @@ ngApp.controller('ctrlFrame', ['$scope', '$location', '$q', 'http2', function($s
 			modifiedData[name] = $scope.app[name];
 		}
 		$scope.modified = true;
+		$scope.submit();
 	};
 	$scope.getApp = function() {
 		http2.get('/rest/pl/fe/matter/enroll/get?site=' + $scope.siteId + '&id=' + $scope.id, function(rsp) {
