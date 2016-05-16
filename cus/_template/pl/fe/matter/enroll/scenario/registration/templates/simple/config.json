@@ -7,12 +7,12 @@
 			"id": "name",
 			"title": "姓名",
 			"type": "name",
-			"showname": "placeholder"
+			"showname": "label"
 		}, {
 			"id": "mobile",
 			"title": "手机",
 			"type": "mobile",
-			"showname": "placeholder"
+			"showname": "label"
 		}, {
 			"id": "gender",
 			"title": "性别",
@@ -31,12 +31,12 @@
 			"id": "department",
 			"title": "部门",
 			"type": "shorttext",
-			"showname": "placeholder"
+			"showname": "label"
 		}, {
 			"id": "position",
 			"title": "职务",
 			"type": "shorttext",
-			"showname": "placeholder"
+			"showname": "label"
 		}],
 		"act_schemas": [{
 			"id": "act1",
@@ -57,7 +57,7 @@
 				"id": "name",
 				"title": "名称",
 				"type": "name",
-				"showname": "placeholder"
+				"showname": "label"
 			}
 		}, {
 			"id": "s2",
@@ -68,7 +68,7 @@
 				"id": "mobile",
 				"title": "手机",
 				"type": "mobile",
-				"showname": "placeholder"
+				"showname": "label"
 			}
 		}, {
 			"id": "s3",
@@ -99,7 +99,7 @@
 				"id": "department",
 				"title": "部门",
 				"type": "shorttext",
-				"showname": "placeholder"
+				"showname": "label"
 			}
 		}, {
 			"id": "s5",
@@ -110,7 +110,7 @@
 				"id": "department",
 				"title": "部门",
 				"type": "shorttext",
-				"showname": "placeholder"
+				"showname": "label"
 			}
 		}, {
 			"id": "s6",
@@ -121,7 +121,7 @@
 				"id": "position",
 				"title": "职务",
 				"type": "shorttext",
-				"showname": "placeholder"
+				"showname": "label"
 			}
 		}],
 		"act_schemas": [{
@@ -135,12 +135,12 @@
 		"id": "name",
 		"title": "名称",
 		"type": "name",
-		"showname": "placeholder"
+		"showname": "label"
 	}, {
 		"id": "mobile",
 		"title": "手机",
 		"type": "mobile",
-		"showname": "placeholder"
+		"showname": "label"
 	}, {
 		"id": "gender",
 		"title": "性别",
@@ -159,12 +159,12 @@
 		"id": "department",
 		"title": "部门",
 		"type": "shorttext",
-		"showname": "placeholder"
+		"showname": "label"
 	}, {
 		"id": "position",
 		"title": "职务",
 		"type": "shorttext",
-		"showname": "placeholder"
+		"showname": "label"
 	}],
 	"scenarioConfig": {
 		"can_rounds": "D"

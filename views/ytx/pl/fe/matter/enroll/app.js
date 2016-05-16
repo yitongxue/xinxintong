@@ -24,15 +24,7 @@
 		$scope.activeWrap = false;
 		$scope.innerlinkTypes = [{
 			value: 'article',
-			title: '单图文',
-			url: '/rest/pl/fe/matter'
-		}, {
-			value: 'news',
-			title: '多图文',
-			url: '/rest/pl/fe/matter'
-		}, {
-			value: 'channel',
-			title: '频道',
+			title: '项目资料',
 			url: '/rest/pl/fe/matter'
 		}];
 		var setActiveWrap = function(wrap) {
