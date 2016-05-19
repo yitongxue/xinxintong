@@ -299,7 +299,7 @@ class base extends \TMS_CONTROLLER {
 			$site = $this->model('site')->byId($siteId);
 			$html = '请关注公众号：' . $site->name;
 		} else {
-			$page = $this->model('code\page')->byId($sns->follow_page_id);
+			$page = $this->model('code\page')->lastPublishedByName($siteId, $sns->follow_page_name);
 			$html = $page->html;
 			$css = $page->css;
 			//$js = $page->js;
@@ -353,5 +353,13 @@ class base extends \TMS_CONTROLLER {
 	public function cleanCookieUser_action($site) {
 		$this->model('site\fe\way')->cleanCookieUser($site);
 		return new \ResponseData('ok');
+	}
+	/**
+	 * 二维码
+	 */
+	public function qrcode_action($url) {
+		include TMS_APP_DIR . '/lib/qrcode/qrlib.php';
+		// outputs image directly into browser, as PNG stream
+		\QRcode::png($url);
 	}
 }

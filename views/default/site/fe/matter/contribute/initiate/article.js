@@ -19,7 +19,13 @@ ngApp.controller('ctrlInitiate', ['$scope', '$location', '$modal', 'http2', 'med
     $scope.Article = new Article('initiate', $scope.siteId, $scope.entry);
     $scope.Entry = new Entry($scope.siteId, $scope.entry);
     $scope.Article.get($scope.id).then(function(data) {
+        var url;
         $scope.editing = data;
+        url = 'http://' + location.host + '/rest/site/fe/matter?site=' + $scope.siteId + '&id=' + $scope.id + '&type=article';
+        $scope.access = {
+            url: url,
+            qrcode: '/rest/site/fe/matter/contribute/qrcode?site=' + $scope.siteId + '&url=' + encodeURIComponent(url),
+        };
         !$scope.editing.attachments && ($scope.editing.attachments = []);
     }).then(function() {
         $scope.Entry.get().then(function(data) {
@@ -83,6 +89,9 @@ ngApp.controller('ctrlInitiate', ['$scope', '$location', '$modal', 'http2', 'med
     };
     $scope.onBodyChange = function() {
         $scope.bodyModified = true;
+    };
+    $scope.tinymceSave = function() {
+        $scope.update('body');
     };
     $scope.$on('tinymce.multipleimage.open', function(event, callback) {
         var options = {
@@ -171,8 +180,22 @@ ngApp.controller('ctrlInitiate', ['$scope', '$location', '$modal', 'http2', 'med
         return url;
     };
     $scope.finish = function() {
-        $scope.editing.finished = 'Y';
-        $scope.Article.update($scope.editing, 'finished');
+        if ($scope.entryApp.params.requireSubChannel && $scope.entryApp.params.requireSubChannel === 'Y') {
+            if (!$scope.editing.subChannels || $scope.editing.subChannels.length === 0) {
+                $scope.errmsg = '请指定投稿频道';
+                return;
+            }
+        }
+        if ($scope.bodyModified) {
+            $scope.Article.update($scope.editing, 'body').then(function() {
+                $scope.editing.finished = 'Y';
+                $scope.Article.update($scope.editing, 'finished');
+            });
+            $scope.bodyModified = false;
+        } else {
+            $scope.editing.finished = 'Y';
+            $scope.Article.update($scope.editing, 'finished');
+        }
     };
     $scope.remove = function() {
         if (window.confirm('确认删除？')) {
