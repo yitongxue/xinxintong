@@ -150,45 +150,6 @@ class record_model extends \TMS_MODEL {
 		return array(true);
 	}
 	/**
-	 * 登记活动签到
-	 *
-	 * 如果用户已经做过活动登记，那么设置签到时间
-	 * 如果用户没有做个活动登记，那么要先产生一条登记记录，并记录签到时间
-	 */
-	public function signin($siteId, &$app, &$user, $data = null) {
-		if ($ek = $this->getLastKey($siteId, $app, $user)) {
-			$enrolled = true;
-		} else {
-			/* 如果当前用户没有登记过，就先签到后登记 */
-			$enrolled = false;
-			$ek = $this->enroll($siteId, $app, $user);
-		}
-		/* 更新状态 */
-		$signinAt = time();
-		$sql = "update xxt_enroll_record set signin_at=$signinAt,signin_num=signin_num+1";
-		$sql .= " where siteid='$siteId' and aid='{$app->id}' and enroll_key='$ek'";
-		$rst = $this->update($sql);
-		/* 记录日志 */
-		$this->insert(
-			'xxt_enroll_signin_log',
-			array(
-				'siteid' => $siteId,
-				'aid' => $app->id,
-				'enroll_key' => $ek,
-				'userid' => $user->uid,
-				'nickname' => $user->nickname,
-				'signin_at' => $signinAt,
-			),
-			false
-		);
-		/* 更新登记记录 */
-		if (!empty($data)) {
-			$this->setData($user, $siteId, $app, $ek, $data);
-		}
-
-		return $enrolled;
-	}
-	/**
 	 * 根据ID返回登记记录
 	 */
 	public function byId($ek, $options = array()) {
@@ -236,26 +197,37 @@ class record_model extends \TMS_MODEL {
 	/**
 	 * 根据指定的数据查找匹配的记录
 	 */
-	public function &byData(&$user, $siteId, &$app, &$data) {
+	public function &byData($siteId, &$app, &$data) {
 		$matchedRecords = array();
+		/*需要匹配的条件*/
+		$conditions = array();
+		foreach ($data as $key => $val) {
+			$conditions[] = "(name='$key' and value='$val')";
+		}
+		if (empty($conditions)) {
+			return $matchedRecords;
+		}
+		/*需要匹配的条件的数量*/
+		$countOfConditions = count($conditions);
+		/*将条件转换为SQL*/
+		$conditions = '(' . implode(' or ', $conditions) . ')';
+		/*查找匹配条件的数据*/
 		$q = array(
-			'*',
-			'xxt_enroll_record',
-			"state=1 and siteid='$siteId' and aid='{$app->id}' and userid='{$user->uid}'",
+			'enroll_key',
+			'xxt_enroll_record_data',
+			"state=1 and aid='{$app->id}' and $conditions",
 		);
-		$userRecords = $this->query_objs_ss($q);
-		foreach ($userRecords as &$userRecord) {
-			$matched = true;
-			$recordData = $this->dataById($userRecord->enroll_key);
-			foreach ($data as $key => $val) {
-				if ($recordData->{$key} !== $val) {
-					$matched = false;
-					break;
-				}
+		/*记录每条记录匹配的次数*/
+		$mapOfCount = new \stdClass;
+		$pendings = $this->query_objs_ss($q);
+		foreach ($pendings as &$pending) {
+			if (isset($mapOfCount->{$pending->enroll_key})) {
+				$mapOfCount->{$pending->enroll_key} += 1;
+			} else {
+				$mapOfCount->{$pending->enroll_key} = 1;
 			}
-			if ($matched) {
-				$userRecord->data = $recordData;
-				$matchedRecords[] = $userRecord;
+			if ($mapOfCount->{$pending->enroll_key} === $countOfConditions) {
+				$matchedRecords[] = $pending->enroll_key;
 			}
 		}
 
@@ -303,8 +275,6 @@ class record_model extends \TMS_MODEL {
 			} else if ($activeRound = $this->M('matter\enroll\round')->getActive($siteId, $app->id)) {
 				$rid = $activeRound->rid;
 			}
-			$signinStartAt = isset($options->signinStartAt) ? $options->signinStartAt : null;
-			$signinEndAt = isset($options->signinEndAt) ? $options->signinEndAt : null;
 			$kw = isset($options->kw) ? $options->kw : null;
 			$by = isset($options->by) ? $options->by : null;
 		}
@@ -331,12 +301,6 @@ class record_model extends \TMS_MODEL {
 				break;
 			}
 		}
-		/*签到时间*/
-		//if (!empty($signinStartAt) && !empty($signinEndAt)) {
-		//	$w .= " and exists(select 1 from xxt_enroll_signin_log l";
-		//	$w .= " where l.signin_at>=$signinStartAt and l.signin_at<=$signinEndAt and l.enroll_key=e.enroll_key";
-		//	$w .= ")";
-		//}
 		/*tags*/
 		if (!empty($options->tags)) {
 			$aTags = explode(',', $options->tags);
@@ -345,7 +309,7 @@ class record_model extends \TMS_MODEL {
 			}
 		}
 		$q = array(
-			'e.enroll_key,e.enroll_at,e.signin_at,e.tags,e.follower_num,e.score,e.remark_num,e.userid,e.nickname,e.openid',
+			'e.enroll_key,e.enroll_at,e.tags,e.follower_num,e.score,e.remark_num,e.userid,e.nickname,e.verified',
 			"xxt_enroll_record e",
 			$w,
 		);
@@ -383,16 +347,6 @@ class record_model extends \TMS_MODEL {
 				}
 				/*获得点赞记录*/
 				$app->can_like_record === 'Y' && $r->likers = $this->likers($r->enroll_key, 1, 3);
-				/*获得签到记录*/
-				if ($app->can_signin === 'Y') {
-					$qs = array(
-						'signin_at',
-						'xxt_enroll_signin_log',
-						"enroll_key='$r->enroll_key'",
-					);
-					$qs2 = array('o' => 'signin_at desc');
-					$r->signinLogs = $this->query_objs_ss($qs, $qs2);
-				}
 				/*获得邀请数据*/
 				if ($app->can_invite === 'Y') {
 					$qf = array(
@@ -536,20 +490,52 @@ class record_model extends \TMS_MODEL {
 	}
 	/**
 	 * 清除一条登记记录
+	 *
 	 * @param string $aid
 	 * @param string $ek
 	 */
-	public function remove($aid, $ek) {
+	public function removeByUser($site, $appId, $ek) {
 		$rst = $this->update(
 			'xxt_enroll_record_data',
 			array('state' => 0),
-			"aid='$aid' and enroll_key='$ek'"
+			"aid='$appId' and enroll_key='$ek'"
 		);
 		$rst = $this->update(
 			'xxt_enroll_record',
 			array('state' => 0),
-			"aid='$aid' and enroll_key='$ek'"
+			"aid='$appId' and enroll_key='$ek'"
 		);
+
+		return $rst;
+	}
+	/**
+	 * 清除一条登记记录
+	 *
+	 * @param string $aid
+	 * @param string $ek
+	 */
+	public function remove($appId, $ek, $byDelete = false) {
+		if ($byDelete) {
+			$rst = $this->delete(
+				'xxt_enroll_record_data',
+				"aid='$appId' and enroll_key='$ek'"
+			);
+			$rst = $this->delete(
+				'xxt_enroll_record',
+				"aid='$appId' and enroll_key='$ek'"
+			);
+		} else {
+			$rst = $this->update(
+				'xxt_enroll_record_data',
+				array('state' => 100),
+				"aid='$appId' and enroll_key='$ek'"
+			);
+			$rst = $this->update(
+				'xxt_enroll_record',
+				array('state' => 100),
+				"aid='$appId' and enroll_key='$ek'"
+			);
+		}
 
 		return $rst;
 	}
@@ -558,17 +544,28 @@ class record_model extends \TMS_MODEL {
 	 *
 	 * @param string $appId
 	 */
-	public function clean($appId) {
-		$rst = $this->update(
-			'xxt_enroll_record_data',
-			array('state' => 0),
-			"aid='$appId'"
-		);
-		$rst = $this->update(
-			'xxt_enroll_record',
-			array('state' => 0),
-			"aid='$appId'"
-		);
+	public function clean($appId, $byDelete = false) {
+		if ($byDelete) {
+			$rst = $this->delete(
+				'xxt_enroll_record_data',
+				"aid='$appId'"
+			);
+			$rst = $this->delete(
+				'xxt_enroll_record',
+				"aid='$appId'"
+			);
+		} else {
+			$rst = $this->update(
+				'xxt_enroll_record_data',
+				array('state' => 0),
+				"aid='$appId'"
+			);
+			$rst = $this->update(
+				'xxt_enroll_record',
+				array('state' => 0),
+				"aid='$appId'"
+			);
+		}
 
 		return $rst;
 	}

@@ -40,9 +40,7 @@
         <div class='form-group' ng-if="app.can_signin==='Y'" style='width:180px'>
             <tms-datepicker tms-title='签到范围结束日期' tms-date='signinEndAt' tms-state='signinEndAt'></tms-datepicker>
         </div>
-        <div class='form-group'>
-            <button class='btn btn-default' ng-click='tagByData()' disabled>打标签</button>
-        </div>
+        <button class='btn btn-success' ng-click='verifyAll()'>全部通过审核</button>
     </div>
     <div id='records'>
         <table class='table table-bordered'>
@@ -54,6 +52,7 @@
                     <th style='width:100px'>登记时间</th>
                     <th class='custom-col' ng-repeat="c in  app.data_schemas" title="{{c.ops}}">{{c.title}}</th>
                     <th style='width:140px'>标签</th>
+                    <th style='width:80px'>审核通过</th>
                     <th style='width:60px' ng-if="app.can_invite==='Y'">邀请</th>
                     <th style='width:72px'>操作</th>
                 </tr>
@@ -73,6 +72,7 @@
                         </span>
                     </td>
                     <td>{{r.tags}}</td>
+                    <td>{{r.verified}}</td>
                     <td ng-if="app.can_invite==='Y'">{{r.follower_num}}</td>
                     <td>
                         <button class='btn btn-xs btn-danger' ng-click='removeRecord(r)'>
@@ -87,62 +87,14 @@
         </table>
     </div>
     <div class='form-group form-inline'>
-        <combox title='标签' evt-prefix='batch-tag' readonly='true' options='app.tags'></combox>
         <button class='btn btn-danger' ng-click='empty()'>清空记录</button>
-        <div class="btn-group">
-            <button type="button" class="btn btn-default">添加用户记录</button>
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-            aria-expanded="false">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <a href="javascript:void(0)" ng-click='importUser()'>注册用户</a>
-                </li>
-                <li>
-                    <a href="javascript:void(0)" ng-click='addRecord()'>手工添加</a>
-                </li>
-            </ul>
-        </div>
-        <pushnotify class='btn btn-primary' single-matter='Y' matter-types='notifyMatterTypes'>发送信息</pushnotify>
+        <button class='btn btn-default' ng-click='addRecord()'>手工添加</button>
         <span>总数：{{page.total}}</span>
         <pagination style='margin:0;cursor:pointer;vertical-align:bottom' ng-if='page.total>page.size' class='pull-right'
         boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at"
         previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="doSearch()"></pagination>
     </div>
 </div>
-<script type="text/ng-template" id="tagByData.html">
-    <div class="modal-header">
-        <button class="close" type="button" ng-click="cancel()">×</button>
-        <h5 class="modal-title">筛选条件</h5>
-    </div>
-    <div class="modal-body">
-        <form class="form-horizontal record-editor">
-            <div class="form-group" ng-repeat="def in schema" ng-if="def.id.indexOf('member')!==0">
-                <label class="col-md-3 control-label">{{def.title}}</label>
-                <div class="col-md-9" ng-if="def.type!=='single'&&def.type!=='multiple'">
-                    <input type='text' class='form-control' ng-model="data.filter[def.id]">
-                </div>
-                <div class="col-md-9" ng-if="def.type==='single'||def.type==='multiple'">
-                    <select class='form-control' ng-model="data.filter[def.id]" ng-options="op.v as op.label for op in def.ops">
-                        <option></option>
-                    </select>
-                </div>
-            </div>
-            <hr>
-            <div class='form-group'>
-                <label class="col-md-3 control-label">标签</label>
-                <div class="col-md-9">
-                    <input type='text' class='form-control' ng-model="data.tag">
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">确定</button>
-    </div>
-</script>
 <script type="text/ng-template" id="recordEditor.html">
     <style>
         /* img tiles */
@@ -198,13 +150,10 @@
                     </span>
                 </div>
             </div>
-            <div class="form-group" ng-if="enroll.can_signin==='Y'&&record.enroll_at">
-                <label class="col-md-2 control-label">签到时间</label>
+            <div class="form-group">
+                <label class="col-md-2 control-label">审核通过</label>
                 <div class="col-md-10">
-                    <ul class='list-group' style='margin-bottom:0'>
-                        <li class='list-group-item' ng-repeat="l in record.signinLogs">{{l.signin_at*1000|date:'yy-MM-dd hh:mm'}}</li>
-                    </ul>
-                    <button class="btn btn-primary" ng-if='record.signin_at==0' ng-click="signin()">签到</button>
+                    <label class='checkbox-inline'><input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model="record.verified">是</label>
                 </div>
             </div>
             <div class="form-group">

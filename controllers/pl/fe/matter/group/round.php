@@ -10,7 +10,7 @@ class round extends \pl\fe\matter\base {
 	 *
 	 */
 	public function list_action($site, $app) {
-		$rounds = $this->model('matter\group\round')->find($app);
+		$rounds = $this->model('matter\group\round')->byApp($app);
 
 		return new \ResponseData($rounds);
 	}
@@ -36,15 +36,26 @@ class round extends \pl\fe\matter\base {
 		$model = $this->model();
 		$nv = $this->getPostJson();
 
+		/*data*/
 		if (isset($nv->targets)) {
 			$nv->targets = $model->toJson($nv->targets);
 		}
-
+		if (isset($nv->extattrs)) {
+			$nv->extattrs = $model->toJson($nv->extattrs);
+		}
 		$rst = $model->update(
 			'xxt_group_round',
 			$nv,
 			"aid='$app' and round_id='$rid'"
 		);
+		/*更新级联信息*/
+		if ($rst && isset($nv->title)) {
+			$model->update(
+				'xxt_group_player',
+				array('round_title' => $nv->title),
+				"aid='$app' and round_id='$rid'"
+			);
+		}
 
 		return new \ResponseData($rst);
 	}
@@ -62,7 +73,7 @@ class round extends \pl\fe\matter\base {
 			"aid='$app' and round_id='$rid'",
 		);
 		if (0 < (int) $model->query_val_ss($q)) {
-			return new \ResponseError('已经有抽奖数据，不允许删除轮次！');
+			return new \ResponseError('已经有分组数据，不允许删除轮次！');
 		}
 
 		$rst = $model->delete(
@@ -73,7 +84,7 @@ class round extends \pl\fe\matter\base {
 		return new \ResponseData($rst);
 	}
 	/**
-	 * 中奖的人
+	 * 属于指定分组的人
 	 */
 	public function winnersGet_action($app, $rid = null) {
 		$result = $this->model('matter\group\player')->winnersByRound($app, $rid);

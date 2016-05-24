@@ -3,6 +3,19 @@ namespace matter\group;
 
 class round_model extends \TMS_MODEL {
 	/**
+	 *
+	 */
+	public function &byId($id) {
+		$q = array(
+			'*',
+			'xxt_group_round',
+			"round_id='$id'",
+		);
+		$round = $this->query_obj_ss($q);
+
+		return $round;
+	}
+	/**
 	 * 创建轮次
 	 */
 	public function &create($app, $prototype = array()) {
@@ -27,7 +40,7 @@ class round_model extends \TMS_MODEL {
 	 * @param string $app
 	 * @param array $options
 	 */
-	public function &find($appId, $options = array()) {
+	public function &byApp($appId, $options = array()) {
 		$fields = isset($options['fields']) ? $options['fields'] : '*';
 		$q = array(
 			$fields,
@@ -37,5 +50,22 @@ class round_model extends \TMS_MODEL {
 		$rounds = $this->query_objs_ss($q);
 
 		return $rounds;
+	}
+	/**
+	 * 清除轮次结果
+	 *
+	 * @param string $appId
+	 */
+	public function clean($appId) {
+		$rst = $this->update(
+			'xxt_group_player',
+			array(
+				'round_id' => 0,
+				'round_title' => '',
+			),
+			"aid='$appId'"
+		);
+
+		return $rst;
 	}
 }
