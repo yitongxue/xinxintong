@@ -112,43 +112,6 @@
                 </nav>
             </div>
         </div>
-        <script type='text/ng-template' id='templatePicker.html'>
-            <div class="modal-header">
-                <button class="close" ng-click="cancel()">×</button>
-                <h5 class="modal-title">选择模板</h5>
-            </div>
-            <div class="modal-body">
-                <div class='options'>
-                    <div class='form-group'>
-                        <label>场景</label>
-                        <select class='form-control' ng-disabled="fixedScenario" ng-model='data.scenario' ng-options='s as s.title for s in templates' ng-change='chooseScenario()'></select>
-                    </div>
-                    <div class='form-group'>
-                        <label>模板</label>
-                        <select class='form-control' ng-model='data.template' ng-options='t.title for t in data.scenario.templates' ng-change='chooseTemplate()'></select>
-                    </div>
-                    <div class='form-group' ng-if="data.scenario.name==='voting'">
-                        <button class='btn btn-default' ng-click='choosePage()'>重新生成页面</button>
-                    </div>
-                    <div class='form-group' ng-if="data.scenario.name==='voting'">
-                        <textarea id='schemaData' ng-model="data.simpleSchema"></textarea>
-                    </div>
-                    
-                </div>
-                <div class='pages'>
-                    <div class='form-group'>
-                        <label>模版页面预览</label>
-                        <select id='selectedPage' class='form-control' ng-model='data.selectedPage' ng-options='p.title for p in pages' ng-change='choosePage()'></select>
-                    </div>
-                    <div class='form-group'>
-                        <iframe id='simulator' src=""></iframe>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-success" ng-click="ok()" ng-disabled='!data.template'>编辑报名表</button>
-            </div>
-        </script>
         <script src="/static/js/jquery.min.js"></script>
         <script src="/static/js/jquery-ui.min.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>

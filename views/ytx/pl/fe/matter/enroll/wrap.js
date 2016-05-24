@@ -250,15 +250,15 @@
         var newWrap = this.addWrap(editor, 'div', attrs, html);
         return newWrap;
     };
-    WrapLib.prototype.embedRounds = function(page, def) {
+    WrapLib.prototype.embedRounds = function(page, config) {
         var onclick, html, attrs = {
             'ng-controller': 'ctrlRounds',
-            wrap: 'list',
+            wrap: 'round-list',
             class: 'form-group'
         };
-        onclick = def.onclick.length ? " ng-click=\"gotoPage($event,'" + def.onclick + "',null,r.rid)\"" : '';
+        config.id && (attrs.id = config.id);
+        onclick = config.onclick.length ? " ng-click=\"gotoPage($event,'" + config.onclick + "',null,r.rid)\"" : '';
         html = "<ul class='list-group'><li class='list-group-item' ng-repeat='r in rounds'" + onclick + "><div>{{r.title}}</div></li></ul>";
-        def.id && (attrs.id = def.id);
         this.addWrap(page, 'div', attrs, html);
     };
     WrapLib.prototype.embedUser = function(page, def) {
@@ -289,11 +289,21 @@
         config.splitLine === 'Y' ? $(wrap).addClass('wrap-splitline') : $(wrap).removeClass('wrap-splitline');
     };
     WrapLib.prototype.extractStaticSchema = function(wrap) {
-        var schema = {};
-        schema.id = $(wrap).attr('id');
-        schema.inline = $(wrap).hasClass('wrap-inline');
-        schema.splitLine = $(wrap).hasClass('wrap-splitline');
-        return schema;
+        var config = {},
+            html;
+        config.id = $(wrap).attr('id');
+        config.inline = $(wrap).hasClass('wrap-inline');
+        config.splitLine = $(wrap).hasClass('wrap-splitline');
+        if (!config.id) {
+            html = $(wrap).html();
+            html = html.match(/\{\{(.+)\}\}/);
+            if (html.length === 2) {
+                config.schema = {
+                    id: html[1].split('.').pop()
+                };
+            }
+        }
+        return config;
     };
     var PrefabActSchema = {
         _args: function(schema) {
@@ -307,6 +317,11 @@
         editRecord: {
             act: function(schema) {
                 return 'editRecord' + PrefabActSchema._args(schema);
+            }
+        },
+        removeRecord: {
+            act: function(schema) {
+                return 'removeRecord' + PrefabActSchema._args(schema);
             }
         },
         submit: {
@@ -344,7 +359,7 @@
                 angular.isFunction(action) && (action = action(schema));
                 if (schema.name === 'acceptInvite') {
                     attrs['ng-controller'] = 'ctrlInvite';
-                } else if (schema.name === 'editRecord' || schema.name === 'likeRecord') {
+                } else if (['editRecord', 'removeRecord'].indexOf(schema.name) !== -1) {
                     attrs['ng-controller'] = 'ctrlRecord';
                 }
                 WrapLib.prototype.addWrap(editor, 'div', attrs, tmplBtn(action, schema.label));

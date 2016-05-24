@@ -1,10 +1,10 @@
 app = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'matters.xxt', 'member.xxt', 'channel.fe.pl']);
 app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider.when('/rest/pl/fe/matter/article', {
-		templateUrl: '/views/ytx/pl/fe/matter/article/setting.html?_=1',
+		templateUrl: '/views/default/pl/fe/matter/article/setting.html?_=1',
 		controller: 'ctrlSetting',
 	}).otherwise({
-		templateUrl: '/views/ytx/pl/fe/matter/article/setting.html?_=1',
+		templateUrl: '/views/default/pl/fe/matter/article/setting.html?_=2',
 		controller: 'ctrlSetting'
 	});
 	$locationProvider.html5Mode(true);
@@ -59,7 +59,15 @@ app.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', 'mediagaller
 	$scope.modified = false;
 	$scope.innerlinkTypes = [{
 		value: 'article',
-		title: '项目资料',
+		title: '单图文',
+		url: '/rest/pl/fe/matter'
+	}, {
+		value: 'news',
+		title: '多图文',
+		url: '/rest/pl/fe/matter'
+	}, {
+		value: 'channel',
+		title: '频道',
 		url: '/rest/pl/fe/matter'
 	}];
 	$scope.back = function() {
@@ -79,6 +87,10 @@ app.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', 'mediagaller
 	$scope.onBodyChange = function() {
 		$scope.modified = true;
 		modifiedData['body'] = encodeURIComponent($scope.editing['body']);
+	};
+	$scope.tinymceSave = function() {
+		$scope.update('body');
+		$scope.submit();
 	};
 	$scope.submit = function() {
 		http2.post('/rest/pl/fe/matter/article/update?site=' + $scope.siteId + '&id=' + $scope.id, modifiedData, function() {
@@ -112,7 +124,7 @@ app.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', 'mediagaller
 		mediagallery.open($scope.siteId, options);
 	});
 	$scope.embedMatter = function() {
-		mattersgallery.open('mattersgallery.open', function(matters, type) {
+		mattersgallery.open($scope.siteId, function(matters, type) {
 			var editor, dom, i, matter, mtype, fn;
 			editor = tinymce.get('body1');
 			dom = editor.dom;

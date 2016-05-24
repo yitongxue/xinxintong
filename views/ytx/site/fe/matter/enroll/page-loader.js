@@ -13,8 +13,8 @@ window.loading = {
 				"xxt-share": "/static/js/xxt.share",
 				"xxt-image": "/static/js/xxt.image",
 				"xxt-geo": "/static/js/xxt.geo",
-				"enroll-directive": "/views/ytx/site/fe/matter/enroll/directive",
-				"enroll-common": "/views/ytx/site/fe/matter/enroll/common",
+				"enroll-directive": "/views/default/site/fe/matter/enroll/directive",
+				"enroll-common": "/views/default/site/fe/matter/enroll/common",
 			},
 			shim: {
 				"angular": {
@@ -36,7 +36,7 @@ window.loading = {
 					exports: "enroll-directive"
 				},
 			},
-			deps: ['/views/ytx/site/fe/matter/enroll/page.js?_=2'],
+			deps: ['/views/default/site/fe/matter/enroll/page.js'],
 			urlArgs: "bust=" + (new Date()).getTime()
 		});
 	}

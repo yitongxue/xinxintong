@@ -24,7 +24,7 @@
                     <button class='btn btn-default' ng-click="createAct()" title='添加操作'>
                     <i class='fa fa-plus-square fa-fw'></i>
                     </button>
-                    <button class='btn btn-default' ng-click="embedMatter()" title='添加素材'>
+                    <button class='btn btn-default' ng-click="embedMatter()" title='添加项目资料'>
                     <i class='fa fa-file fa-fw'></i>
                     </button>
                     <button class='btn btn-default' ng-click="modifyWrap()" title='编辑' ng-disabled='!hasActiveWrap||!activeWrap.editable'>
@@ -48,6 +48,9 @@
                     <button class='btn btn-default' title='页面设置' ng-click="gotoPageConfig()">
                     <i class='fa fa-cog fa-fw'></i>
                     </button>
+                    <button class='btn btn-default' title='编辑代码' ng-click="gotoCode()">
+                    <i class='fa fa-code fa-fw'></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -59,14 +62,28 @@
         </div>
         <div class='tile'>
             <div class='form-group'>
-                <input type='text' class='form-control' ng-model="app.title" tms-auto-update tms-wait=1000 tms-update="update('title')">
+                <input type='text' class='form-control' ng-model='app.title' tms-auto-update tms-wait=1000 tms-update="update('title')">
                 <div class='help-block'>标题：最多35个汉字，70个英文字符</div>
             </div>
             <div class='form-group' ng-if="app.scenarioConfig.can_period!=='D'">
-                <tms-datepicker tms-title='开始时间' tms-date='app.start_at' tms-state='start_at'></tms-datepicker>
+                <tms-datepicker class='tms-datepicker' tms-title='开始时间' tms-date='app.start_at' tms-state='start_at'></tms-datepicker>
                 <div class='help-block'>开始时间（可选）</div>
-                <tms-datepicker tms-title='结束时间' tms-date='app.end_at' tms-state='end_at'></tms-datepicker>
+                <tms-datepicker class='tms-datepicker' tms-title='结束时间' tms-date='app.end_at' tms-state='end_at'></tms-datepicker>
                 <div class='help-block'>结束时间（可选）</div>
+            </div>
+        </div>
+        <div class='tile'>
+            <div class='form-group'>
+                <label class='checkbox-inline'>
+                    <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='app.use_site_header' ng-change="update('use_site_header');">使用站点页眉</label>
+                <label class='checkbox-inline'>
+                    <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='app.use_site_footer' ng-change="update('use_site_footer');">使用站点页脚</label>
+            </div>
+            <div class='form-group' ng-if="app.mission_id>0">
+                <label class='checkbox-inline'>
+                    <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='app.use_mission_header' ng-change="update('use_mission_header');">使用项目页眉</label>
+                <label class='checkbox-inline'>
+                    <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='app.use_mission_footer' ng-change="update('use_mission_footer');">使用项目页脚</label>
             </div>
         </div>
         <div class='tile' ng-if="app.state==='2'">
@@ -77,10 +94,11 @@
         <div class='tile'>
             <a href='/rest/pl/fe/matter/enroll/schema?site={{siteId}}&id={{id}}'>所有登记项</a>
         </div>
+        <div class='tile'>
+            <a href='/rest/pl/fe/matter/enroll/config?site={{siteId}}&id={{id}}'>进入规则</a>
+        </div>
         <div class='tile' ng-if="app.state==='2'">
-            <div class='form-group'>
-                <a href='/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}'>登记记录</a>
-            </div>
+            <a href='/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}'>登记结果</a>
         </div>
         <div class='tile'>
             <div class='form-group'>

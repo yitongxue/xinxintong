@@ -564,7 +564,15 @@
     ngApp.provider.controller('ctrlPage', ['$scope', '$location', 'http2', '$modal', '$timeout', '$q', function($scope, $location, http2, $modal, $timeout, $q) {
         $scope.innerlinkTypes = [{
             value: 'article',
-            title: '项目资料',
+            title: '单图文',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'news',
+            title: '多图文',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'channel',
+            title: '频道',
             url: '/rest/pl/fe/matter'
         }];
         $scope.onPageChange = function(page) {
@@ -1244,7 +1252,7 @@
             });
         };
         $scope.gotoCode = function(codeid) {
-            window.open('/rest/code?pid=' + codeid, '_self');
+            //window.open('/rest/pl/fe/code?site=' + $scope.siteId + '&name=' + codeid, '_self');
         };
         $scope.$on('tinymce.multipleimage.open', function(event, callback) {
             var options = {

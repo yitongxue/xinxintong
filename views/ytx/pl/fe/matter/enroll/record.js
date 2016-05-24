@@ -6,7 +6,15 @@
             url: '/rest/pl/fe/matter'
         }, {
             value: 'article',
-            title: '项目资料',
+            title: '单图文',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'news',
+            title: '多图文',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'channel',
+            title: '频道',
             url: '/rest/pl/fe/matter'
         }, {
             value: 'enroll',
@@ -103,41 +111,6 @@
         $scope.signinEndAt = endAt.getTime() / 1000;
         $scope.selected = {};
         $scope.selectAll;
-        $scope.tagByData = function() {
-            $modal.open({
-                templateUrl: 'tagByData.html',
-                controller: ['$scope', '$modalInstance', function($scope2, $mi) {
-                    $scope2.data = {
-                        filter: {},
-                        tag: ''
-                    };
-                    $scope2.schema = [];
-                    angular.forEach($scope.schema, function(def) {
-                        if (['img', 'file', 'datetime'].indexOf(def.type) === -1) {
-                            $scope2.schema.push(def);
-                        }
-                    });
-                    $scope2.cancel = function() {
-                        $mi.dismiss();
-                    };
-                    $scope2.ok = function() {
-                        $mi.close($scope2.data);
-                    };
-                }],
-                backdrop: 'static'
-            }).result.then(function(data) {
-                if (data.tag && data.tag.length) {
-                    http2.post('/rest/pl/fe/matter/enroll/record/tagByData?aid=' + $scope.aid, data, function(rsp) {
-                        var aAssigned;
-                        $scope.doSearch();
-                        aAssigned = data.tag.split(',');
-                        angular.forEach(aAssigned, function(newTag) {
-                            $scope.app.tags.indexOf(newTag) === -1 && $scope.app.tags.push(newTag);
-                        });
-                    });
-                }
-            });
-        };
         $scope.$on('xxt.tms-datepicker.change', function(evt, data) {
             $scope[data.state] = data.value;
             $scope.doSearch(1);
@@ -167,7 +140,7 @@
                     eks: eks,
                     tags: aSelected
                 };
-                http2.post('/rest/pl/fe/matter/enroll/record/batchTag?aid=' + $scope.aid, posted, function(rsp) {
+                http2.post('/rest/pl/fe/matter/enroll/record/batchTag?aid=' + $scope.id, posted, function(rsp) {
                     var i, l, m, n, newTag;
                     n = aSelected.length;
                     for (i = 0, l = records.length; i < l; i++) {
@@ -259,7 +232,7 @@
                             data[schemaId] = imgs;
                         });
                     }
-                    record.data = data;
+                    angular.extend(record, p);
                     //$scope.app.tags = tags;
                 });
             });
@@ -334,17 +307,25 @@
             var vcode;
             vcode = prompt('是否要删除所有登记信息？，若是，请输入活动名称。');
             if (vcode === $scope.app.title) {
-                http2.get('/rest/pl/fe/matter/enroll/record/empty?site=' + $scope.siteId + '&app=' + $scope.aid, function(rsp) {
+                http2.get('/rest/pl/fe/matter/enroll/record/empty?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
                     $scope.doSearch(1);
                 });
             }
         };
+        $scope.verifyAll = function() {
+            http2.get('/rest/pl/fe/matter/enroll/record/verifyAll?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
+                angular.forEach($scope.records, function(record) {
+                    record.verified = 'Y';
+                    $scope.$root.infomsg = '完成操作';
+                });
+            });
+        };
         $scope.$watch('selectAll', function(nv) {
-            var i, j;
-            if (nv !== undefined)
-                for (i = 0, j = $scope.records.length; i < j; i++) {
+            if (nv !== undefined) {
+                for (var i = $scope.records.length - 1; i >= 0; i--) {
                     $scope.selected[i] = nv;
                 }
+            }
         });
         $scope.$watch('app', function(app) {
             if (!app) return;
@@ -436,14 +417,17 @@
             $scope.record.signin_at = Math.round((new Date()).getTime() / 1000);
         };
         $scope.ok = function() {
-            var p = {
-                tags: $scope.record.aTags.join(','),
-                data: {}
-            };
-            $scope.record.tags = p.tags;
-            if ($scope.record.id) {
-                p.signin_at = $scope.record.signin_at;
-            }
+            var record = $scope.record,
+                p = {
+                    //tags: record.aTags.join(','),
+                    data: {}
+                };
+            record.tags = p.tags;
+            //if (record.id) {
+            //p.signin_at = record.signin_at;
+            p.verified = record.verified;
+            //}
+
             angular.forEach($scope.app.data_schemas, function(col) {
                 p.data[col.id] = $scope.record.data[col.id];
             });

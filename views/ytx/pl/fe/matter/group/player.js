@@ -58,7 +58,7 @@
                 backdrop: 'static'
             }).result.then(function(data) {
                 if (data.tag && data.tag.length) {
-                    http2.post('/rest/mp/app/enroll/record/tagByData?aid=' + $scope.aid, data, function(rsp) {
+                    http2.post('/rest/pl/fe/matter/group/record/tagByData?aid=' + $scope.aid, data, function(rsp) {
                         var aAssigned;
                         $scope.doSearch();
                         aAssigned = data.tag.split(',');
@@ -163,18 +163,21 @@
                 windowClass: 'auto-height',
                 resolve: {
                     app: function() {
-                        return $scope.app;
+                        return angular.copy($scope.app);
+                    },
+                    rounds: function() {
+                        return $scope.rounds;
                     },
                     player: function() {
-                        return player;
+                        return angular.copy(player);
                     }
                 }
             }).result.then(function(updated) {
-                var p, tags;
-                p = updated[0];
-                http2.post('/rest/pl/fe/matter/group/player/update?site=' + $scope.siteId + '&id=' + $scope.id + '&ek=' + player.enroll_key, p, function(rsp) {
+                var p = updated[0];
+                http2.post('/rest/pl/fe/matter/group/player/update?site=' + $scope.siteId + '&app=' + $scope.id + '&ek=' + player.enroll_key, p, function(rsp) {
                     //tags = updated[1];
                     //$scope.app.tags = tags;
+                    angular.extend(player, rsp.data);
                 });
             });
         };
@@ -187,6 +190,9 @@
                     app: function() {
                         return $scope.app;
                     },
+                    rounds: function() {
+                        return $scope.rounds;
+                    },
                     player: function() {
                         return {
                             tags: ''
@@ -194,18 +200,15 @@
                     }
                 }
             }).result.then(function(updated) {
-                var p, tags;
-                p = updated[0];
-                tags = updated[1];
-                http2.post('/rest/pl/fe/matter/group/player/add?site=' + $scope.siteId + '&id=' + $scope.id, p, function(rsp) {
-                    $scope.app.tags = tags;
+                var p = updated[0];
+                http2.post('/rest/pl/fe/matter/group/player/add?site=' + $scope.siteId + '&app=' + $scope.id, p, function(rsp) {
                     $scope.players.splice(0, 0, rsp.data);
                 });
             });
         };
         $scope.removePlayer = function(record) {
             if (window.confirm('确认删除？')) {
-                http2.get('/rest/mp/app/enroll/record/remove?aid=' + $scope.id + '&key=' + record.enroll_key, function(rsp) {
+                http2.get('/rest/pl/fe/matter/group/player/remove?site=' + $scope.siteId + '&app=' + $scope.id + '&ek=' + record.enroll_key, function(rsp) {
                     var i = $scope.players.indexOf(record);
                     $scope.players.splice(i, 1);
                     $scope.page.total = $scope.page.total - 1;
@@ -216,7 +219,7 @@
             var vcode;
             vcode = prompt('是否要删除所有登记信息？，若是，请输入活动名称。');
             if (vcode === $scope.app.title) {
-                http2.get('/rest/mp/app/enroll/record/empty?aid=' + $scope.aid, function(rsp) {
+                http2.get('/rest/pl/fe/matter/group/player/empty?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
                     $scope.doSearch(1);
                 });
             }
@@ -232,56 +235,6 @@
         $scope.$watch('app', function(nv) {
             if (!nv) return;
             $scope.doSearch();
-        });
-    }]);
-    ngApp.provider.controller('ctrlEditor', ['$scope', '$modalInstance', '$sce', 'app', 'player', function($scope, $mi, $sce, app, player) {
-        $scope.app = app;
-        $scope.aTags = app.tags;
-        player.aTags = (!player.tags || player.tags.length === 0) ? [] : player.tags.split(',');
-        $scope.player = player;
-        $scope.json2Obj = function(json) {
-            if (json && json.length) {
-                obj = JSON.parse(json);
-                return obj;
-            } else {
-                return {};
-            }
-        };
-        $scope.ok = function() {
-            var c, p, col;
-            p = {
-                tags: $scope.player.aTags.join(','),
-                data: {}
-            };
-            $scope.player.tags = p.tags;
-            for (c in $scope.app.data_schemas) {
-                col = $scope.app.data_schemas[c];
-                p.data[col.id] = $scope.player.data[col.id];
-            }
-            $mi.close([p, $scope.aTags]);
-        };
-        $scope.cancel = function() {
-            $mi.dismiss('cancel');
-        };
-        $scope.$on('tag.xxt.combox.done', function(event, aSelected) {
-            var aNewTags = [];
-            for (var i in aSelected) {
-                var existing = false;
-                for (var j in $scope.player.aTags) {
-                    if (aSelected[i] === $scope.player.aTags[j]) {
-                        existing = true;
-                        break;
-                    }
-                }!existing && aNewTags.push(aSelected[i]);
-            }
-            $scope.player.aTags = $scope.player.aTags.concat(aNewTags);
-        });
-        $scope.$on('tag.xxt.combox.add', function(event, newTag) {
-            $scope.player.aTags.push(newTag);
-            $scope.aTags.indexOf(newTag) === -1 && $scope.aTags.push(newTag);
-        });
-        $scope.$on('tag.xxt.combox.del', function(event, removed) {
-            $scope.player.aTags.splice($scope.player.aTags.indexOf(removed), 1);
         });
     }]);
 })();
