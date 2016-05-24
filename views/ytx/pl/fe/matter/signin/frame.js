@@ -5,13 +5,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 		directive: $compileProvider.directive
 	};
 	$routeProvider.when('/rest/pl/fe/matter/signin/schema', {
-		templateUrl: '/views/default/pl/fe/matter/signin/schema.html?_=3',
+		templateUrl: '/views/ytx/pl/fe/matter/signin/schema.html?_=3',
 		controller: 'ctrlSchema',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/signin/schema.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/signin/schema.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -19,13 +19,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/signin/page', {
-		templateUrl: '/views/default/pl/fe/matter/signin/page.html?_=5',
+		templateUrl: '/views/ytx/pl/fe/matter/signin/page.html?_=5',
 		controller: 'ctrlPage',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/signin/page.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/signin/page.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -33,13 +33,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/signin/record', {
-		templateUrl: '/views/default/pl/fe/matter/signin/record.html?_=3',
+		templateUrl: '/views/ytx/pl/fe/matter/signin/record.html?_=3',
 		controller: 'ctrlRecord',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/signin/record.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/signin/record.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -47,13 +47,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).when('/rest/pl/fe/matter/signin/publish', {
-		templateUrl: '/views/default/pl/fe/matter/signin/publish.html?_=2',
+		templateUrl: '/views/ytx/pl/fe/matter/signin/publish.html?_=2',
 		controller: 'ctrlRunning',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/signin/publish.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/signin/publish.js', function() {
 						defer.resolve();
 					});
 				})();
@@ -61,13 +61,13 @@ ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$co
 			}
 		}
 	}).otherwise({
-		templateUrl: '/views/default/pl/fe/matter/signin/app.html?_=2',
+		templateUrl: '/views/ytx/pl/fe/matter/signin/app.html?_=3',
 		controller: 'ctrlApp',
 		resolve: {
 			load: function($q) {
 				var defer = $q.defer();
 				(function() {
-					$.getScript('/views/default/pl/fe/matter/signin/app.js', function() {
+					$.getScript('/views/ytx/pl/fe/matter/signin/app.js', function() {
 						defer.resolve();
 					});
 				})();

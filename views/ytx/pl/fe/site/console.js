@@ -17,6 +17,7 @@ app.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
         switch (type) {
             case 'article':
             case 'enroll':
+            case 'signin':
             case 'group':
             case 'lottery':
                 location.href = '/rest/pl/fe/matter/' + type + '?id=' + id + '&site=' + $scope.siteId;
@@ -41,7 +42,7 @@ app.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
                     $scope.matters = rsp.data.articles;
                 }
                 $scope.page.total = rsp.data.total;
-            } else if (/enroll|group/.test($scope.matterType)) {
+            } else if (/enroll|signin|group/.test($scope.matterType)) {
                 if (append) {
                     $scope.matters = $scope.matters.concat(rsp.data.apps);
                 } else {
