@@ -57,7 +57,7 @@
 			"id": "act3",
 			"name": "gotoEnroll",
 			"label": "修改报名信息"
-		}]]
+		}]
 	}],
 	"schema": [{
 		"id": "name",

@@ -1,11 +1,11 @@
-<div class="form-group form-group-lg" wrap="input"><label>姓名</label><input ng-model="data.name" title="姓名" class="form-control" type="text" /></div>
-<div class="form-group form-group-lg" wrap="input"><label>手机</label><input ng-model="data.mobile" title="手机" class="form-control" type="text" /></div>
-<div wrap="input" class="form-group form-group-lg"><label class="">性别</label>
+<div class="form-group form-group-lg" wrap="input" schema="name"><label>姓名</label><input ng-model="data.name" title="姓名" class="form-control" type="text" /></div>
+<div class="form-group form-group-lg" wrap="input" schema="mobile"><label>手机</label><input ng-model="data.mobile" title="手机" class="form-control" type="text" /></div>
+<div wrap="input" class="form-group form-group-lg" schema="gender"><label class="">性别</label>
 <ul>
 <li class="radio-inline" wrap="radio"><label class="radio-inline"><input type="radio" name="gender" value="v1" ng-model="data.gender" title="性别" data-label="男" /><span>男</span></label></li>
 <li class="radio-inline" wrap="radio"><label class="radio-inline"><input type="radio" name="gender" value="v2" ng-model="data.gender" title="性别" data-label="女" /><span>女</span></label></li>
 </ul>
 </div>
-<div class="form-group form-group-lg" wrap="input"><label>部门</label><input ng-model="data.department" title="部门" class="form-control" type="text" /></div>
-<div class="form-group form-group-lg" wrap="input"><label>职务</label><input ng-model="data.position" title="职务" class="form-control" type="text" /></div>
+<div class="form-group form-group-lg" wrap="input" schema="department"><label>部门</label><input ng-model="data.department" title="部门" class="form-control" type="text" /></div>
+<div class="form-group form-group-lg" wrap="input" schema="position"><label>职务</label><input ng-model="data.position" title="职务" class="form-control" type="text" /></div>
 <div id="act1" class="form-group" wrap="button"><button class="btn btn-primary btn-block btn-lg" ng-click="submit($event,'result')"><span>提交信息</span></button></div>
