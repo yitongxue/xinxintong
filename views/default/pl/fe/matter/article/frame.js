@@ -1,10 +1,10 @@
 app = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'matters.xxt', 'member.xxt', 'channel.fe.pl']);
 app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 	$routeProvider.when('/rest/pl/fe/matter/article', {
-		templateUrl: '/views/default/pl/fe/matter/article/setting.html?_=1',
+		templateUrl: '/views/default/pl/fe/matter/article/setting.html?_=3',
 		controller: 'ctrlSetting',
 	}).otherwise({
-		templateUrl: '/views/default/pl/fe/matter/article/setting.html?_=2',
+		templateUrl: '/views/default/pl/fe/matter/article/setting.html?_=3',
 		controller: 'ctrlSetting'
 	});
 	$locationProvider.html5Mode(true);
@@ -286,7 +286,7 @@ app.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', 'mediagaller
 		});
 	};
 	$scope.downloadUrl = function(att) {
-		return '/rest/site/fe/mattter/article/attachmentGet?site=' + $scope.siteId + '&articleid=' + $scope.editing.id + '&attachmentid=' + att.id;
+		return '/rest/site/fe/matter/article/attachmentGet?site=' + $scope.siteId + '&articleid=' + $scope.editing.id + '&attachmentid=' + att.id;
 	};
 	http2.get('/rest/pl/fe/matter/tag/list?site=' + $scope.siteId + '&resType=article&subType=0', function(rsp) {
 		$scope.tags = rsp.data;
