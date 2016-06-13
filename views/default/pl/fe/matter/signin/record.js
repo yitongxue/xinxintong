@@ -1,5 +1,5 @@
-(function() {
-    ngApp.provider.controller('ctrlRecord', ['$scope', 'http2', '$modal', function($scope, http2, $modal) {
+define(['frame'], function(ngApp) {
+    ngApp.provider.controller('ctrlRecord', ['$scope', 'http2', '$uibModal', function($scope, http2, $uibModal) {
         $scope.notifyMatterTypes = [{
             value: 'text',
             title: '文本',
@@ -53,6 +53,7 @@
             tags: [],
             searchBy: 'nickname',
             orderBy: 'time',
+            byRound: '',
             joinParams: function() {
                 var p;
                 p = '&page=' + this.at + '&size=' + this.size;
@@ -70,17 +71,8 @@
             v: 'nickname'
         }];
         $scope.orderBys = [{
-            n: '登记时间',
+            n: '签到时间',
             v: 'time'
-        }, {
-            n: '邀请数',
-            v: 'follower'
-        }, {
-            n: '点赞数',
-            v: 'score'
-        }, {
-            n: '评论数',
-            v: 'remark'
         }];
         var current, startAt, endAt;
         current = new Date();
@@ -168,7 +160,7 @@
             }
         };
         $scope.editRecord = function(record) {
-            $modal.open({
+            $uibModal.open({
                 templateUrl: 'recordEditor.html',
                 controller: 'ctrlEditor',
                 backdrop: 'static',
@@ -195,12 +187,13 @@
                         });
                     }
                     record.data = data;
+                    record.verified = rsp.data.verified;
                     //$scope.app.tags = tags;
                 });
             });
         };
         $scope.addRecord = function() {
-            $modal.open({
+            $uibModal.open({
                 templateUrl: 'recordEditor.html',
                 controller: 'ctrlEditor',
                 windowClass: 'auto-height',
@@ -234,16 +227,16 @@
             });
         };
         $scope.importUser = function() {
-            $modal.open({
+            $uibModal.open({
                 templateUrl: "userPicker.html",
                 backdrop: 'static',
                 windowClass: 'auto-height',
                 size: 'lg',
-                controller: function($scope, $modalInstance) {
+                controller: ['$scope', '$uibModalInstance', function($scope, $mi) {
                     $scope.cancel = function() {
-                        $modalInstance.dismiss();
+                        $mi.dismiss();
                     }
-                },
+                }],
             }).result.then(function(selected) {
                 if (selected.members && selected.members.length) {
                     var members = [];
@@ -325,7 +318,7 @@
             }
         }
     });
-    ngApp.provider.controller('ctrlEditor', ['$scope', '$modalInstance', '$sce', 'app', 'record', function($scope, $modalInstance, $sce, app, record) {
+    ngApp.provider.controller('ctrlEditor', ['$scope', '$uibModalInstance', '$sce', 'app', 'record', function($scope, $mi, $sce, app, record) {
         var p, col, files;
         for (p in app.data_schemas) {
             col = app.data_schemas[p];
@@ -379,13 +372,14 @@
             if ($scope.record.id) {
                 p.signin_at = $scope.record.signin_at;
             }
+            p.verified = $scope.record.verified;
             angular.forEach($scope.app.data_schemas, function(col) {
                 p.data[col.id] = $scope.record.data[col.id];
             });
-            $modalInstance.close([p, $scope.aTags]);
+            $mi.close([p, $scope.aTags]);
         };
         $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
+            $mi.dismiss('cancel');
         };
         $scope.chooseImage = function(imgFieldName, count, from) {
             var data = $scope.record.data;
@@ -444,4 +438,4 @@
             $scope.record.aTags.splice($scope.record.aTags.indexOf(removed), 1);
         });
     }]);
-})();
+});

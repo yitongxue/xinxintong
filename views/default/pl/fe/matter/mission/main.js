@@ -25,7 +25,7 @@ app.controller('ctrlApp', ['$scope', '$location', 'http2', function($scope, $loc
 		$scope.editing = mission;
 	});
 }]);
-app.controller('ctrlSetting', ['$scope', 'http2', '$modal', function($scope, http2, $modal) {
+app.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', function($scope, http2, $uibModal) {
 	var modifiedData = {};
 	$scope.modified = false;
 	window.onbeforeunload = function(e) {
@@ -110,6 +110,13 @@ app.controller('ctrlPhase', ['$scope', 'http2', function($scope, http2) {
 		var data = {
 			title: '阶段' + ($scope.phases.length + 1)
 		};
+		/*设置阶段的缺省起止时间*/
+		(function() {
+			var tomorrow = new Date();
+			tomorrow.setTime(tomorrow.getTime() + 86400000);
+			data.start_at = tomorrow.setHours(9, 0, 0, 0) / 1000;
+			data.end_at = tomorrow.setHours(17, 0, 0, 0) / 1000;;
+		})();
 		http2.post('/rest/pl/fe/matter/mission/phase/create?site=' + $scope.siteId + '&mission=' + $scope.id, data, function(rsp) {
 			$scope.phases.push(rsp.data);
 		});
@@ -136,7 +143,7 @@ app.controller('ctrlPhase', ['$scope', 'http2', function($scope, http2) {
 		$scope.phases = rsp.data;
 	});
 }]);
-app.controller('ctrlMatter', ['$scope', '$modal', 'http2', function($scope, $modal, http2) {
+app.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope, $uibModal, http2) {
 	var indicators = {
 		registration: {
 			title: '在线报名',
@@ -178,11 +185,11 @@ app.controller('ctrlMatter', ['$scope', '$modal', 'http2', function($scope, $mod
 		});
 	};
 	$scope.addEnroll = function(assignedScenario) {
-		$modal.open({
+		$uibModal.open({
 			templateUrl: '/views/default/pl/fe/_module/enroll-template.html',
 			backdrop: 'static',
 			windowClass: 'auto-height template',
-			controller: ['$scope', '$modalInstance', function($scope2, $mi) {
+			controller: ['$scope', '$uibModalInstance', function($scope2, $mi) {
 				$scope2.data = {};
 				$scope2.cancel = function() {
 					$mi.dismiss();
