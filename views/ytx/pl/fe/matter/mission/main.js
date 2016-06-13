@@ -263,13 +263,21 @@ app.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope, $
 		});*/
 		var url, config;
 		url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.siteId + '&mission=' + $scope.id;
-		config = {
-			proto: {
-				title: $scope.editing.title + '-报名'
-			}
-		};
-		url += '&scenario=registration';
-		url += '&template=simple';
+		if (assignedScenario === 'registration') {
+			config = {
+				proto: {
+					title: $scope.editing.title + '-报名'
+				}
+			};
+			url += '&scenario=registration';
+			url += '&template=simple';
+		} else if (assignedScenario === 'voting') {
+			config = {
+				proto: {
+					title: $scope.editing.title + '-评价'
+				}
+			};
+		}
 		http2.post(url, config, function(rsp) {
 			location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
 		});
