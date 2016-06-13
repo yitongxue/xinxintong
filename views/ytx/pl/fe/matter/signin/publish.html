@@ -85,13 +85,6 @@
             <a href='/rest/pl/fe/matter/signin/record?site={{siteId}}&id={{id}}'>签到记录</a>
         </div>
     </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <div>阅读：{{app.read_num}}</div>
-            <div>分享好友：{{app.share_friend_num}}</div>
-            <div>分享朋友圈：{{app.share_timeline_num}}</div>
-        </div>
-    </div>
 </div>
 <script type="text/ng-template" id="batchRounds.html">
     <div class="modal-header">
@@ -101,13 +94,13 @@
     <div class="modal-body">
         <div class='form-horizontal'>
             <div class='form-group'>
-                <label class='col-md-3 control-label'>课程开始时间</label>
+                <label class='col-md-3 control-label'>活动开始时间</label>
                 <div class='col-md-9'>
                     <tms-datepicker class='tms-datepicker' tms-title='课程开始时间' tms-date='params.start_at' tms-state='start_at'></tms-datepicker>
                 </div>
             </div>
             <div class='form-group'>
-                <label class='col-md-3 control-label'>课程结束时间</label>
+                <label class='col-md-3 control-label'>活动结束时间</label>
                 <div class='col-md-9'>
                     <tms-datepicker class='tms-datepicker' tms-title='课程结束时间' tms-date='params.end_at' tms-state='end_at'></tms-datepicker>
                 </div>

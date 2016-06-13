@@ -25,7 +25,7 @@ app.controller('ctrlApp', ['$scope', '$location', 'http2', function($scope, $loc
 		$scope.editing = mission;
 	});
 }]);
-app.controller('ctrlSetting', ['$scope', 'http2', '$modal', function($scope, http2, $modal) {
+app.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', function($scope, http2, $uibModal) {
 	var modifiedData = {};
 	$scope.modified = false;
 	window.onbeforeunload = function(e) {
@@ -108,7 +108,7 @@ app.controller('ctrlSetting', ['$scope', 'http2', '$modal', function($scope, htt
 app.controller('ctrlPhase', ['$scope', 'http2', function($scope, http2) {
 	$scope.add = function() {
 		var data = {
-			title: '阶段' + ($scope.phases.length + 1)
+			title: '期数' + ($scope.phases.length + 1)
 		};
 		http2.post('/rest/pl/fe/matter/mission/phase/create?site=' + $scope.siteId + '&mission=' + $scope.id, data, function(rsp) {
 			$scope.phases.push(rsp.data);
@@ -136,7 +136,7 @@ app.controller('ctrlPhase', ['$scope', 'http2', function($scope, http2) {
 		$scope.phases = rsp.data;
 	});
 }]);
-app.controller('ctrlMatter', ['$scope', '$modal', 'http2', function($scope, $modal, http2) {
+app.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope, $uibModal, http2) {
 	var indicators = {
 		registration: {
 			title: '在线报名',
@@ -178,11 +178,11 @@ app.controller('ctrlMatter', ['$scope', '$modal', 'http2', function($scope, $mod
 		});
 	};
 	$scope.addEnroll = function(assignedScenario) {
-		$modal.open({
+		/*$uibModal.open({
 			templateUrl: '/views/ytx/pl/fe/_module/enroll-template.html',
 			backdrop: 'static',
 			windowClass: 'auto-height template',
-			controller: ['$scope', '$modalInstance', function($scope2, $mi) {
+			controller: ['$scope', '$uibModalInstance', function($scope2, $mi) {
 				$scope2.data = {};
 				$scope2.cancel = function() {
 					$mi.dismiss();
@@ -260,6 +260,18 @@ app.controller('ctrlMatter', ['$scope', '$modal', 'http2', function($scope, $mod
 			http2.post(url, config, function(rsp) {
 				location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
 			});
+		});*/
+		var url, config;
+		url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.siteId + '&mission=' + $scope.id;
+		config = {
+			proto: {
+				title: $scope.editing.title + '-报名'
+			}
+		};
+		url += '&scenario=registration';
+		url += '&template=simple';
+		http2.post(url, config, function(rsp) {
+			location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
 		});
 	};
 	$scope.addSignin = function() {

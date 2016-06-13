@@ -71,14 +71,7 @@
         <button class='btn btn-block btn-default' ng-click="stop()">停止</button>
     </div>
     <div class='tile'>
-        <a href='/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}'>登记结果</a>
-    </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <div>阅读：{{app.read_num}}</div>
-            <div>分享好友：{{app.share_friend_num}}</div>
-            <div>分享朋友圈：{{app.share_timeline_num}}</div>
-        </div>
+        <a href='/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}'>报名结果</a>
     </div>
 </div>
 <script type="text/ng-template " id="roundEditor.html ">
@@ -105,6 +98,7 @@
     <div class="modal-footer ">
         <button class="btn btn-danger pull-left " ng-click="remove() " ng-if='round.rid&&round.state==0'>删除</button>
         <button class="btn btn-success pull-left " ng-click="start() " ng-if='round.state==0'>启用</button>
+        <button class="btn btn-success pull-left " ng-click="stop() " ng-if='round.state==1'>停用</button>
         <button class="btn btn-success " ng-click="ok() ">保存</button>
     </div>
 </script>

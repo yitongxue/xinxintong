@@ -36,9 +36,23 @@
             <input type='text' class='form-control' ng-model='editing.author' ng-change="update('author');">
             <div class='help-block'>作者（可选）：最多8个汉字或英文字符</div>
         </div>
-        <div class='form-group' ng-if="editing.custom_body!=='Y'">
-            <textarea class='form-control' ng-model='editing.url' ng-change="update('url');"></textarea>
-            <div class='help-block'>原文链接(可选)</div>
+    </div>
+    <div class='tile'>
+        <div class='form-group'>
+            <button id='addAttachment' class='btn btn-default btn-sm'>
+                <span class='glyphicon glyphicon-plus'></span>
+            </button>
+            <ul class='list-group' style='margin-bottom:0'>
+                <li class='list-group-item' ng-repeat='a in editing.attachments' ng-mouseenter="enter=true" ng-mouseleave="enter=false">
+                    <span>
+                        <a ng-href='{{downloadUrl(a)}}' target='_blank'>{{a.name}}</a>
+                    </span>
+                    <button class='btn btn-default btn-xs pull-right' ng-if='enter' ng-click='delAttachment($index,a)'>
+                        <span class='glyphicon glyphicon-remove'></span>
+                    </button>
+                </li>
+            </ul>
+            <div class='help-block'>附件（可选）</div>
         </div>
     </div>
     <div class='tile'>
@@ -64,24 +78,6 @@
         <tinymce content='editing.body' contenteditable='bodyEditable' onsavecallback="tinymceSave()" toolbar="save" update="onBodyChange()" change="onBodyChange()" id='body1' height='700'></tinymce>
         <div class='help-block'>正文：少于2万字符</div>
     </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <button id='addAttachment' class='btn btn-default btn-sm'>
-                <span class='glyphicon glyphicon-plus'></span>
-            </button>
-            <ul class='list-group' style='margin-bottom:0'>
-                <li class='list-group-item' ng-repeat='a in editing.attachments' ng-mouseenter="enter=true" ng-mouseleave="enter=false">
-                    <span>
-                        <a ng-href='{{downloadUrl(a)}}' target='_blank'>{{a.name}}</a>
-                    </span>
-                    <button class='btn btn-default btn-xs pull-right' ng-if='enter' ng-click='delAttachment($index,a)'>
-                        <span class='glyphicon glyphicon-remove'></span>
-                    </button>
-                </li>
-            </ul>
-            <div class='help-block'>附件（可选）</div>
-        </div>
-    </div>
 </div>
 <div class='col-md-4'>
     <div class='tile'>
@@ -105,22 +101,6 @@
         </div>
     </div>
     <div class='tile'>
-        <div class='form-group' ng-controller='ctrlSetChannel' ng-init="matterType='article';matterObj='editing'">
-            <combox evt-prefix='channel' readonly=true prop='title' existing='editing.channels' options='channels'></combox>
-            <div class='help-block'>频道（可选）</div>
-        </div>
-    </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <combox evt-prefix='tag' prop='title' existing='editing.tags' options='tags'></combox>
-            <div class='help-block'>内容标签</div>
-        </div>
-        <div class='form-group'>
-            <combox evt-prefix='tag2' prop='title' existing='editing.tags2' options='tags2'></combox>
-            <div class='help-block'>管理标签</div>
-        </div>
-    </div>
-    <div class='tile'>
         <div class='form-group'>
             <memberacl site-id='{{siteId}}' obj='editing' prop-access='access_control' update-access-control="update('access_control')" prop-member-schemas='authapis' update-member-schemas="update('authapis')" prop-acl='acl' change-acl-url='/rest/pl/fe/matter/article/setAcl?site={{siteId}}&id={{editing.id}}' remove-acl-url='/rest/pl/fe/matter/article/removeAcl?site={{siteId}}'></memberacl>
         </div>
@@ -129,11 +109,8 @@
         <div class='form-group'>
             <label class='checkbox-inline'>
                 <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.can_share' ng-change="update('can_share');">可以分享</label>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.can_fullsearch' ng-change="update('can_fullsearch');">可以检索</label>
-        </div>
     </div>
-    <div class='tile'>
+    <div class='tile' style='display:none'>
         <div class='form-group'>
             <label class='checkbox-inline'>
                 <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.use_site_header' ng-change="update('use_site_header');">使用站点页眉</label>
