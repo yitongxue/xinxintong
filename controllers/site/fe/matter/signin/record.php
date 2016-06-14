@@ -168,11 +168,6 @@ class record extends base {
 			if ($enrollApp) {
 				$enrollRecord = $this->model('matter\enroll\record')->byData($site, $enrollApp, $requireCheckedData);
 				if (empty($enrollRecord)) {
-					/* 已经登记，更新原先提交的数据 */
-					$modelRec->update('xxt_signin_record',
-						array('verified' => 'N'),
-						"enroll_key='{$signState->ek}'"
-					);
 					$signState->verified = 'N';
 					if (isset($app->entry_rule->fail->entry)) {
 						$signState->forword = $app->entry_rule->fail->entry;
@@ -183,6 +178,11 @@ class record extends base {
 						$signState->forword = $app->entry_rule->success->entry;
 					}
 				}
+				/* 已经登记，更新原先提交的数据 */
+				$modelRec->update('xxt_signin_record',
+					array('verified' => $signState->verified),
+					"enroll_key='{$signState->ek}'"
+				);
 			}
 		}
 

@@ -1,5 +1,8 @@
-(function() {
-	ngApp.provider.controller('ctrlSetting', ['$scope', '$location', 'http2', '$modal', 'mediagallery', function($scope, $location, http2, $modal, mediagallery) {
+define(['frame'], function(ngApp) {
+	/**
+	 *
+	 */
+	ngApp.provider.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', 'mediagallery', function($scope, http2, $uibModal, mediagallery) {
 		window.onbeforeunload = function(e) {
 			var message;
 			if ($scope.modified) {
@@ -19,14 +22,14 @@
 			});
 		};
 		$scope.importByApp = function() {
-			$modal.open({
+			$uibModal.open({
 				templateUrl: 'importByApp.html',
 				resolve: {
 					app: function() {
 						return $scope.app;
 					}
 				},
-				controller: ['$scope', '$modalInstance', 'app', function($scope2, $mi, app) {
+				controller: ['$scope', '$uibModalInstance', 'app', function($scope2, $mi, app) {
 					$scope2.app = app;
 					$scope2.data = {
 						app: '',
@@ -94,10 +97,10 @@
 			}
 		};
 	}]);
-	ngApp.provider.controller('ctrlRule', ['$scope', '$modal', 'http2', function($scope, $modal, http2) {
+	ngApp.provider.controller('ctrlRule', ['$scope', '$uibModal', 'http2', function($scope, $uibModal, http2) {
 		$scope.aTargets = null;
 		$scope.configRule = function() {
-			$modal.open({
+			$uibModal.open({
 				templateUrl: 'configRule.html',
 				resolve: {
 					app: function() {
@@ -110,7 +113,7 @@
 						return angular.copy($scope.app.data_schemas);
 					}
 				},
-				controller: ['$modalInstance', '$scope', 'http2', 'app', 'rule', 'schemas', function($mi, $scope, http2, app, rule, schemas) {
+				controller: ['$uibModalInstance', '$scope', 'http2', 'app', 'rule', 'schemas', function($mi, $scope, http2, app, rule, schemas) {
 					$scope.schemas = [];
 					http2.get('/rest/pl/fe/matter/group/player/count?site=' + app.siteid + '&app=' + app.id, function(rsp) {
 						$scope.countOfPlayers = rsp.data;
@@ -170,14 +173,14 @@
 			});
 		};
 		$scope.addTarget = function() {
-			$modal.open({
+			$uibModal.open({
 				templateUrl: 'targetEditor.html',
 				resolve: {
 					schemas: function() {
 						return angular.copy($scope.app.data_schemas);
 					}
 				},
-				controller: ['$modalInstance', '$scope', 'schemas', function($mi, $scope, schemas) {
+				controller: ['$uibModalInstance', '$scope', 'schemas', function($mi, $scope, schemas) {
 					$scope.schemas = schemas;
 					$scope.target = {};
 					$scope.cancel = function() {
@@ -237,4 +240,4 @@
 			});
 		});
 	}]);
-})();
+});

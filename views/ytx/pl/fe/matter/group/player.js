@@ -1,4 +1,4 @@
-(function() {
+define(['frame'], function(ngApp) {
     ngApp.provider.controller('ctrlRecord', ['$scope', 'http2', '$modal', function($scope, http2, $modal) {
         $scope.doSearch = function(page) {
             var url;
@@ -237,4 +237,4 @@
             $scope.doSearch();
         });
     }]);
-})();
+});
