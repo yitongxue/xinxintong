@@ -1,8 +1,5 @@
 <div>
     <div class='form-group form-inline'>
-        <div class='form-group'>
-            <combox title='标签' evt-prefix='search-tag' readonly='true' existing='page.tags' options='app.tags'></combox>
-        </div>
         <div class='form-group pull-right' style='width:90px'>
             <div class='input-group'>
                 <input class='form-control' ng-model='page.size' title='每页条数' placeholder='每页条数'>
@@ -12,9 +9,6 @@
                     </button>
                 </span>
             </div>
-        </div>
-        <div class='form-group'>
-            <button class='btn btn-default' ng-click='tagByData()'>打标签</button>
         </div>
     </div>
     <div id='players'>
