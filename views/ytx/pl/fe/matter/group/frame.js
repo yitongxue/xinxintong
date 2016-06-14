@@ -5,7 +5,7 @@ define(['require'], function(require) {
 			controller: $controllerProvider.register
 		};
 		$routeProvider.when('/rest/pl/fe/matter/group/player', {
-			templateUrl: '/views/ytx/pl/fe/matter/group/player.html?_=1',
+			templateUrl: '/views/ytx/pl/fe/matter/group/player.html?_=2',
 			controller: 'ctrlRecord',
 			resolve: {
 				load: function($q) {
