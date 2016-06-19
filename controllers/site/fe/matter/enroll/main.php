@@ -93,6 +93,7 @@ class main extends base {
 							$this->snsOAuth($wxConfig, 'wx');
 						}
 					} else if ($wxConfig = $this->model('sns\wx')->bySite('platform')) {
+						die('xxxxxxxx');
 						if ($wxConfig->joined === 'Y') {
 							$this->snsOAuth($wxConfig, 'wx');
 						}
