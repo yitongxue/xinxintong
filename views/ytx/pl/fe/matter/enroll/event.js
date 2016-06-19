@@ -1,4 +1,4 @@
-(function() {
+define(['frame'], function(ngApp) {
 	ngApp.provider.controller('ctrlEntry', ['$scope', 'http2', function($scope, http2) {
 		$scope.pages4OutAcl = [];
 		$scope.pages4Unauth = [];
@@ -37,4 +37,4 @@
 			}
 		}, true);
 	}]);
-})();
+});
