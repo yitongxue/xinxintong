@@ -163,7 +163,6 @@ class base extends \TMS_CONTROLLER {
 			$snsConfig = $modelSns->bySite('platform');
 		}
 		$snsProxy = $this->model('sns\\' . $snsName . '\proxy', $snsConfig);
-		die('ssss:' . json_encode($snsConfig));
 		$rst = $snsProxy->getOAuthUser($code);
 		$rst[0] === false && die('xxt oauth2 failed: ' . $rst[1]);
 		/**
