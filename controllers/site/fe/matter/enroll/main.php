@@ -87,13 +87,13 @@ class main extends base {
 		$entryRule = $app->entry_rule;
 		if ($this->userAgent() === 'wx') {
 			if (isset($entryRule->wxfan)) {
+				die('xxxxxxxx');
 				if (!isset($this->who->sns->wx)) {
 					if ($wxConfig = $this->model('sns\wx')->bySite($siteid)) {
 						if ($wxConfig->joined === 'Y') {
 							$this->snsOAuth($wxConfig, 'wx');
 						}
 					} else if ($wxConfig = $this->model('sns\wx')->bySite('platform')) {
-						die('xxxxxxxx');
 						if ($wxConfig->joined === 'Y') {
 							$this->snsOAuth($wxConfig, 'wx');
 						}
