@@ -207,7 +207,7 @@ class proxy_model extends \sns\proxybase {
 	/**
 	 *
 	 */
-	public function oauthUrl($redirect, $state = null, $scope = 'snsapi_userinfo') {
+	public function oauthUrl($redirect, $state = null, $scope = 'snsapi_base') {
 		$appid = $this->config->appid;
 
 		$oauth = "https://open.weixin.qq.com/connect/oauth2/authorize";
