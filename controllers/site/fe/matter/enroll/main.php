@@ -88,7 +88,6 @@ class main extends base {
 		if ($entryRule->scope === 'sns') {
 			if ($this->userAgent() === 'wx') {
 				if (!empty($entryRule->sns->wx->entry)) {
-					die('wwww:' . json_encode($this->who));
 					if (!isset($this->who->sns->wx)) {
 						if ($wxConfig = $this->model('sns\wx')->bySite($siteid)) {
 							if ($wxConfig->joined === 'Y') {

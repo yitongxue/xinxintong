@@ -56,6 +56,7 @@ class base extends \TMS_CONTROLLER {
 						$snsName = $snsName[1];
 						$snsUser = $this->snsOAuthUserByCode($this->siteId, $code, $snsName);
 						$auth['sns'][$snsName] = $snsUser;
+						die('ssss:' . json_encode($auth));
 					}
 				}
 			}
