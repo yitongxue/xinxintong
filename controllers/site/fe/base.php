@@ -45,6 +45,7 @@ class base extends \TMS_CONTROLLER {
 			$snsUser->openid = $openid;
 			$auth['sns'][$snsName] = $snsUser;
 		} else if ($this->myGetcookie("_{$this->siteId}_oauthpending") === 'Y') {
+			die('ssss:' . json_encode($auth));
 			/* oauth回调 */
 			$this->mySetcookie("_{$this->siteId}_oauthpending", '', time() - 3600);
 			if (isset($_GET['state']) && isset($_GET['code'])) {
@@ -56,7 +57,6 @@ class base extends \TMS_CONTROLLER {
 						$snsName = $snsName[1];
 						$snsUser = $this->snsOAuthUserByCode($this->siteId, $code, $snsName);
 						$auth['sns'][$snsName] = $snsUser;
-						die('ssss:' . json_encode($auth));
 					}
 				}
 			}
