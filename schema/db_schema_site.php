@@ -16,15 +16,32 @@ $sql .= ",state tinyint not null default 1"; // 1:正常, 0:停用
 $sql .= ",home_page_id int not null default 0"; // 站点主页
 $sql .= ",home_page_name varchar(13) not null default ''"; // 站点主页
 $sql .= ",header_page_id int not null default 0"; // 通用页头
-$sql .= ",header_page_name int not null default ''"; // 通用页头
+$sql .= ",header_page_name varchar(13) not null default ''"; // 通用页头
 $sql .= ",footer_page_id int not null default 0"; // 通用页尾
-$sql .= ",footer_page_name int not null default ''"; // 通用页尾
+$sql .= ",footer_page_name varchar(13) not null default ''"; // 通用页尾
 $sql .= ",shift2pc_page_id int not null default 0"; // 引导到PC端完成
-$sql .= ",shift2pc_page_name int not null default ''"; // 引导到PC端完成
+$sql .= ",shift2pc_page_name varchar(13) not null default ''"; // 引导到PC端完成
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');
 	echo 'database error(xxt_site): ' . $mysqli->error;
+}
+/*
+ * 站点配置的通知消息
+ */
+$sql = "create table if not exists xxt_site_notice(";
+$sql .= "id int not null auto_increment";
+$sql .= ",siteid varchar(32) not null";
+$sql .= ",creater varchar(40) not null";
+$sql .= ",creater_name varchar(255) not null default ''";
+$sql .= ",create_at int not null";
+$sql .= ",event_name varchar(255) not null"; // 事件名称
+$sql .= ",tmplmsg_comfig_id int not null default 0"; // 对应的模版消息ID，引用xxt_tmplmsg_mapping
+$sql .= ",active char(1) not null default 'N'"; //是否已激活
+$sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+if (!$mysqli->query($sql)) {
+	header('HTTP/1.0 500 Internal Server Error');
+	echo 'database error: ' . $mysqli->error;
 }
 /**
  * 站点授权管理员

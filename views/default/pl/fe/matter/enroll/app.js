@@ -102,7 +102,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			tinymce.activeEditor.setContent(page.html);
 		};
 		$scope.newSchema = function(type) {
-			var newSchema = schemaLib.newSchema(type);
+			var newSchema = schemaLib.newSchema(type, $scope.app);
 			$scope.app.data_schemas.push(newSchema);
 			$scope.update('data_schemas').then(function() {
 				$scope.$broadcast('xxt.matter.enroll.app.data_schemas.created', newSchema);
@@ -464,7 +464,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 	/**
 	 * page
 	 */
-	ngApp.provider.controller('ctrlPage', ['$scope', '$q', 'mediagallery', 'mattersgallery', function($scope, $q, mediagallery, mattersgallery) {
+	ngApp.provider.controller('ctrlPage', ['$scope', '$q', '$timeout', 'mediagallery', 'mattersgallery', function($scope, $q, $timeout, mediagallery, mattersgallery) {
 		var tinymceEditor;
 		$scope.activeWrap = false;
 		$scope.innerlinkTypes = [{
@@ -580,10 +580,11 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			});
 		};
 		$scope.newList = function(pattern) {
+			var domWrap;
 			if (pattern === 'records') {
-				var domWrap = $scope.ep.appendRecordList($scope.app);
+				domWrap = $scope.ep.appendRecordList($scope.app);
 			} else if (pattern === 'rounds') {
-				var domWrap = $scope.ep.appendRoundList($scope.app);
+				domWrap = $scope.ep.appendRoundList($scope.app);
 			}
 			$scope.updPage($scope.ep, ['data_schemas', 'html']).then(function() {
 				$scope.setActiveWrap(domWrap);
@@ -633,6 +634,46 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 		$scope.onPageChange = function() {
 			$scope.ep.$$modified = true;
 		};
+		$scope.$on('tinymce.content.editing', function(event, node) {
+			var domNodeWrap = $(node).parents('[wrap]');
+			if (domNodeWrap.length === 1) {
+				if (/label/i.test(node.nodeName)) {
+					/* schema's wrap */
+					(function freshSchemaByDom() {
+						var oWrap = wrapLib.dataByDom($scope.activeWrap.dom);
+						if (oWrap) {
+							if (oWrap.schema.title !== $scope.activeWrap.schema.title) {
+								$timeout(function() {
+									$scope.activeWrap.schema.title = oWrap.schema.title;
+								});
+							}
+						}
+					})();
+				}
+			} else if (domNodeWrap.length === 2) {
+				/* schema option's wrap */
+				(function() {
+					var $domParentWrap = $(domNodeWrap[0]),
+						oOptionWrap, editingSchema;
+					if (/radio|checkbox/.test($domParentWrap.attr('wrap'))) {
+						oOptionWrap = wrapLib.input.dataByDom(domNodeWrap[0]);
+						if (oOptionWrap.schema && oOptionWrap.schema.ops && oOptionWrap.schema.ops.length === 1) {
+							for (var i = $scope.app.data_schemas.length - 1; i > -0; i--) {
+								editingSchema = $scope.app.data_schemas[i];
+								if (oOptionWrap.schema.id === editingSchema.id) {
+									for (var j = editingSchema.ops.length - 1; j >= 0; j--) {
+										if (oOptionWrap.schema.ops[0].v === editingSchema.ops[j].v) {
+											editingSchema.ops[j].l = oOptionWrap.schema.ops[0].l;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+				})();
+			}
+		});
 		$scope.$on('tinymce.multipleimage.open', function(event, callback) {
 			var options = {
 				callback: callback,

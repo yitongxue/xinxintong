@@ -1,4 +1,4 @@
-app = angular.module('app', ['ngRoute', 'ui.tms', 'matters.xxt']);
+app = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt']);
 app.config(['$controllerProvider', '$locationProvider', function($controllerProvider, $locationProvider) {
 	app.provider = {
 		controller: $controllerProvider.register
@@ -25,7 +25,7 @@ app.controller('ctrlApp', ['$scope', '$location', 'http2', function($scope, $loc
 		$scope.editing = mission;
 	});
 }]);
-app.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', function($scope, http2, $uibModal) {
+app.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', 'mediagallery', function($scope, http2, $uibModal, mediagallery) {
 	var modifiedData = {};
 	$scope.modified = false;
 	window.onbeforeunload = function(e) {
@@ -68,9 +68,11 @@ app.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', function($scope, 
 		});
 	};
 	$scope.$on('xxt.tms-datepicker.change', function(event, data) {
+		var prop;
 		if (data.state.indexOf('mission.') === 0) {
-			$scope.editing[data.state] = data.value;
-			$scope.update(data.state);
+			prop = data.state.substr(8);
+			$scope.editing[prop] = data.value;
+			$scope.update(prop);
 		}
 	});
 	$scope.editPage = function(event, page) {
