@@ -1,115 +1,34 @@
 define(['require', 'page'], function(require, pageLib) {
-	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'matters.xxt', 'channel.fe.pl']);
+	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'ui.xxt', 'channel.fe.pl']);
 	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider) {
+		var RouteParam = function(name) {
+			var baseURL = '/views/ytx/pl/fe/matter/enroll/';
+			this.templateUrl = baseURL + name + '.html?=4';
+			this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
+			this.resolve = {
+				load: function($q) {
+					var defer = $q.defer();
+					require([baseURL + name + '.js'], function() {
+						defer.resolve();
+					});
+					return defer.promise;
+				}
+			};
+		};
 		ngApp.provider = {
 			controller: $controllerProvider.register,
 			directive: $compileProvider.directive
 		};
-		$routeProvider.when('/rest/pl/fe/matter/enroll/page', {
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/page.html?_=4',
-			controller: 'ctrlPage',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					require(['/views/ytx/pl/fe/matter/enroll/page.js'], function() {
-						defer.resolve();
-					});
-					return defer.promise;
-				}
-			}
-		}).when('/rest/pl/fe/matter/enroll/event', {
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/event.html?_=2',
-			controller: 'ctrlEntry',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					(function() {
-						$.getScript('/views/ytx/pl/fe/matter/enroll/event.js', function() {
-							defer.resolve();
-						});
-					})();
-					return defer.promise;
-				}
-			}
-		}).when('/rest/pl/fe/matter/enroll/record', {
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/record.html?_=4',
-			controller: 'ctrlRecord',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					require(['/views/ytx/pl/fe/matter/enroll/record.js'], function() {
-						defer.resolve();
-					});
-					return defer.promise;
-				}
-			}
-		}).when('/rest/pl/fe/matter/enroll/stat', {
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/stat.html?_=1',
-			controller: 'ctrlStat',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					(function() {
-						$.getScript('/views/ytx/pl/fe/matter/enroll/stat.js', function() {
-							defer.resolve();
-						});
-					})();
-					return defer.promise;
-				}
-			}
-		}).when('/rest/pl/fe/matter/enroll/coin', {
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/coin.html?_=1',
-			controller: 'ctrlCoin',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					(function() {
-						$.getScript('/views/ytx/pl/fe/matter/enroll/coin.js', function() {
-							defer.resolve();
-						});
-					})();
-					return defer.promise;
-				}
-			}
-		}).when('/rest/pl/fe/matter/enroll/publish', {
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/publish.html?_=3',
-			controller: 'ctrlRunning',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					require(['/views/ytx/pl/fe/matter/enroll/publish.js'], function() {
-						defer.resolve();
-					});
-					return defer.promise;
-				}
-			}
-		}).when('/rest/pl/fe/matter/enroll/config', {
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/config.html?_=2',
-			controller: 'ctrlConfig',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					(function() {
-						$.getScript('/views/ytx/pl/fe/matter/enroll/config.js', function() {
-							defer.resolve();
-						});
-					})();
-					return defer.promise;
-				}
-			}
-		}).otherwise({
-			templateUrl: '/views/ytx/pl/fe/matter/enroll/app.html?_=9',
-			controller: 'ctrlApp',
-			resolve: {
-				load: function($q) {
-					var defer = $q.defer();
-					require(['/views/ytx/pl/fe/matter/enroll/app.js'], function() {
-						defer.resolve();
-					});
-					return defer.promise;
-				}
-			}
-		});
+		$routeProvider
+			.when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
+			.when('/rest/pl/fe/matter/enroll/event', new RouteParam('event'))
+			.when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
+			.when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
+			.when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
+			.when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish'))
+			.when('/rest/pl/fe/matter/enroll/config', new RouteParam('config'))
+			.otherwise(new RouteParam('app'));
+
 		$locationProvider.html5Mode(true);
 	}]);
 	ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', function($scope, $location, $uibModal, $q, http2) {
@@ -145,7 +64,7 @@ define(['require', 'page'], function(require, pageLib) {
 		$scope.createPage = function() {
 			var deferred = $q.defer();
 			$uibModal.open({
-				templateUrl: '/views/ytx/pl/fe/matter/enroll/component/createPage.html?_=3',
+				templateUrl: '/views/default/pl/fe/matter/enroll/component/createPage.html?_=3',
 				backdrop: 'static',
 				controller: ['$scope', '$uibModalInstance', function($scope, $mi) {
 					$scope.options = {};

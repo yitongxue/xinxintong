@@ -21,28 +21,26 @@
                         <tms-datepicker class='tms-datepicker' tms-title='结束时间' tms-date='app.end_at' tms-state='end_at'></tms-datepicker>
                     </div>
                 </div>
-                <div class="navbar-form navbar-right">
-                    <button style='display:none' uib-popover-template="'appSetting.html'" popover-placement="bottom" popover-title="应用设置" popover-trigger="outsideClick" type="button" class="btn btn-default">活动设置 <span class="caret"></span></button>
-                    <button class='btn btn-success' ng-click="publish()">收集数据</button>
-                    <button class='btn btn-default' ng-click="remove()">删除</button>
+                <div class="navbar-form navbar-right" style='display:none'>
+                    <button uib-popover-template="'appSetting.html'" popover-placement="bottom" popover-title="活动设置" popover-trigger="outsideClick" type="button" class="btn btn-default">活动设置 <span class="caret"></span></button>
                 </div>
             </div>
         </nav>
         <div class='tile' ng-if="app.state==='2'" style='display:none'>
-            <a href='/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}'>报名结果</a>
+            <a href='/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}'>登记结果</a>
         </div>
     </div>
     <!--app-->
     <!--pages-->
     <div class='col-md-12'>
-        <div class="container-fluid">
-            <ul class="nav nav-pills">
+        <div class="container-fluid" style="padding-bottom:8px">
+            <ul class="nav nav-tabs">
                 <li role="presentation" ng-class="{'active':p===ep}" ng-repeat="p in app.pages">
-                    <a href="#" ng-click="choosePage(p)"><span>{{p.title}}</span></a>
+                    <a href="#" ng-click="choosePage(p)"><span><i class='fa fa-file-o'></i> {{p.title}}</span></a>
                 </li>
-                <ul class="navbar-form navbar-right" style='display:none'>
+                <li class="pull-right" style='display:none'>
                     <button uib-popover-template="'pageSetting.html'" popover-placement="bottom" popover-title="页面设置" popover-trigger="outsideClick" class="btn btn-default">页面设置 <span class="caret"></span></button>
-                </ul>
+                </li>
             </ul>
         </div>
     </div>
@@ -51,30 +49,38 @@
     <div class='col-md-12 page' ng-controller="ctrlPage">
         <div class='row'>
             <div class='col-md-3'>
-                <!--create input wrap-->
+                <!-- create input wrap-->
                 <div class='form-group tile' ng-if="ep.type==='I'">
+                    <div class='help-block'>在页面中添加登记项</div>
                     <button class='btn btn-default' ng-click="newSchema('name')">姓名</button>
                     <button class='btn btn-default' ng-click="newSchema('mobile')">手机</button>
                     <button class='btn btn-default' ng-click="newSchema('email')">邮箱</button>
                     <button class='btn btn-default' ng-click="newSchema('date')">日期</button>
-                    <button class='btn btn-default' ng-click="newSchema('shorttext')">短文本</button>
-                    <button class='btn btn-default' ng-click="newSchema('longtext')">长文本</button>
+                    <button class='btn btn-default' ng-click="newSchema('shorttext')">单行文本</button>
+                    <button class='btn btn-default' ng-click="newSchema('longtext')">多行文本</button>
                     <button class='btn btn-default' ng-click="newSchema('single')">单选题</button>
                     <button class='btn btn-default' ng-click="newSchema('multiple')">多选题</button>
                     <button class='btn btn-default' ng-click="newSchema('image')">上传图片</button>
                     <button class='btn btn-default' ng-click="newSchema('file')">上传文件</button>
                     <button class='btn btn-default' ng-click="newSchema('location')">上传位置</button>
-                    <button class='btn btn-default' ng-click="newSchema('phase')">课程期数</button>
-                    <div class='help-block'>添加登记项</div>
+                    <button class='btn btn-default' ng-click="newSchema('phase')">项目阶段</button>
+                    <button class='btn btn-default' ng-click="newMember()">自定义用户信息</button>
                 </div>
-                <!--create input wrap-->
-                <!--create button wrap-->
+                <!-- end create input wrap-->
+                <!-- create button wrap-->
                 <div class='tile' style='display:none'>
+                    <div class='help-block'>在页面中添加操作</div>
                     <button class='btn btn-default' ng-click="newButton(btn)" ng-repeat="btn in buttons">{{btn.l}}</button>
-                    <div class='help-block'>添加操作</div>
                 </div>
-                <!--create button wrap-->
+                <!-- end create button wrap-->
+                <!-- embed inner matter-->
+                <div class='tile'>
+                    <div class='help-block'>在页面中添加素材</div>
+                    <button class='btn btn-default' ng-click="embedMatter()">添加素材</button>
+                </div>
+                <!-- end embed inner matter-->
                 <div class='tile' ng-if="ep.type==='I'">
+                    <div class='help-block'>活动中所有登记项</div>
                     <div class='list-group' ng-controller="ctrlAppSchemas4Input">
                         <div class='list-group-item schema' ng-repeat="s in appSchemas">
                             <div class='checkbox' style='margin:0;padding:0' ng-mouseenter="entered=true" ng-mouseleave="entered=false">
@@ -83,7 +89,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class='help-block'>所有登记项</div>
                 </div>
                 <div ng-if="ep.type==='V'" ng-controller="ctrlAppSchemas4View">
                     <div class='list-group-item' ng-repeat="s in appSchemas">
@@ -107,12 +112,6 @@
                 <div class='page-editor'>
                     <tinymce content='ep.html' id='tinymce-page' height='660' change="onPageChange()" toolbar="code"></tinymce>
                     <div class='sidebar'>
-                        <button class='btn btn-default' ng-click="updPage(ep,['html'])" title='保存修改' ng-disabled='!ep.$$modified'>
-                        <i class='fa fa-save fa-fw'></i>
-                        </button>
-                        <button class='btn btn-default' ng-click="embedMatter()" title='添加素材'>
-                        <i class='fa fa-file fa-fw'></i>
-                        </button>
                         <button class='btn btn-default' ng-click="removeWrap()" title='删除' ng-disabled='!activeWrap'>
                         <i class='fa fa-remove fa-fw'></i>
                         </button>
@@ -146,6 +145,18 @@
         </div>
     </div>
     <!--page-->
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container-fluid" style='text-align:center'>
+            <form class="navbar-form" style='display:inline-block'>
+                <button class='btn' ng-disabled='!modified&&!ep.$$modified' ng-class="(modified||ep.$$modified)?'btn-success':'btn-default'" ng-click="updPage(ep,['data_schemas','html'])">保存修改</button>
+                <button class='btn btn-success' ng-click="publish()">收集数据</button>
+                <a href="/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}">查看结果</a>
+            </form>
+            <form class="navbar-form navbar-right" style='display:inline-block'>
+                <button class='btn btn-default' ng-click="remove()">删除活动</button>
+            </form>
+        </div>
+    </nav>
 </div>
 <script type="text/ng-template" id="appSetting.html">
     <div id="appSetting">
