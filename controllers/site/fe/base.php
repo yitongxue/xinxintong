@@ -159,7 +159,7 @@ class base extends \TMS_CONTROLLER {
 	protected function snsOAuthUserByCode($site, $code, $snsName) {
 		$modelSns = $this->model('sns\\' . $snsName);
 		$snsConfig = $modelSns->bySite($site);
-		if ($snsConfig === false && $snsConfig->joined !== 'Y') {
+		if ($snsConfig === false || $snsConfig->joined !== 'Y') {
 			$snsConfig = $modelSns->bySite('platform');
 		}
 		$snsProxy = $this->model('sns\\' . $snsName . '\proxy', $snsConfig);
