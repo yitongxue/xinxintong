@@ -86,8 +86,8 @@ class main extends base {
 	private function _requireSnsOAuth($siteid, &$app) {
 		$entryRule = $app->entry_rule;
 		if ($this->userAgent() === 'wx') {
-			die('xxxxxxxx2222');
 			if (isset($entryRule->wxfan)) {
+				die('xxxxxxxx2222:');
 				if (!isset($this->who->sns->wx)) {
 					if ($wxConfig = $this->model('sns\wx')->bySite($siteid)) {
 						if ($wxConfig->joined === 'Y') {
