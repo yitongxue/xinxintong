@@ -109,7 +109,7 @@ class main extends base {
 						}
 					}
 				}
-			} else if (!empty($entryRule->sns->yx->entry)) && $this->userAgent() === 'yx') {
+			} else if (!empty($entryRule->sns->yx->entry) && $this->userAgent() === 'yx') {
 				if (!isset($this->who->sns->yx)) {
 					if ($yxConfig = $this->model('sns\yx')->bySite($siteid)) {
 						if ($yxConfig->joined === 'Y') {
