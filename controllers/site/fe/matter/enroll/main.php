@@ -87,7 +87,6 @@ class main extends base {
 		$entryRule = $app->entry_rule;
 		if ($entryRule->scope === 'sns') {
 			if ($this->userAgent() === 'wx') {
-				die('xxxxxxxx2222:' . json_encode($entryRule));
 				if (!empty($entryRule->sns->wx->entry)) {
 					if (!isset($this->who->sns->wx)) {
 						if ($wxConfig = $this->model('sns\wx')->bySite($siteid)) {
