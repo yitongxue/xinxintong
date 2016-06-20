@@ -317,7 +317,7 @@ class record extends \pl\fe\matter\base {
 						}
 						$modelWxfan === false && $modelWxfan = $this->model('sns\wx\fan');
 						$fan = $modelWxfan->byUser($wxSiteId, $userid, 'openid', 'Y');
-						die(json_encode($fan));
+						die(json_encode($tmplmsgId));
 						/*如果定义了发送素材的模版消息，用模版消息发送*/
 						$this->tmplmsgSendByOpenid($tmplmsgId, $fan->openid, $message);
 						break;
