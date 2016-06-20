@@ -71,6 +71,7 @@ class base extends \TMS_CONTROLLER {
 			$wxConfig = $this->model('sns\wx')->bySite($siteId);
 			$proxy = $this->model('sns\wx\proxy', $wxConfig);
 			$rst = $proxy->messageTemplateSend($msg);
+			die(json_encode($rst));
 			if ($rst[0] === false) {
 				return $rst;
 			}
