@@ -1,4 +1,4 @@
-app = angular.module('app', ['ngRoute', 'ui.tms', 'matters.xxt']);
+app = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt']);
 app.config(['$controllerProvider', '$locationProvider', function($controllerProvider, $locationProvider) {
 	app.provider = {
 		controller: $controllerProvider.register
@@ -110,6 +110,26 @@ app.controller('ctrlPhase', ['$scope', 'http2', function($scope, http2) {
 		var data = {
 			title: '期数' + ($scope.phases.length + 1)
 		};
+		/*设置阶段的缺省起止时间*/
+		(function() {
+			var nextDay = new Date(),
+				lastEndAt;
+			if ($scope.phases.length) {
+				lastEndAt = 0;
+				angular.forEach($scope.phases, function(phase) {
+					if (phase.end_at > lastEndAt) {
+						lastEndAt = phase.end_at;
+					}
+				});
+				/* 最后一天的下一天 */
+				nextDay.setTime(lastEndAt * 1000 + 86400000);
+			} else {
+				/* tomorrow */
+				nextDay.setTime(nextDay.getTime() + 86400000);
+			}
+			data.start_at = nextDay.setHours(0, 0, 0, 0) / 1000;
+			data.end_at = nextDay.setHours(23, 59, 59, 0) / 1000;
+		})();
 		http2.post('/rest/pl/fe/matter/mission/phase/create?site=' + $scope.siteId + '&mission=' + $scope.id, data, function(rsp) {
 			$scope.phases.push(rsp.data);
 		});
@@ -277,6 +297,8 @@ app.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope, $
 					title: $scope.editing.title + '-评价'
 				}
 			};
+			url += '&scenario=voting';
+			url += '&template=simple';
 		}
 		http2.post(url, config, function(rsp) {
 			location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;

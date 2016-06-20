@@ -3,7 +3,7 @@ define(['require', 'page'], function(require, pageLib) {
 	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider) {
 		var RouteParam = function(name) {
 			var baseURL = '/views/ytx/pl/fe/matter/enroll/';
-			this.templateUrl = baseURL + name + '.html?=5';
+			this.templateUrl = baseURL + name + '.html?=7';
 			this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
 			this.resolve = {
 				load: function($q) {
@@ -49,14 +49,17 @@ define(['require', 'page'], function(require, pageLib) {
 			});
 			return defer.promise;
 		};
-		$scope.update = function(name) {
-			if (['entry_rule'].indexOf(name) !== -1) {
-				modifiedData[name] = encodeURIComponent($scope.app[name]);
-			} else if (name === 'tags') {
-				modifiedData.tags = $scope.app.tags.join(',');
-			} else {
-				modifiedData[name] = $scope.app[name];
-			}
+		$scope.update = function(names) {
+			angular.isString(names) && (names = [names]);
+			angular.forEach(names, function(name) {
+				if (['entry_rule'].indexOf(name) !== -1) {
+					modifiedData[name] = encodeURIComponent($scope.app[name]);
+				} else if (name === 'tags') {
+					modifiedData.tags = $scope.app.tags.join(',');
+				} else {
+					modifiedData[name] = $scope.app[name];
+				}
+			});
 			$scope.modified = true;
 
 			return $scope.submit();
@@ -64,7 +67,7 @@ define(['require', 'page'], function(require, pageLib) {
 		$scope.createPage = function() {
 			var deferred = $q.defer();
 			$uibModal.open({
-				templateUrl: '/views/default/pl/fe/matter/enroll/component/createPage.html?_=3',
+				templateUrl: '/views/ytx/pl/fe/matter/enroll/component/createPage.html?_=3',
 				backdrop: 'static',
 				controller: ['$scope', '$uibModalInstance', function($scope, $mi) {
 					$scope.options = {};

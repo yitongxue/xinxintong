@@ -1,11 +1,12 @@
-define(['require'], function(require) {
-	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'matters.xxt']);
+define(['require'], function() {
+	'use strict';
+	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt']);
 	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', function($controllerProvider, $routeProvider, $locationProvider) {
 		ngApp.provider = {
 			controller: $controllerProvider.register
 		};
 		$routeProvider.when('/rest/pl/fe/matter/group/player', {
-			templateUrl: '/views/ytx/pl/fe/matter/group/player.html?_=2',
+			templateUrl: '/views/ytx/pl/fe/matter/group/player.html?_=1',
 			controller: 'ctrlRecord',
 			resolve: {
 				load: function($q) {
@@ -29,7 +30,7 @@ define(['require'], function(require) {
 				}
 			}
 		}).otherwise({
-			templateUrl: '/views/ytx/pl/fe/matter/group/setting.html?_=3',
+			templateUrl: '/views/ytx/pl/fe/matter/group/setting.html?_=5',
 			controller: 'ctrlSetting',
 			resolve: {
 				load: function($q) {
@@ -61,13 +62,17 @@ define(['require'], function(require) {
 			});
 			return defer.promise;
 		};
-		$scope.update = function(name) {
-			if (name === 'tags') {
-				modifiedData.tags = $scope.app.tags.join(',');
-			} else {
-				modifiedData[name] = $scope.app[name];
-			}
+		$scope.update = function(names) {
+			angular.isString(names) && (names = [names]);
+			angular.forEach(names, function(name) {
+				if (name === 'tags') {
+					modifiedData.tags = $scope.app.tags.join(',');
+				} else {
+					modifiedData[name] = $scope.app[name];
+				}
+			});
 			$scope.modified = true;
+
 			return $scope.submit();
 		};
 		$scope.syncByApp = function() {

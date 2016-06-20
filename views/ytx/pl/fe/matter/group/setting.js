@@ -1,7 +1,4 @@
 define(['frame'], function(ngApp) {
-	/**
-	 *
-	 */
 	ngApp.provider.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', 'mediagallery', function($scope, http2, $uibModal, mediagallery) {
 		window.onbeforeunload = function(e) {
 			var message;
@@ -92,9 +89,28 @@ define(['frame'], function(ngApp) {
 		$scope.remove = function() {
 			if (window.confirm('确定删除？')) {
 				http2.get('/rest/pl/fe/matter/group/remove?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
-					location = '/rest/pl/fe/site/console?site=' + $scope.siteId;
+					if ($scope.app.mission) {
+						location = "/rest/pl/fe/matter/mission?site=" + $scope.siteId + "&id=" + $scope.app.mission.id;
+					} else {
+						location = '/rest/pl/fe/site/console?site=' + $scope.siteId;
+					}
 				});
 			}
+		};
+		$scope.choosePhase = function() {
+			var phaseId = $scope.app.mission_phase_id,
+				i, phase, newPhase;
+			for (i = $scope.app.mission.phases.length - 1; i >= 0; i--) {
+				phase = $scope.app.mission.phases[i];
+				$scope.app.title = $scope.app.title.replace('-' + phase.title, '');
+				if (phase.phase_id === phaseId) {
+					newPhase = phase;
+				}
+			}
+			if (newPhase) {
+				$scope.app.title += '-' + newPhase.title;
+			}
+			$scope.update(['mission_phase_id', 'title']);
 		};
 	}]);
 	ngApp.provider.controller('ctrlRule', ['$scope', '$uibModal', 'http2', function($scope, $uibModal, http2) {
@@ -146,6 +162,13 @@ define(['frame'], function(ngApp) {
 					$scope.rounds = rsp.data;
 					$scope.group_rule = rule;
 				});
+			});
+		};
+		$scope.emptyRule = function() {
+			var url = '/rest/pl/fe/matter/group/configRule?site=' + $scope.siteId + '&app=' + $scope.id;
+			http2.post(url, {}, function(rsp) {
+				$scope.rounds = [];
+				$scope.group_rule = {};
 			});
 		};
 		$scope.addRound = function() {

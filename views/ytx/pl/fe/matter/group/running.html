@@ -25,14 +25,12 @@
             <div class='help-block'>分组名称</div>
         </div>
         <div class='form-group compact'>
-            <input type="text" class="form-control" ng-model="selectedRound.extattrs.credit" tms-auto-update tms-wait=1000 tms-update="updateRound('extattrs')">
-            <div class='help-block'>积分</div>
+            <input type="text" class="form-control" ng-model="selectedRound.extattrs.attr1" tms-auto-update tms-wait=1000 tms-update="updateRound('extattrs')">
+            <div class='help-block'>扩展属性1</div>
         </div>
         <div class='form-group compact'>
-            <select class='form-control' ng-model="selectedRound.extattrs.leader" ng-options="player.id as player.data.name for player in players" ng-change="updateRound('extattrs')">
-                <option></option>
-            </select>
-            <div class='help-block'>组长</div>
+            <input type="text" class="form-control" ng-model="selectedRound.extattrs.attr2" tms-auto-update tms-wait=1000 tms-update="updateRound('extattrs')">
+            <div class='help-block'>扩展属性2</div>
         </div>
     </div>
     <div class='tile'>

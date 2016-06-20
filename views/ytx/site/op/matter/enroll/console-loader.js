@@ -18,7 +18,7 @@ window.loading = {
 					exports: "angular"
 				},
 			},
-			deps: ['/views/default/site/op/matter/enroll/console.js?_=1'],
+			deps: ['/views/ytx/site/op/matter/enroll/console.js?_=1'],
 			urlArgs: "bust=" + (new Date()).getTime()
 		});
 	}
