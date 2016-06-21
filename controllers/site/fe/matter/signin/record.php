@@ -166,10 +166,6 @@ class record extends base {
 			/*在指定的登记活动中检查数据*/
 			$enrollApp = $this->model('matter\enroll')->byId($app->enroll_app_id);
 			if ($enrollApp) {
-<<<<<<< HEAD
-				$enrollRecord = $this->model('matter\enroll\record')->byData($site, $enrollApp, $requireCheckedData);
-				if (empty($enrollRecord)) {
-=======
 				$modelEnrollRec = $this->model('matter\enroll\record');
 				$enrollRecords = $modelEnrollRec->byData($site, $enrollApp, $requireCheckedData);
 				if (empty($enrollRecords)) {
@@ -178,7 +174,6 @@ class record extends base {
 						array('verified' => 'N'),
 						"enroll_key='{$signState->ek}'"
 					);
->>>>>>> upstream/master
 					$signState->verified = 'N';
 					if (isset($app->entry_rule->fail->entry)) {
 						$signState->forword = $app->entry_rule->fail->entry;
