@@ -69,8 +69,9 @@ app.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', 'mediagallery', f
 	};
 	$scope.$on('xxt.tms-datepicker.change', function(event, data) {
 		if (data.state.indexOf('mission.') === 0) {
-			$scope.editing[data.state] = data.value;
-			$scope.update(data.state);
+			prop = data.state.substr(8);
+			$scope.editing[prop] = data.value;
+			$scope.update(prop);
 		}
 	});
 	$scope.editPage = function(event, page) {
