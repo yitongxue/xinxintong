@@ -6,7 +6,7 @@
         <title>项目</title>
         <link href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
         <link href="/static/css/tms.css?_=1" rel="stylesheet">
-        <link href="/views/ytx/pl/fe/matter/mission/main.css?_=2" rel="stylesheet">
+        <link href="/views/ytx/pl/fe/matter/mission/main.css?_=3" rel="stylesheet">
     
     <body ng-app='app' ng-controller='ctrlApp' ng-cloak class='ng-cloak'>
         <notice-box err='errmsg' info='infomsg' prog='progmsg' delay='2000'></notice-box>
@@ -79,7 +79,10 @@
                     </div><!--tile-->
                     <div class='tile' ng-controller="ctrlPhase">
                         <div class='list-group'>
-                            <div class='list-group-item' ng-repeat="p in phases">
+                            <div class='list-group-item clearfix' ng-repeat="p in phases">
+                                <div style='text-align:right'>
+                                    <button class='btn btn-default' ng-click="remove(p)">删除阶段</button>
+                                </div>
                                 <div class='help-block'>期数名称</div>
                                 <input type="text" class="form-control" ng-model="p.title" tms-auto-update tms-wait=1000 tms-update="update(p,'title')">
                                 <div class='help-block'>期数说明</div>
@@ -88,7 +91,6 @@
                                 <tms-datepicker class='tms-datepicker' tms-title='开始时间' tms-obj="p" tms-date='p.start_at' tms-state='phase.start_at' tms-mask="y,m,d"></tms-datepicker>
                                 <div class='help-block'>期数结束时间</div>
                                 <tms-datepicker class='tms-datepicker' tms-title='结束时间' tms-obj="p" tms-date='p.end_at' tms-state='phase.end_at' tms-mask="y,m,d,23,59"></tms-datepicker>
-                                <button class='btn btn-default' ng-click="remove(p)">删除</button>
                             </div>
                         </div>
                         <div class='help-block'>如果您的项目多于1期／次，请点击下面按钮</div>
