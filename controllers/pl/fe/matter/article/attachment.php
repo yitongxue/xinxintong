@@ -56,7 +56,7 @@ class resumableAliOss {
 			fclose($handle);
 			//
 			$rsp = $fs2->create_mpu_object($this->siteId . $this->dest, $tmpfname);
-			echo (json_encode($rsp));
+			die(json_encode($rsp));
 		}
 	}
 	/**
