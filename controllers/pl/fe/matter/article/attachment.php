@@ -70,7 +70,6 @@ class resumableAliOss {
 		$content = base64_decode(preg_replace('/data:(.*?)base64\,/', '', $_POST['resumableChunkContent']));
 		// move the temporary file
 		$fs = \TMS_APP::M('fs/saestore', $this->siteId);
-		die('xxxxxxxx');
 		if (!$fs->write($dest_file, $content)) {
 			return array(false, 'Error saving (move_uploaded_file) chunk ' . $_POST['resumableChunkNumber'] . ' for file ' . $_POST['resumableFilename']);
 		} else {
