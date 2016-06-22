@@ -56,7 +56,7 @@ class resumableAliOss {
 			fclose($handle);
 			//
 			$rsp = $fs2->create_mpu_object($this->siteId . $this->dest, $tmpfname);
-			die(json_encode($rsp));
+			echo (json_encode($rsp));
 		}
 	}
 	/**
@@ -73,6 +73,7 @@ class resumableAliOss {
 		if (!$fs->write($dest_file, $content)) {
 			return array(false, 'Error saving (move_uploaded_file) chunk ' . $_POST['resumableChunkNumber'] . ' for file ' . $_POST['resumableFilename']);
 		} else {
+			die('xxxxxxxx');
 			// check if all the parts present, and create the final destination file
 			$this->createFileFromChunks($temp_dir, $_POST['resumableFilename'], $_POST['resumableChunkSize'], $_POST['resumableTotalSize']);
 			return array(true);
