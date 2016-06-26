@@ -1,5 +1,5 @@
-'use strict';
 define(['main'], function(ngApp) {
+	'use strict';
 	ngApp.provider.service('serTmplmsg', ['$q', 'http2', function($q, http2) {
 		var _baseURL = '/rest/pl/fe/matter/tmplmsg';
 		this.list = function() {
@@ -89,7 +89,7 @@ define(['main'], function(ngApp) {
 			serTmplmsg.addParam($scope.editing.id).then(function(data) {
 				var oNewParam = {
 					id: data,
-					pname: 'newparam',
+					pname: 'keyword',
 					plabel: ''
 				};
 				!angular.isArray($scope.editing.params) && ($scope.editing.params = []);

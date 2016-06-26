@@ -21,17 +21,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				location.href = '/rest/pl/fe/matter/enroll/publish?site=' + $scope.siteId + '&id=' + $scope.id;
 			});
 		};
-		$scope.remove = function() {
-			if (window.confirm('确定删除？')) {
-				http2.get('/rest/pl/fe/matter/enroll/remove?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
-					if ($scope.app.mission) {
-						location = "/rest/pl/fe/matter/mission?site=" + $scope.siteId + "&id=" + $scope.app.mission.id;
-					} else {
-						location = '/rest/pl/fe/site/console?site=' + $scope.siteId;
-					}
-				});
-			}
-		};
 		$scope.addPage = function() {
 			$scope.createPage().then(function(page) {
 				$scope.choosePage(page);
@@ -44,7 +33,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			if (page === $scope.ep && names.indexOf('html') !== -1) {
 				$scope.ep.purifyHtml();
 			}
-			$scope.$root.progmsg = '正在保存页面...';
 			angular.forEach(names, function(name) {
 				p[name] = name === 'html' ? encodeURIComponent(page[name]) : page[name];
 			});
@@ -55,7 +43,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			url += '&cname=' + page.code_name;
 			http2.post(url, p, function(rsp) {
 				page.$$modified = false;
-				$scope.$root.progmsg = '';
 				defer.resolve();
 			});
 			return defer.promise;
@@ -102,6 +89,13 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 		$scope.$watch('app', function(app) {
 			if (!app) return;
 			$scope.ep = app.pages[0];
+			if (app.mission && app.mission.phases && app.mission.phases.length) {
+				$scope.phases = app.mission.phases;
+				$scope.phases.unshift({
+					title: '全部',
+					phase_id: ''
+				});
+			}
 		});
 		$scope.choosePage = function(page) {
 			if (angular.isString(page)) {
@@ -117,7 +111,15 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			tinymce.activeEditor.setContent(page.html);
 		};
 		$scope.newSchema = function(type) {
-			var newSchema = schemaLib.newSchema(type, $scope.app);
+			var newSchema, mission;
+			if (type === 'phase') {
+				mission = $scope.app.mission;
+				if (!mission || !mission.phases || mission.phases.length === 0) {
+					alert('请先指定项目的阶段');
+					return;
+				}
+			}
+			newSchema = schemaLib.newSchema(type, $scope.app);
 			$scope.app.data_schemas.push(newSchema);
 			$scope.update('data_schemas').then(function() {
 				$scope.$broadcast('xxt.matter.enroll.app.data_schemas.created', newSchema);
@@ -154,10 +156,10 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			appSchemas = $scope.app.data_schemas,
 			chooseState = {};
 		angular.forEach(pageSchemas, function(dataWrap) {
-			if (dataWrap.schema && chooseState[dataWrap.schema.id]) {
+			if (dataWrap.schema) {
 				chooseState[dataWrap.schema.id] = true;
 			} else {
-				console.error('page schema not exist', dataWrap);
+				console.error('page[' + $scope.ep.name + '] schema not exist', dataWrap);
 			}
 		});
 		$scope.appSchemas = appSchemas;

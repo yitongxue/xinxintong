@@ -4,6 +4,7 @@ body{background:#f8f8f8;padding:71px 0;}
 .tile>.form-group,.tile>.checkbox{padding:8px;background:#fff;border-radius:4px;}
 .tile>.form-group.compact{margin-bottom:0;}
 .tile>.form-group:last-child{margin-bottom:0;}
+#app-view,#publish-view{padding-bottom:71px;}
 
 /*app-setting*/
 #appSetting .checkbox{display:block;}

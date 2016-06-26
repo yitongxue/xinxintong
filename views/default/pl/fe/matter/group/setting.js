@@ -15,7 +15,7 @@ define(['frame'], function(ngApp) {
 			$scope.app.state = 2;
 			$scope.update('state');
 			$scope.submit().then(function() {
-				location.href = '/rest/pl/fe/matter/group/running?site=' + $scope.siteId + '&id=' + $scope.id;
+				location.href = '/rest/site/op/matter/group?site=' + $scope.siteId + '&app=' + $scope.id;
 			});
 		};
 		$scope.importByApp = function() {
@@ -45,8 +45,10 @@ define(['frame'], function(ngApp) {
 						if (appType === 'registration') {
 							url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&size=999';
 							url += '&scenario=registration';
+							delete $scope2.data.includeEnroll;
 						} else {
 							url = '/rest/pl/fe/matter/signin/list?site=' + $scope.siteId + '&size=999';
+							$scope2.data.includeEnroll = 'Y';
 						}
 						app.mission && (url += '&mission=' + app.mission.id);
 						http2.get(url, function(rsp) {
@@ -56,8 +58,14 @@ define(['frame'], function(ngApp) {
 				}],
 				backdrop: 'static'
 			}).result.then(function(data) {
-				if (data.app && data.app.length) {
-					http2.post('/rest/pl/fe/matter/group/player/importByApp?site=' + $scope.siteId + '&app=' + $scope.id, data, function(rsp) {
+				var params;
+				if (data.app) {
+					params = {
+						app: data.app.id,
+						appType: data.appType,
+					};
+					data.appType === 'signin' && (params.includeEnroll = data.includeEnroll);
+					http2.post('/rest/pl/fe/matter/group/player/importByApp?site=' + $scope.siteId + '&app=' + $scope.id, params, function(rsp) {
 						location.href = '/rest/pl/fe/matter/group/player?site=' + $scope.siteId + '&id=' + $scope.id;
 					});
 				}

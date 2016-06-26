@@ -55,16 +55,18 @@ class player extends \pl\fe\matter\base {
 			return new \ResponseTimeout();
 		}
 
-		$posted = $this->getPostJson();
-		if (!empty($posted->app)) {
-			if ($posted->appType === 'registration') {
-				$sourceApp = $this->_importByEnroll($site, $app, $posted->app);
-			} else if ($posted->appType === 'signin') {
-				$sourceApp = $this->_importBySignin($site, $app, $posted->app);
+		$sourceApp = null;
+		$params = $this->getPostJson();
+
+		if (!empty($params->app)) {
+			if ($params->appType === 'registration') {
+				$sourceApp = $this->_importByEnroll($site, $app, $params->app);
+			} else if ($params->appType === 'signin') {
+				$sourceApp = $this->_importBySignin($site, $app, $params);
 			}
 		}
 
-		return new \ResponseData('ok');
+		return new \ResponseData($sourceApp);
 	}
 	/**
 	 * 从关联活动同步数据
@@ -94,37 +96,38 @@ class player extends \pl\fe\matter\base {
 		return new \ResponseData($count);
 	}
 	/**
-	 * 从登记活动导入数据
+	 * 从报名活动导入数据
 	 */
 	private function &_importByEnroll($site, $app, $byApp, $sync = 'N') {
 		$modelGrp = $this->model('matter\group');
 		$modelPlayer = $this->model('matter\group\player');
+		$modelEnl = $this->model('matter\enroll');
 
-		$sourceApp = $this->model('matter\enroll')->byId($byApp, array('fields' => 'data_schemas', 'cascaded' => 'N'));
+		$sourceApp = $modelEnl->byId($byApp, ['fields' => 'data_schemas', 'cascaded' => 'N']);
 		/* 导入活动定义 */
 		$modelGrp->update(
 			'xxt_group',
-			array(
+			[
 				'last_sync_at' => time(),
 				'source_app' => '{"id":"' . $byApp . '","type":"enroll"}',
 				'data_schemas' => $sourceApp->data_schemas,
-			),
+			],
 			"id='$app'"
 		);
 		/* 清空已有分组数据 */
 		$modelPlayer->clean($app, true);
 		/* 获取所有登记数据 */
 		$modelRec = $this->model('matter\enroll\record');
-		$q = array(
+		$q = [
 			'enroll_key',
 			'xxt_enroll_record',
 			"aid='$byApp' and state=1",
-		);
+		];
 		$eks = $modelRec->query_vals_ss($q);
 		/* 导入数据 */
 		if (!empty($eks)) {
-			$objGrp = $modelGrp->byId($app, array('cascaded' => 'N'));
-			$options = array('cascaded' => 'Y');
+			$objGrp = $modelGrp->byId($app, ['cascaded' => 'N']);
+			$options = ['cascaded' => 'Y'];
 			foreach ($eks as $ek) {
 				$record = $modelRec->byId($ek, $options);
 				$user = new \stdClass;
@@ -138,20 +141,38 @@ class player extends \pl\fe\matter\base {
 		return $sourceApp;
 	}
 	/**
-	 * 从登记活动导入数据
+	 * 从签到活动导入数据
+	 * 如果指定了包括报名数据，只需要从报名活动中导入登记项的定义，签到时已经自动包含了报名数据
 	 */
-	private function &_importBySignin($site, $app, $byApp, $sync = 'N') {
+	private function &_importBySignin($site, $app, &$params) {
+		$byApp = $params->app;
 		$modelGrp = $this->model('matter\group');
 		$modelPlayer = $this->model('matter\group\player');
+		$modelSignin = $this->model('matter\signin');
 
-		$sourceApp = $this->model('matter\signin')->byId($byApp, array('fields' => 'data_schemas', 'cascaded' => 'N'));
+		$sourceApp = $modelSignin->byId($byApp, ['fields' => 'data_schemas,enroll_app_id', 'cascaded' => 'N']);
+		$sourceDataSchemas = $sourceApp->data_schemas;
+		/**
+		 * 导入报名数据，需要合并签到和报名的登记项
+		 */
+		if (isset($params->includeEnroll) && $params->includeEnroll === 'Y') {
+			if (!empty($sourceApp->enroll_app_id)) {
+				$modelEnl = $this->model('matter\enroll');
+				$enrollApp = $modelEnl->byId($sourceApp->enroll_app_id, ['fields' => 'data_schemas', 'cascaded' => 'N']);
+				$enrollDataSchemas = json_decode($enrollApp->data_schemas);
+				$sourceDataSchemas = json_decode($sourceDataSchemas);
+				$diff = array_udiff($enrollDataSchemas, $sourceDataSchemas, create_function('$a,$b', 'return strcmp($a->id,$b->id);'));
+				$sourceDataSchemas = array_merge($sourceDataSchemas, $diff);
+				$sourceDataSchemas = $modelGrp->toJson($sourceDataSchemas);
+			}
+		}
 		/* 导入活动定义 */
 		$modelGrp->update(
 			'xxt_group',
 			array(
 				'last_sync_at' => time(),
 				'source_app' => '{"id":"' . $byApp . '","type":"signin"}',
-				'data_schemas' => $sourceApp->data_schemas,
+				'data_schemas' => $sourceDataSchemas,
 			),
 			"id='$app'"
 		);

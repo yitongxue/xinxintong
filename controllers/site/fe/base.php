@@ -252,7 +252,7 @@ class base extends \TMS_CONTROLLER {
 				$ca = false;
 			}
 		} else {
-			$ca = fasle;
+			$ca = false;
 		}
 
 		return $ca;
@@ -264,6 +264,15 @@ class base extends \TMS_CONTROLLER {
 		\TPL::assign('title', $title);
 		\TPL::assign('body', $err);
 		\TPL::output('error');
+		exit;
+	}
+	/**
+	 *
+	 */
+	protected function outputInfo($info, $title = '提示') {
+		\TPL::assign('title', $title);
+		\TPL::assign('body', $info);
+		\TPL::output('info');
 		exit;
 	}
 	/**

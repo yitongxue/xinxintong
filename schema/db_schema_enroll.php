@@ -44,11 +44,12 @@ $sql .= ",form_code_id int not null default 0"; // 表单页 should remove
 $sql .= ",lottery_page_id int not null default 0"; // 抽奖页 should remove
 $sql .= ",open_lastroll char(1) not null default 'Y'"; // 打开最后一条登记记录，还是编辑新的
 $sql .= ",multi_rounds char(1) not null default 'N'"; // 支持轮次
+$sql .= ",notify_submit char(1) not null default 'N'"; // 是否发送提交事件通知
 $sql .= ",can_like_record char(1) not null default 'N'"; // 支持对登记记录点赞 should remove
 $sql .= ",can_remark_record char(1) not null default 'N'"; // 支持对登记记录评论 should remove
 $sql .= ",can_autoenroll char(1) not null default 'N'"; // 是否支持自动登记
-$sql .= ",can_invite char(1) not null default 'N'"; // 是否支持邀请
-$sql .= ",can_signin char(1) not null default 'N'"; // 是否支持签到
+$sql .= ",can_invite char(1) not null default 'N'"; // 是否支持邀请 should remove
+$sql .= ",can_signin char(1) not null default 'N'"; // 是否支持签到 shuld remove
 $sql .= ",can_lottery char(1) not null default 'N'"; // 是否支持抽奖 should remove
 $sql .= ",remark_notice char(1) not null default 'N'";
 $sql .= ",tags text";
@@ -138,10 +139,14 @@ if (!$mysqli->query($sql)) {
 $sql = "create table if not exists xxt_enroll_receiver(";
 $sql .= "id int not null auto_increment";
 $sql .= ",siteid varchar(32) not null";
-$sql .= ",mpid varchar(32) not null default ''";
+$sql .= ",mpid varchar(32) not null default ''"; // should remove
 $sql .= ",aid varchar(40) not null";
-$sql .= ",identity varchar(100) not null";
-$sql .= ",idsrc char(2) not null default ''";
+$sql .= ",join_at int not null default 0"; // 加入时间
+$sql .= ",identity varchar(100) not null"; // should remove
+$sql .= ",idsrc char(2) not null default ''"; // should remove
+$sql .= ",userid varchar(40) not null default ''";
+$sql .= ",nickname varchar(255) not null default ''";
+$sql .= ",sns_user text"; // 社交账号信息
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');
@@ -161,8 +166,9 @@ $sql .= ",openid varchar(255) not null default ''"; // should remove
 $sql .= ",nickname varchar(255) not null default ''";
 $sql .= ",enroll_key varchar(32) not null";
 $sql .= ",enroll_at int not null"; // 填写报名信息时间
-$sql .= ",signin_at int not null default 0"; // 签到时间
-$sql .= ",signin_num int not null default 0"; // 签到次数
+$sql .= ",first_enroll_at int not null"; // 填写报名信息时间
+$sql .= ",signin_at int not null default 0"; // 签到时间 ???
+$sql .= ",signin_num int not null default 0"; // 签到次数 ???
 $sql .= ",tags text";
 $sql .= ",comment text";
 $sql .= ",vid varchar(32)"; // should remove
@@ -244,7 +250,8 @@ if (!$mysqli->query($sql)) {
  * 自定义登记数据统计
  */
 $sql = "create table if not exists xxt_enroll_record_stat(";
-$sql .= "aid varchar(40) not null";
+$sql .= "siteid varchar(32) not null";
+$sql .= ",aid varchar(40) not null";
 $sql .= ",create_at int not null";
 $sql .= ",id varchar(40) not null";
 $sql .= ",title varchar(255) not null";
