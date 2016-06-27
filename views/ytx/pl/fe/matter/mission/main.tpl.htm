@@ -26,6 +26,12 @@
         </nav>
         <div class='container'>
             <div id='viewSetting' ng-controller="ctrlSetting">
+                <nav class="navbar navbar-default">
+                    <div class="navbar-form">
+                        <button class='btn' ng-disabled='!modified' ng-class="modified?'btn-success':'btn-default'" ng-click="submit()">保存项目</button>
+                        <button class='btn btn-default' ng-click="remove()">删除项目</button>
+                    </div>
+                </nav>
                 <div class='attrs'>
                     <div class='tile'>
                         <div class='form-group'>
@@ -97,15 +103,17 @@
                         <button class='btn btn-success' ng-click="add()">添加期数</button>
                     </div>
                 </div>
-                <nav class="navbar navbar-default">
-                    <div class="navbar-form">
-                        <div class="navbar-form">
-                            <button class='btn' ng-disabled='!modified' ng-class="modified?'btn-success':'btn-default'" ng-click="submit()">保存项目</button>
-                        </div>
-                    </div>
-                </nav>
             </div>
             <div id='viewMatter' ng-controller="ctrlMatter">
+                <nav class="navbar navbar-default">
+                    <div class="navbar-form">
+                        <button class='btn btn-success' ng-click="addArticle()">+项目资料</button>
+                        <button class='btn btn-success' ng-click="addEnroll('registration')">+在线报名</button>
+                        <button class='btn btn-success' ng-click="addSignin()">+签到</button>
+                        <button class='btn btn-success' ng-click="addGroup()">+分组</button>
+                        <button class='btn btn-success' ng-click="addEnroll('voting')">+评价</button>
+                    </div>
+                </nav>
                 <div class='matters'>
                     <div class='col-md-6' ng-repeat='m in matters'>
                         <div class='thumbnail' ng-click="open(m)">
@@ -123,15 +131,6 @@
                         </div>
                     </div>
                 </div>
-                <nav class="navbar navbar-default">
-                    <div class="navbar-form">
-                        <button class='btn btn-success' ng-click="addArticle()">+项目资料</button>
-                        <button class='btn btn-success' ng-click="addEnroll('registration')">+在线报名</button>
-                        <button class='btn btn-success' ng-click="addSignin()">+签到</button>
-                        <button class='btn btn-success' ng-click="addGroup()">+分组</button>
-                        <button class='btn btn-success' ng-click="addEnroll('voting')">+评价</button>
-                    </div>
-                </nav>
             </div>
         </div>
         <script src="/static/js/jquery.min.js"></script>

@@ -8,8 +8,9 @@
 		<link href="/views/ytx/pl/fe/site/console.css" rel="stylesheet">
 		<title>我的站点</title>
 	</head>
-	<body ng-app='app' ng-controller='ctrlSite'>
+	<body ng-app='app' ng-controller='ctrlSite' ng-cloak class='ng-cloak'>
 		<notice-box err='errmsg' info='infomsg' delay='1000'></notice-box>
+		<!-- top navbar-->
 		<nav class='navbar navbar-inverse'>
 			<ul class='nav navbar-nav'>
 				<li><a href='/rest/pl/fe' target='_self'>首页</a></li>
@@ -19,25 +20,30 @@
 					<a href='/rest/pl/fe/site/console?site={{siteId}}'>工作台</a>
 				</li>
 				<li>
-					<a href='/rest/pl/fe/site/user?site={{siteId}}' target='_self'>用户</a>
+					<a href='/rest/pl/fe/file?site={{siteId}}' target='_self'>图片库</a>
 				</li>
 				<li>
-					<a href='/rest/pl/fe/file?site={{siteId}}' target='_self'>文件库</a>
-				</li>
-				<li>
-					<a href='/rest/pl/fe/site/setting?site={{siteId}}' target='_self'>机构设置</a>
+					<a href='/rest/pl/fe/site/setting?site={{siteId}}' target='_self'>其它设置</a>
 				</li>
 			</ul>
-			<ul class='nav navbar-nav navbar-right' style='margin-right:0'>
-				<li><a href='/page/pl/fe/user/settings' target='_self'>设置</a></li>
+			<ul class='nav navbar-nav navbar-right'>
+				<li><a href='/page/pl/fe/user/settings' target='_self'>用户设置</a></li>
 				<li><a href='/rest/pl/fe/user/logout' target='_self'>退出</a></li>
 			</ul>
 		</nav>
+		<!-- end top navbar-->
 		<div class='container' ng-controller='ctrlConsole'>
+			<!-- missions -->
 			<div id='viewMissions' ng-controller='ctrlMission'>
-    			<div class='matters'>
-    				<div class='form-group'></div>
-					<div class='col-md-12' ng-repeat='m in matters'>
+				<nav class="navbar navbar-default ytx-top">
+					<div class='container-fluid'>
+						<ul class='nav navbar-nav'>
+							<li class='active'><a href='#'>我的项目</a></li>
+						</ul>
+					</div>
+				</nav>
+    			<div class='missions'>
+					<div class='col-md-12' ng-repeat='m in missions'>
 						<div class='thumbnail' ng-click="open(m)">
 							<h4 class='title' ng-bind='m.title'></h4>
 							<p class='summary' ng-bind='m.summary'></p>
@@ -47,26 +53,40 @@
 							</div>
 						</div>
 					</div>
-					<button class='btn btn-block btn-default' ng-click="moreMissions()" ng-if="page.total>missions.length">更多</button>
+					<div class='form-group'>
+						<button class='btn btn-block btn-default' ng-click="moreMissions()" ng-if="page.total>missions.length">更多</button>
+					</div>
+					<div class='col-md-12' ng-if="missions.length===0">
+                        <div class='thumbnail indicator' ng-click="addMission()">
+                            <div><span class='glyphicon glyphicon-plus'></span>项目</div>
+                        </div>
+                    </div>
 				</div>
-				<nav class="navbar navbar-default">
-					<div class="navbar-form">
-						<button class="btn btn-success" ng-click="addMission()">生成一个新项目</button>
+				<nav class="navbar navbar-default ytx-bottom">
+					<div class="container-fluid">
+						<div class="navbar-form">
+							<button class="btn btn-success" ng-click="addMission()"><span class='glyphicon glyphicon-plus'></span>生成新项目</button>
+						</div>
 					</div>
 				</nav>
 			</div>
-			<div id='viewRecent' ng-controller='ctrlMatters'>
-				<div class="form-group">
-					<select class='form-control' ng-model="matterType" ng-change="chooseMatterType()">
-						<option value='recent'>最近修改</option>
-						<option value='article'>项目资料</option>
-						<option value='enroll'>登记活动</option>
-						<option value='signin'>签到</option>
-						<option value='group'>分组</option>
-					</select>
-			    </div>
+			<!-- end missions -->
+			<!-- matters -->
+			<div id='viewMatter' ng-controller='ctrlMatters'>
+				<nav class="navbar navbar-default ytx-top">
+					<div class='container-fluid'>
+						<ul class='nav navbar-nav'>
+							<li ng-class="{'active':matterType==='recent'}"><a href='#' ng-click="chooseMatterType('recent')">最近</a></li>
+							<li ng-class="{'active':matterType==='registration'}"><a href='#' ng-click="chooseMatterType('registration')">在线报名</a></li>
+							<li ng-class="{'active':matterType==='signin'}"><a href='#' ng-click="chooseMatterType('signin')">签到</a></li>
+							<li ng-class="{'active':matterType==='group'}"><a href='#' ng-click="chooseMatterType('group')">分组</a></li>
+							<li ng-class="{'active':matterType==='voting'}"><a href='#' ng-click="chooseMatterType('voting')">评价</a></li>
+							<li ng-class="{'active':matterType==='article'}"><a href='#' ng-click="chooseMatterType('article')">项目资料</a></li>
+						</ul>
+					</div>
+				</nav>
     			<div class='matters'>
-					<div class='col-md-12' ng-repeat='m in matters'>
+					<div class='col-md-6' ng-repeat='m in matters'>
 						<div class='thumbnail' ng-click="open(m)">
 							<h4 class='title' ng-bind='m.matter_title||m.title'></h4>
 							<p class='summary' ng-bind='m.matter_summary||m.summary'></p>
@@ -76,22 +96,30 @@
 							</div>
 						</div>
 					</div>
-					<button class='btn btn-block btn-default' ng-click="moreMatters()" ng-if="page.total>matters.length">更多</button>
+					<div class='form-group' ng-if="page.total>matters.length">
+						<button class='btn btn-block btn-default' ng-click="moreMatters()">更多</button>
+					</div>
+					<div class='col-md-6' ng-repeat='i in indicators'>
+                        <div class='thumbnail indicator' ng-click="addByIndicator(i)">
+                            <div><span class='glyphicon glyphicon-plus'></span>{{i.title}}</div>
+                        </div>
+                    </div>
 				</div>
-				<nav class="navbar navbar-default">
-				</nav>
+				<nav class="navbar navbar-default ytx-bottom" ng-if="matterType!=='recent'">
+			        <div class="container-fluid">
+			            <form class="navbar-form">
+			                <button class='btn btn-success' ng-click="addMatter()"><span class='glyphicon glyphicon-plus'></span>新建</button>
+			            </form>
+			        </div>
+			    </nav>
 			</div>
-			<div id='viewUsers'>
-				用户动态，开发中
-			</div>
+			<!-- end matters -->
 		</div>
 		<script src="/static/js/angular.min.js"></script>
 		<script src="/static/js/angular-route.min.js"></script>
 		<script src="/static/js/angular-sanitize.min.js"></script>
-		<script src="/static/js/ui-bootstrap.min.js"></script>
 		<script src="/static/js/ui-bootstrap-tpls.min.js"></script>
 		<script src="/static/js/ui-tms.js"></script>
-		<script src="/static/js/matters-xxt.js"></script>
-		<script src="/views/ytx/pl/fe/site/console.js?_=3"></script>
+		<script src="/views/ytx/pl/fe/site/console.js?_=4"></script>
 	</body>
 </html>
