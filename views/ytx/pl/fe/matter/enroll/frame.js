@@ -1,9 +1,9 @@
 define(['require', 'page'], function(require, pageLib) {
 	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'ui.xxt', 'channel.fe.pl']);
-	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider) {
+	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider) {
 		var RouteParam = function(name) {
 			var baseURL = '/views/ytx/pl/fe/matter/enroll/';
-			this.templateUrl = baseURL + name + '.html?=7';
+			this.templateUrl = baseURL + name + '.html?_=' + (new Date() * 1);;
 			this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
 			this.resolve = {
 				load: function($q) {
@@ -20,16 +20,20 @@ define(['require', 'page'], function(require, pageLib) {
 			directive: $compileProvider.directive
 		};
 		$routeProvider
+			.when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish'))
+			.when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
 			.when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
 			.when('/rest/pl/fe/matter/enroll/event', new RouteParam('event'))
 			.when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
-			.when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
 			.when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
-			.when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish'))
 			.when('/rest/pl/fe/matter/enroll/config', new RouteParam('config'))
 			.otherwise(new RouteParam('app'));
 
 		$locationProvider.html5Mode(true);
+
+		$uibTooltipProvider.setTriggers({
+			'show': 'hide'
+		});
 	}]);
 	ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', function($scope, $location, $uibModal, $q, http2) {
 		var ls = $location.search(),
