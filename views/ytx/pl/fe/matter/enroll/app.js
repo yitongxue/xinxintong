@@ -117,40 +117,68 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			tinymce.activeEditor.setContent(page.html);
 		};
 		$scope.newSchema = function(type) {
-			var newSchema;
+			var i, newSchema, mission;
 			if (type === 'phase') {
+				mission = $scope.app.mission;
+				if (!mission || !mission.phases || mission.phases.length === 0) {
+					alert('请先指定项目的课程期数');
+					return;
+				}
 				newSchema = schemaLib.newSchema(type, $scope.app, {
 					title: '课程期数'
 				});
 			} else {
 				newSchema = schemaLib.newSchema(type, $scope.app);
 			}
-			$scope.app.data_schemas.push(newSchema);
-			$scope.update('data_schemas').then(function() {
-				$scope.$broadcast('xxt.matter.enroll.app.data_schemas.created', newSchema);
-			});
-		};
-		$scope.newMember = function() {
-			if (!$scope.memberSchemas || $scope.memberSchemas.length === 0) return;
-
-			var memberSchema = $scope.memberSchemas[0],
-				newSchema = schemaLib.newInput('member');
-
-			newSchema.schema_id = memberSchema.id;
-			if (memberSchema.attr_name[0] === '0') {
-				newSchema.title = '姓名';
-				newSchema.id = 'member.name';
-			} else if (memberSchema.attr_mobile[0] === '0') {
-				newSchema.title = '手机';
-				newSchema.id = 'member.mobile';
-			} else if (memberSchema.attr_email[0] === '0') {
-				newSchema.title = '邮箱';
-				newSchema.id = 'member.email';
+			for (i = $scope.app.data_schemas.length - 1; i >= 0; i--) {
+				if (newSchema.id === $scope.app.data_schemas[i].id) {
+					alert('不允许重复添加登记项');
+					return;
+				}
 			}
 			$scope.app.data_schemas.push(newSchema);
 			$scope.update('data_schemas').then(function() {
 				$scope.$broadcast('xxt.matter.enroll.app.data_schemas.created', newSchema);
 			});
+		};
+		$scope.newMember = function(memberSchema) {
+			var newSchema = schemaLib.newSchema('member'),
+				mapOfMemberSchemas = {};
+
+			angular.forEach($scope.app.data_schemas, function(schema) {
+				if (schema.type === 'member') {
+					mapOfMemberSchemas[schema.id] = schema;
+				}
+			});
+			newSchema.schema_id = memberSchema.id;
+			if (memberSchema.attr_name[0] === '0' && mapOfMemberSchemas['member.name'] === undefined) {
+				newSchema.title = '姓名';
+				newSchema.id = 'member.name';
+			} else if (memberSchema.attr_mobile[0] === '0' && mapOfMemberSchemas['member.mobile'] === undefined) {
+				newSchema.title = '手机';
+				newSchema.id = 'member.mobile';
+			} else if (memberSchema.attr_email[0] === '0' && mapOfMemberSchemas['member.email'] === undefined) {
+				newSchema.title = '邮箱';
+				newSchema.id = 'member.email';
+			} else {
+				(function() {
+					var i, ea;
+					for (var i = memberSchema.extattr.length - 1; i >= 0; i--) {
+						ea = memberSchema.extattr[i];
+						if (mapOfMemberSchemas['member.' + ea.id] === undefined) {
+							newSchema.title = ea.label;
+							newSchema.id = 'member.' + ea.id;
+							break;
+						}
+					}
+				})();
+			}
+			if (newSchema.id.indexOf('member') === 0) {
+				$scope.app.data_schemas.push(newSchema);
+				$scope.update('data_schemas').then(function() {
+					$scope.$broadcast('xxt.matter.enroll.app.data_schemas.created', newSchema);
+				});
+			}
 		};
 	}]);
 	/**
@@ -187,6 +215,13 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				appSchemas.splice(appSchemas.indexOf(removedSchema), 1);
 				$scope.update('data_schemas');
 			}
+			/* 输入项被删除，其它页面上也不应该再有这个输入项 */
+			angular.forEach($scope.app.pages, function(page) {
+				if (page !== $scope.ep) {
+					page.removeBySchema(removedSchema);
+					$scope.updPage(page, ['data_schemas', 'html']);
+				}
+			});
 		});
 		$scope.$on('xxt.matter.enroll.page.data_schemas.added', function(event, addedSchema, target) {
 			chooseState[addedSchema.id] = true;

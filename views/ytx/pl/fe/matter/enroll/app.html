@@ -61,7 +61,7 @@
                     <button class='btn btn-default' ng-click="newSchema('file')">上传文件</button>
                     <button class='btn btn-default' ng-click="newSchema('location')">上传位置</button>
                     <button class='btn btn-default' ng-click="newSchema('phase')">课程期数</button>
-                    <button class='btn btn-default ytx-hide' ng-click="newMember()">自定义用户信息</button>
+                    <button class='btn btn-default' ng-click="newMember(ms)" ng-repeat="ms in memberSchemas"><span>自定义用户信息：</span><span>{{ms.title}}</span></button>
                 </div>
                 <!--create input wrap-->
                 <!--create button wrap-->
