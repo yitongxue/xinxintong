@@ -1,0 +1,218 @@
+{
+	"pages": [{
+		"name": "enroll",
+		"title": "填写报名信息页",
+		"type": "I",
+		"data_schemas": [{
+			"schema": {
+				"id": "name",
+				"title": "姓名",
+				"type": "name"
+			},
+			"config": {
+				"required": "Y",
+				"showname": "label"
+			}
+		}, {
+			"schema": {
+				"id": "mobile",
+				"title": "手机",
+				"type": "mobile"
+			},
+			"config": {
+				"required": "Y",
+				"showname": "label"
+			}
+		}, {
+			"schema": {
+				"id": "gender",
+				"title": "性别",
+				"type": "single",
+				"ops": [{
+					"v": "v1",
+					"l": "男"
+				}, {
+					"v": "v2",
+					"l": "女"
+				}]
+			},
+			"config": {
+				"required": "Y",
+				"showname": "label",
+				"component": "R",
+				"align": "H"
+			}
+		}, {
+			"schema": {
+				"id": "department",
+				"title": "部门",
+				"type": "shorttext"
+			},
+			"config": {
+				"required": "Y",
+				"showname": "label"
+			}
+		}, {
+			"schema": {
+				"id": "position",
+				"title": "职务",
+				"type": "shorttext"
+			},
+			"config": {
+				"required": "Y",
+				"showname": "label"
+			}
+		}],
+		"act_schemas": [{
+			"id": "act1",
+			"name": "submit",
+			"label": "提交信息",
+			"next": "result"
+		}]
+	}, {
+		"name": "result",
+		"title": "学员报名后展示页",
+		"type": "V",
+		"data_schemas": [{
+			"config": {
+				"id": "s1",
+				"pattern": "record",
+				"inline": "Y",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "name",
+				"title": "名称",
+				"type": "name"
+			}
+		}, {
+			"config": {
+				"id": "s2",
+				"pattern": "record",
+				"inline": "Y",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "mobile",
+				"title": "手机",
+				"type": "mobile"
+			}
+		}, {
+			"config": {
+				"id": "s3",
+				"pattern": "record",
+				"inline": "Y",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "gender",
+				"title": "性别",
+				"type": "single",
+				"ops": [{
+					"v": "v1",
+					"l": "男"
+				}, {
+					"v": "v2",
+					"l": "女"
+				}]
+			}
+		}, {
+			"config": {
+				"id": "s4",
+				"pattern": "record",
+				"inline": "Y",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "department",
+				"title": "部门",
+				"type": "shorttext"
+			}
+		}, {
+			"config": {
+				"id": "s5",
+				"pattern": "record",
+				"inline": "Y",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "department",
+				"title": "部门",
+				"type": "shorttext"
+			}
+		}, {
+			"config": {
+				"id": "s6",
+				"pattern": "record",
+				"inline": "Y",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "position",
+				"title": "职务",
+				"type": "shorttext"
+			}
+		}, {
+			"config": {
+				"id": "s7",
+				"pattern": "record",
+				"inline": "Y",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "enrollAt",
+				"title": "报名时间",
+				"type": "_enrollAt"
+			}
+		}],
+		"act_schemas": [{
+			"id": "act2",
+			"name": "editRecord",
+			"label": "修改报名信息",
+			"next": "enroll"
+		}, {
+			"id": "act3",
+			"name": "removeRecord",
+			"label": "取消报名",
+			"next": "enroll"
+		}]
+	}],
+	"schema": [{
+		"id": "name",
+		"title": "名称",
+		"type": "name"
+	}, {
+		"id": "mobile",
+		"title": "手机",
+		"type": "mobile"
+	}, {
+		"id": "gender",
+		"title": "性别",
+		"type": "single",
+		"ops": [{
+			"v": "v1",
+			"l": "男"
+		}, {
+			"v": "v2",
+			"l": "女"
+		}]
+	}, {
+		"id": "department",
+		"title": "部门",
+		"type": "shorttext"
+	}, {
+		"id": "position",
+		"title": "职务",
+		"type": "shorttext"
+	}],
+	"scenarioConfig": {
+		"can_rounds": "D"
+	},
+	"entryRule": {
+		"otherwise": {
+			"entry": "enroll"
+		}
+	},
+	"multi_rounds": "N",
+	"enrolled_entry_page": "result"
+}
