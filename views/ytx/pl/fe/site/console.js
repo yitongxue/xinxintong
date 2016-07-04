@@ -22,7 +22,7 @@ ngApp.controller('ctrlMission', ['$scope', 'http2', function($scope, http2) {
         });
     };
     $scope.open = function(mission) {
-        location.href = '/rest/pl/fe/matter/mission?id=' + mission.id + '&site=' + $scope.siteId;
+        location.href = '/rest/pl/fe/matter/mission?id=' + mission.mission_id + '&site=' + $scope.siteId;
     };
     $scope.page = {
         at: 1,
