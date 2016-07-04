@@ -1,0 +1,33 @@
+html,body{height:100%;width:100%}
+body{background:#f8f8f8;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.ng-cloak{display:none;}
+.navbar{min-height:52px;}
+.site.navbar-nav{position:absolute;left:50%;margin-left:-208px;float:none;}
+.site.navbar-nav .active:after{content:' ';position:absolute;left:0;right:0;bottom:-1px;height:3px;background:red;}
+.container{flex:1.0;overflow:hidden;position:relative;display:flex;padding:0;}
+#viewMissions,#viewMatter{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:4px;background:#fff;}
+#viewMissions{flex:1.0;}
+#viewMatter{flex:2.0;}
+#viewMissions{margin-right:8px;}
+.navbar.ytx-top{margin:-1px -1px 15px;}
+.navbar.ytx-bottom{margin:0 -1px;}
+.navbar.ytx-bottom .container-fluid{text-align:center;}
+.navbar.ytx-bottom .container-fluid .navbar-form{display:inline-block;}
+
+/*missions*/
+#viewMissions .missions{flex:1.0;overflow-y:auto;overflow-x:hidden;}
+#viewMissions .thumbnail{position:relative;height:145px;cursor:pointer;display:flex;flex-direction:column;padding:8px;}
+#viewMissions .thumbnail .summary{flex:1;overflow:hidden;}
+#viewMissions .thumbnail .attr{display:flex;}
+#viewMissions .thumbnail .operator_name{flex:1;}
+
+/*recent*/
+#viewMatter .matters{flex:1.0;overflow-y:auto;overflow-x:hidden;}
+#viewMatter .thumbnail{position:relative;height:145px;cursor:pointer;display:flex;flex-direction:column;padding:8px;}
+#viewMatter .thumbnail .summary{flex:1;overflow:hidden;}
+#viewMatter .thumbnail .attr{display:flex;}
+#viewMatter .thumbnail .operator_name{flex:1;}
+
+/*indicator*/
+#viewMissions .thumbnail.indicator,#viewMatter .thumbnail.indicator{flex-direction:row;align-items:center;background:#f8f8f8;}
+#viewMissions .thumbnail.indicator>div,#viewMatter .thumbnail.indicator>div{flex:1.0;font-size:18px;text-align:center;}
