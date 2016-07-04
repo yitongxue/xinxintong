@@ -37,10 +37,6 @@
             <div class='help-block'>作者（可选）：最多8个汉字或英文字符</div>
             <input type='text' class='form-control' ng-model='editing.author' ng-change="update('author');">
         </div>
-        <div class='form-group compact'>
-            <div class='help-block'>原文链接(可选)</div>
-            <textarea class='form-control' ng-model='editing.url' ng-change="update('url');"></textarea>
-        </div>
     </div>
     <div class='tile'>
         <div class='form-group'>
@@ -101,55 +97,6 @@
         </div>
     </div>
     <div class='tile'>
-        <div class='form-group' ng-controller='ctrlSetChannel' ng-init="matterType='article';matterObj='editing'">
-            <combox evt-prefix='channel' readonly=true prop='title' existing='editing.channels' options='channels'></combox>
-            <div class='help-block'>频道（可选）</div>
-        </div>
-    </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <combox evt-prefix='tag' prop='title' existing='editing.tags' options='tags'></combox>
-            <div class='help-block'>内容标签</div>
-        </div>
-        <div class='form-group'>
-            <combox evt-prefix='tag2' prop='title' existing='editing.tags2' options='tags2'></combox>
-            <div class='help-block'>管理标签</div>
-        </div>
-    </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <memberacl site-id='{{siteId}}' obj='editing' prop-access='access_control' update-access-control="update('access_control')" prop-member-schemas='authapis' update-member-schemas="update('authapis')" prop-acl='acl' change-acl-url='/rest/pl/fe/matter/article/setAcl?site={{siteId}}&id={{editing.id}}' remove-acl-url='/rest/pl/fe/matter/article/removeAcl?site={{siteId}}'></memberacl>
-        </div>
-    </div>
-    <div class='tile' ng-if="editing.entry">
-        <div class='form-group'>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.approved' ng-change="update('approved');">审核通过</label>
-        </div>
-    </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.can_share' ng-change="update('can_share');">可以分享</label>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.can_fullsearch' ng-change="update('can_fullsearch');">可以检索</label>
-        </div>
-    </div>
-    <div class='tile'>
-        <div class='form-group'>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.use_site_header' ng-change="update('use_site_header');">使用站点页眉</label>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.use_site_footer' ng-change="update('use_site_footer');">使用站点页脚</label>
-        </div>
-        <div class='form-group' ng-if="editing.mission_id>0">
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.use_mission_header' ng-change="update('use_mission_header');">使用项目页眉</label>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.use_mission_footer' ng-change="update('use_mission_footer');">使用项目页脚</label>
-        </div>
-    </div>
-    <div class='tile'>
         <div class='form-group'>
             <div>创建人：{{editing.creater_name}}</div>
             <div>创建时间：{{editing.create_at*1000|date:'yy-MM-dd HH:mm'}}</div>
@@ -166,7 +113,7 @@
             <button class='btn btn-block' ng-click="submit()" ng-disabled='!modified' ng-class="modified?'btn-success':'btn-default'">保存</button>
         </form>
         <form class="navbar-form navbar-right" style='display:inline-block'>
-            <button class='btn btn-default' ng-click="remove()">删除图文</button>
+            <button class='btn btn-default' ng-click="remove()">删除资料</button>
         </form>
     </div>
 </nav>
