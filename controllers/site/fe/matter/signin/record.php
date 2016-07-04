@@ -199,6 +199,11 @@ class record extends base {
 						$signState->forword = $app->entry_rule->success->entry;
 					}
 				}
+				/* 已经登记，更新原先提交的数据 */
+				$modelRec->update('xxt_signin_record',
+					array('verified' => $signState->verified),
+					"enroll_key='{$signState->ek}'"
+				);
 			}
 		}
 		/**
