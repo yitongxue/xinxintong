@@ -81,6 +81,9 @@
     <!-- left -->
     <div class='col-md-4'>
         <div class='tile'>
+            <div class='form-group' ng-if="!app.mission">
+                <button class='btn btn-block btn-success' ng-click="assignMission()">指定项目</button>
+            </div>
             <div class='form-group'>
                 <button class='btn btn-block btn-success' ng-click='importByApp()'>导入用户</button>
             </div>

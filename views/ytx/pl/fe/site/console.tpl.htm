@@ -11,7 +11,7 @@
 	<body ng-app='app' ng-controller='ctrlSite' ng-cloak class='ng-cloak'>
 		<notice-box err='errmsg' info='infomsg' delay='1000'></notice-box>
 		<!-- top navbar-->
-		<nav class='navbar navbar-inverse'>
+		<nav class='navbar navbar-inverse tms-large'>
 			<ul class='nav navbar-nav'>
 				<li><a href='/rest/pl/fe' target='_self'>首页</a></li>
 			</ul>
@@ -105,8 +105,8 @@
                         </div>
                     </div>
 				</div>
-				<nav class="navbar navbar-default ytx-bottom" ng-if="matterType!=='recent'">
-			        <div class="container-fluid">
+				<nav class="navbar navbar-default ytx-bottom">
+			        <div class="container-fluid" ng-if="matterType!=='recent'">
 			            <form class="navbar-form">
 			                <button class='btn btn-success' ng-click="addMatter()"><span class='glyphicon glyphicon-plus'></span>新建</button>
 			            </form>
