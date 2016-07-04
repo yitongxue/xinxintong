@@ -6,9 +6,8 @@ body{background:#f8f8f8;position:relative;overflow:hidden;display:flex;flex-dire
 .site.navbar-nav .active:after{content:' ';position:absolute;left:0;right:0;bottom:-1px;height:3px;background:red;}
 .container{flex:1.0;overflow:hidden;position:relative;display:flex;padding:0;}
 #viewMissions,#viewMatter{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:4px;background:#fff;}
-#viewMissions{flex:1.0;}
+#viewMissions{flex:1.0;margin-right:8px;}
 #viewMatter{flex:2.0;}
-#viewMissions{margin-right:8px;}
 .navbar.ytx-top{margin:-1px -1px 15px;}
 .navbar.ytx-bottom{margin:0 -1px;}
 .navbar.ytx-bottom .container-fluid{text-align:center;}
