@@ -218,11 +218,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				$scope.$emit('xxt.matter.enroll.page.data_schemas.requestRemove', schema);
 			}
 		};
-		$scope.remove = function(removedSchema) {
-			if (window.confirm('确定删除所有页面上的登记项？')) {
-				$scope.$emit('xxt.matter.enroll.app.data_schemas.requestRemove', removedSchema);
-			}
-		};
 		$scope.$on('xxt.matter.enroll.page.data_schemas.add', function(event, newSchema) {
 			chooseState[newSchema.id] = true;
 		});
@@ -674,23 +669,48 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			tinymceEditor.save();
 		};
 		$scope.embedMatter = function(page) {
-			mattersgallery.open($scope.siteId, function(matters, type) {
-				var dom, fn;
-				dom = tinymceEditor.dom;
-				angular.forEach(matters, function(matter) {
-					fn = "openMatter(" + matter.id + ",'" + type + "')";
-					tinymceEditor.insertContent(dom.createHTML('div', {
-						'wrap': 'matter',
-						'class': 'form-group'
-					}, dom.createHTML('span', {
-						"ng-click": fn,
-					}, dom.encode(matter.title))));
-				});
-			}, {
+			var options = {
 				matterTypes: $scope.innerlinkTypes,
-				hasParent: false,
 				singleMatter: true
-			});
+			};
+			if ($scope.app.mission) {
+				options.mission = $scope.app.mission;
+			}
+			mattersgallery.open($scope.siteId, function(matters, type) {
+				var dom = tinymceEditor.dom,
+					style = "cursor:pointer",
+					fn, domMatter, sibling;
+				if ($scope.activeWrap) {
+					sibling = $scope.activeWrap.dom;
+					while (sibling.parentNode !== tinymceEditor.getBody()) {
+						sibling = sibling.parentNode;
+					}
+					/*加到当前选中元素的后面*/
+					angular.forEach(matters, function(matter) {
+						fn = "openMatter(" + matter.id + ",'" + type + "')";
+						domMatter = dom.create('div', {
+							'wrap': 'matter',
+							'class': 'form-group',
+						}, dom.createHTML('span', {
+							"style": style,
+							"ng-click": fn
+						}, dom.encode(matter.title)));
+						dom.insertAfter(domMatter, sibling);
+					});
+				} else {
+					/*加到页面的结尾*/
+					angular.forEach(matters, function(matter) {
+						fn = "openMatter($event,'" + matter.id + "','" + type + "')";
+						domMatter = dom.add(tinymceEditor.getBody(), 'div', {
+							'wrap': 'matter',
+							'class': 'form-group',
+						}, dom.createHTML('span', {
+							"style": style,
+							"ng-click": fn
+						}, dom.encode(matter.title)));
+					});
+				}
+			}, options);
 		};
 		$scope.gotoCode = function() {
 			window.open('/rest/pl/fe/code?site=' + $scope.siteId + '&name=' + $scope.ep.code_name, '_self');
