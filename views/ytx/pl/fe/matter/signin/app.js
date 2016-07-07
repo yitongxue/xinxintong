@@ -617,12 +617,14 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				$scope.setActiveWrap(domNewWrap);
 				deferred.resolve();
 			});
+			/* 页面滚动到新元素 */
+			$scope.ep.scroll(domNewWrap);
 
 			return deferred.promise;
 		};
 		/*创建了新的schema*/
 		$scope.$on('xxt.matter.signin.app.data_schemas.created', function(event, newSchema) {
-			var newWrap, viewPages = [];
+			var newWrap;
 			if ($scope.ep.type === 'I') {
 				addInputSchema(newSchema).then(function() {
 					$scope.$broadcast('xxt.matter.signin.page.data_schemas.added', newSchema, 'app');
@@ -630,17 +632,12 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			}
 			angular.forEach($scope.app.pages, function(page) {
 				if (page.type === 'V') {
-					//viewPages.push(page);
 					/* 更新内存的数据 */
 					page.appendRecord(newSchema);
 					/* 更新后台数据 */
 					$scope.updPage(page, ['data_schemas', 'html']);
 				}
 			});
-			/*如果只有1个查看页，在页面上自动添加登记项*/
-			//if (viewPages.length === 1) {
-			//var page = viewPages[0];
-			//}
 		});
 		$scope.$on('xxt.matter.signin.page.data_schemas.requestAdd', function(event, addedSchema) {
 			addInputSchema(addedSchema).then(function() {
