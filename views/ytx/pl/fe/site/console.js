@@ -8,7 +8,16 @@ ngApp.controller('ctrlSite', ['$scope', '$location', 'http2', function($scope, $
         $scope.site = rsp.data;
     });
 }]);
-ngApp.controller('ctrlConsole', ['$scope', 'http2', function($scope, http2) {}]);
+ngApp.controller('ctrlConsole', ['$scope', 'http2', function($scope, http2) {
+    $scope.selectedMission = null;
+    $scope.chooseMission = function(m, changeState) {
+        changeState && (m._selected = !m._selected);
+        if ($scope.selectedMission !== null && m !== $scope.selectedMission) {
+            $scope.selectedMission._selected = false;
+        }
+        $scope.selectedMission = m._selected ? m : null;
+    };
+}]);
 ngApp.controller('ctrlMission', ['$scope', 'http2', function($scope, http2) {
     var searchMissions = function(append) {
         var url = '/rest/pl/fe/matter/mission/list?site=' + $scope.siteId + $scope.page.j();
@@ -21,7 +30,8 @@ ngApp.controller('ctrlMission', ['$scope', 'http2', function($scope, http2) {
             }
         });
     };
-    $scope.open = function(mission) {
+    $scope.open = function(evt, mission) {
+        evt.stopPropagation();
         location.href = '/rest/pl/fe/matter/mission?id=' + mission.mission_id + '&site=' + $scope.siteId;
     };
     $scope.page = {
@@ -107,6 +117,7 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
         }
         url += matterType;
         url += '/list?site=' + $scope.siteId;
+        $scope.selectedMission && (url += '&mission=' + $scope.selectedMission.mission_id);
         scenario && (url += '&scenario=' + scenario);
         url += $scope.page.j();
         url += '&_=' + (new Date() * 1);
@@ -161,6 +172,26 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
             !typeCount.voting && $scope.indicators.push(indicators.voting);
 
             $scope.matters = matters;
+        });
+    };
+    var searchByMission = function(mission) {
+        http2.get('/rest/pl/fe/matter/mission/matter/list?site=' + $scope.siteId + '&id=' + mission.mission_id + '&_=' + (new Date() * 1), function(rsp) {
+            var typeCount = {};
+            angular.forEach(rsp.data, function(matter) {
+                matter._operator = matter.modifier_name || matter.creater_name;
+                matter._operateAt = matter.modifiy_at || matter.create_at;
+                if (matter.type === 'enroll') {
+                    typeCount[matter.scenario] ? typeCount[matter.scenario]++ : (typeCount[matter.scenario] = 1);
+                } else {
+                    typeCount[matter.type] ? typeCount[matter.type]++ : (typeCount[matter.type] = 1);
+                }
+            });
+            $scope.matters = rsp.data;
+            $scope.indicators = [];
+            !typeCount.registration && $scope.indicators.push(indicators.registration);
+            !typeCount.signin && $scope.indicators.push(indicators.signin);
+            !typeCount.group && $scope.indicators.push(indicators.group);
+            !typeCount.voting && $scope.indicators.push(indicators.voting);
         });
     };
     $scope.moreMatters = function() {
@@ -254,5 +285,17 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
     $scope.addByIndicator = function(indicator) {
         indicator.handler()
     };
-    searchRecent();
+    $scope.$watch('selectedMission', function(mission) {
+        if ($scope.matterType === 'recent') {
+            if (mission) {
+                searchByMission(mission);
+            } else {
+                searchRecent();
+            }
+        } else {
+            $scope.page.at = 1;
+            $scope.page.total = 0;
+            searchMatters(false);
+        }
+    });
 }]);
