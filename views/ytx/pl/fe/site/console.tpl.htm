@@ -103,8 +103,8 @@
 								<div class='modify_at' title='修改时间' ng-bind="(m.operate_at||m.modify_at)*1000|date:'yy-MM-dd'"></div>
 							</div>
 							<div class='actions' ng-if="entered">
-								<button class='btn btn-default' title='复制'><span class='glyphicon glyphicon-copy'></span></button>
-								<button class='btn btn-default' title='删除'><span class='glyphicon glyphicon-remove'></span></button>
+								<button class='btn btn-default' title='复制' ng-click="copyMatter($event,m)"><span class='glyphicon glyphicon-copy'></span></button>
+								<button class='btn btn-default' title='删除' ng-click="removeMatter($event,m)"><span class='glyphicon glyphicon-remove'></span></button>
 							</div>
 						</div>
 					</div>
