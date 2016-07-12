@@ -139,7 +139,7 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
                 break;
         }
         http2.get(url, function(rsp) {
-            location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
+            location.href = '/rest/pl/fe/matter/' + type + '?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
     $scope.page = {
