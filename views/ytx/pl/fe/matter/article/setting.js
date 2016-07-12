@@ -1,5 +1,5 @@
 define(['frame'], function(ngApp) {
-	ngApp.provider.controller('ctrlSetting', ['$scope', '$uibModal', 'http2', 'mattersgallery', 'mediagallery', function($scope, $uibModal, http2, mattersgallery, mediagallery) {
+	ngApp.provider.controller('ctrlSetting', ['$scope', '$uibModal', 'http2', 'mattersgallery', 'mediagallery', 'noticebox', function($scope, $uibModal, http2, mattersgallery, mediagallery, noticebox) {
 		var modifiedData = {};
 		var r = new Resumable({
 			target: '/rest/pl/fe/matter/article/attachment/upload?site=' + $scope.siteId + '&articleid=' + $scope.id,
@@ -102,6 +102,7 @@ define(['frame'], function(ngApp) {
 			http2.post('/rest/pl/fe/matter/article/update?site=' + $scope.siteId + '&id=' + $scope.id, modifiedData, function() {
 				modifiedData = {};
 				$scope.modified = false;
+				noticebox.success('完成保存');
 			});
 		};
 		$scope.remove = function() {
@@ -118,6 +119,7 @@ define(['frame'], function(ngApp) {
 		$scope.update = function(name) {
 			$scope.modified = true;
 			modifiedData[name] = name === 'body' ? encodeURIComponent($scope.editing[name]) : $scope.editing[name];
+			$scope.submit();
 		};
 		$scope.setPic = function() {
 			var options = {

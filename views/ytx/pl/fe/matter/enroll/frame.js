@@ -35,7 +35,7 @@ define(['require', 'page'], function(require, pageLib) {
 			'show': 'hide'
 		});
 	}]);
-	ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', function($scope, $location, $uibModal, $q, http2) {
+	ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', 'noticebox', function($scope, $location, $uibModal, $q, http2, noticebox) {
 		var ls = $location.search(),
 			modifiedData = {};
 		$scope.id = ls.id;
@@ -50,6 +50,7 @@ define(['require', 'page'], function(require, pageLib) {
 				$scope.modified = false;
 				modifiedData = {};
 				defer.resolve(rsp.data);
+				noticebox.success('完成保存');
 			});
 			return defer.promise;
 		};

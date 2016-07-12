@@ -2,7 +2,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 	/**
 	 * app setting controller
 	 */
-	ngApp.provider.controller('ctrlApp', ['$scope', '$q', 'http2', 'mattersgallery', function($scope, $q, http2, mattersgallery) {
+	ngApp.provider.controller('ctrlApp', ['$scope', '$q', 'http2', 'mattersgallery', 'noticebox', function($scope, $q, http2, mattersgallery, noticebox) {
 		window.onbeforeunload = function(e) {
 			var message;
 			if ($scope.ep.$$modified) {
@@ -68,6 +68,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			http2.post(url, p, function(rsp) {
 				page.$$modified = false;
 				defer.resolve();
+				noticebox.success('完成保存');
 			});
 			return defer.promise;
 		};
