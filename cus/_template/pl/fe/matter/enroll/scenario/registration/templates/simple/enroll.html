@@ -1,12 +1,22 @@
 <div wrap="text" class="form-group"><span>欢迎您报名本次课程</span></div>
-<div class="form-group form-group-lg" wrap="input" schema="name" schema-type="name"><label>姓名</label><input ng-model="data.name" title="姓名" class="form-control input-lg" type="text" /></div>
-<div class="form-group form-group-lg" wrap="input" schema="mobile" schema-type="mobile"><label>手机</label><input ng-model="data.mobile" title="手机" class="form-control input-lg" type="text" /></div>
-<div wrap="input" class="form-group form-group-lg" schema="gender" schema-type="single"><label class="">性别</label>
+<!-- begin: generate by schema -->
+<?php foreach ($this->schema as $def) { 
+$schema = $def->schema;
+?>
+<?php if (in_array($schema->type,['name','email','mobile','shorttext'])) { ?>
+<div class="form-group form-group-lg" wrap="input" schema="<?php echo $schema->id;?>" schema-type="<?php echo $schema->type;?>"><label class=""><?php echo $schema->title;?></label><input ng-model="data.<?php echo $schema->id;?>" title="<?php echo $schema->title;?>" class="form-control input-lg" type="text" /></div>
+<?php } else if ($schema->type==='longtext') { ?>
+<div class="form-group form-group-lg" wrap="input" schema="<?php echo $schema->id;?>" schema-type="<?php echo $schema->type;?>"><label class=""><?php echo $schema->title;?></label><textarea style="height:auto;" ng-model="data.<?php echo $schema->id;?>" title="<?php echo $schema->title;?>" class="form-control input-lg" rows="3"></textarea></div>
+<?php } else if (in_array($schema->type,['single','phase'])) { ?>
+<div wrap="input" class="form-group form-group-lg" schema="<?php echo $schema->id;?>" schema-type="<?php echo $schema->type;?>">
+<label><?php echo $schema->title; ?></label>
 <ul>
-<li class="radio-inline" wrap="radio"><label class="radio-inline"><input type="radio" name="gender" value="v1" ng-model="data.gender" title="性别" data-label="男" /><span>男</span></label></li>
-<li class="radio-inline" wrap="radio"><label class="radio-inline"><input type="radio" name="gender" value="v2" ng-model="data.gender" title="性别" data-label="女" /><span>女</span></label></li>
+<?php foreach ($schema->ops as $op) {?>
+<li class="radio" wrap="radio"><label><input type="radio" name="<?php echo $schema->id;?>" value="<?php echo $op->v;?>" ng-model="data.<?php echo $schema->id;?>"><span><?php echo $op->l;?></span></label></li>
+<?php } ?>
 </ul>
 </div>
-<div class="form-group form-group-lg" wrap="input" schema="department" schema-type="shorttext"><label>部门</label><input ng-model="data.department" title="部门" class="form-control input-lg" type="text" /></div>
-<div class="form-group form-group-lg" wrap="input" schema="position" schema-type="shorttext"><label>职务</label><input ng-model="data.position" title="职务" class="form-control input-lg" type="text" /></div>
+<?php } ?>
+<?php } ?>
+<!-- end: generate by schema -->
 <div id="act1" class="form-group" wrap="button"><button class="btn btn-primary btn-block btn-lg" ng-click="submit($event,'result')"><span>提交信息</span></button></div>

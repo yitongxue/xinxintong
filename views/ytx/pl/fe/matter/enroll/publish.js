@@ -6,7 +6,7 @@ define(['frame'], function(ngApp) {
 				i, l, page, signinUrl;
 			entry = {
 				url: $scope.url,
-				qrcode: '/rest/pl/fe/matter/enroll/qrcode?url=' + encodeURIComponent($scope.url),
+				qrcode: '/rest/site/fe/matter/enroll/qrcode?site=' + $scope.siteId + '&url=' + encodeURIComponent($scope.url),
 			};
 			$scope.entry = entry;
 		});
@@ -31,6 +31,9 @@ define(['frame'], function(ngApp) {
 			$scope.app.pic = '';
 			$scope.update('pic');
 		};
+		$scope.summaryOfRecords().then(function(data) {
+			$scope.summary = data;
+		});
 	}]);
 	ngApp.provider.controller('ctrlReceiver', ['$scope', 'http2', '$interval', function($scope, http2, $interval) {
 		var baseURL = '/rest/pl/fe/matter/enroll/receiver/';
@@ -200,5 +203,16 @@ define(['frame'], function(ngApp) {
 				}
 			});
 		};
+	}]);
+	ngApp.provider.controller('ctrlStat', ['$scope', 'http2', function($scope, http2) {
+		$scope.$watch('app', function(app) {
+			if (!app) return;
+			var url = '/rest/pl/fe/matter/enroll/stat/get';
+			url += '?site=' + $scope.siteId;
+			url += '&app=' + app.id;
+			http2.get(url, function(rsp) {
+				$scope.stat = rsp.data;
+			});
+		});
 	}]);
 });
