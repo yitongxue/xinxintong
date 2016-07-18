@@ -87,7 +87,7 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
     };
     $scope.matterType = 'recent';
     $scope.open = function(matter) {
-        var type = (matter.matter_type || $scope.matterType),
+        var type = (matter.matter_type || matter.type || $scope.matterType),
             id = (matter.matter_id || matter.id);
         switch (type) {
             case 'article':
