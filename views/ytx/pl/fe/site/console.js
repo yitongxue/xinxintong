@@ -330,6 +330,7 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
     };
     $scope.$watch('selectedMission', function(mission) {
         $scope.matters = [];
+        $scope.indicators = [];
         if ($scope.matterType === 'recent') {
             if (mission) {
                 searchByMission(mission);
