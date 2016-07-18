@@ -17,7 +17,7 @@
                             <option></option>
                         </select>
                     </div>
-                    <div class='form-group'>
+                    <div class='form-group hide'>
                         <label>分组类型</label>
                         <select class='form-control' ng-model='app.scenario' ng-change="update('scenario');">
                             <option value='split'>拆分</option>
@@ -29,29 +29,35 @@
         </nav>
     </div>
     <!-- end attrs -->
-    <!-- left -->
-    <div class='col-md-4'>
-        <!-- users -->
-        <div class='tile'>
-            <div class='form-group' ng-if="!app.sourceApp">
-                <button class='btn btn-block btn-success' ng-click="importByApp()">导入用户</button>
-            </div>
-            <div class='form-group compact' ng-if="app.sourceApp">
-                <div class="help-block">分组用户来源</div>
-                <div class="input-group">
-                    <div class='form-control' ng-bind="app.sourceApp.title"></div>
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" ng-click="cancelSourceApp()">
-                            <span class='glyphicon glyphicon-remove'></span>
-                        </button>
-                    </span>
+    <!-- source app -->
+    <div class='col-md-12 source'>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-form">
+                    <div class='form-group' ng-if="!app.sourceApp">
+                        <button class='btn btn-block btn-success' ng-click="importByApp()">导入用户</button>
+                    </div>
+                    <div class='form-group compact' ng-if="app.sourceApp">
+                        <label>分组用户来源</label>
+                        <div class="input-group">
+                            <div class='form-control' ng-bind="app.sourceApp.title"></div>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" ng-click="cancelSourceApp()">
+                                    <span class='glyphicon glyphicon-remove'></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class='form-group' ng-if="app.sourceApp">
+                        <button class='btn btn-block btn-success' ng-click='syncByApp()'>同步用户</button>
+                    </div>
                 </div>
             </div>
-            <div class='form-group' ng-if="app.sourceApp">
-                <button class='btn btn-block btn-success' ng-click='syncByApp()'>同步用户</button>
-            </div>
-        </div>
-        <!-- end users -->
+        </nav>
+    </div>
+    <!-- end source app -->
+    <!-- left -->
+    <div class='col-md-4'>
         <!-- groups -->
         <div class='tile' ng-if="app.sourceApp">
             <div class='form-group'>
@@ -67,12 +73,9 @@
                     <button class='btn btn-xs btn-default pull-right' ng-if="r===editingRound" ng-click="removeRound()"><span class='glyphicon glyphicon-remove'></span></button>
                 </a>
             </div>
-            <div class='form-group'>
-                <button class='btn btn-block btn-success' ng-disabled="!app.sourceApp" ng-click="execute()">进行分组</button>
-            </div>
         </div>
         <!-- end groups-->
-        <div class='tile'>
+        <div class='tile hide'>
             <div class='form-group'>
                 <div>创建人：{{app.creater_name}}</div>
                 <div>创建时间：{{app.create_at*1000|date:'yy-MM-dd HH:mm'}}</div>
@@ -80,7 +83,7 @@
                 <div>最后一次修改时间：{{app.modify_at*1000|date:'yy-MM-dd HH:mm'}}</div>
             </div>
         </div>
-        <div class='tile'>
+        <div class='tile hide'>
             <div class='form-group compact'>
                 <div class='help-block'>投影地址</div>
                 <div class='form-control' ng-bind="opUrl" style="height:auto;word-break:break-all;"></div>
@@ -146,12 +149,8 @@
                         <input type='text' class='form-control' ng-model='editingRound.title' tms-auto-update tms-wait=1000 tms-update="updateRound('title')">
                     </div>
                     <div class='form-group compact'>
-                        <div class='help-block'>扩展属性1</div>
+                        <div class='help-block'>积分</div>
                         <input type="text" class="form-control" ng-model="editingRound.extattrs.attr1" tms-auto-update tms-wait=1000 tms-update="updateRound('extattrs')">
-                    </div>
-                    <div class='form-group compact'>
-                        <div class='help-block'>扩展属性2</div>
-                        <input type="text" class="form-control" ng-model="editingRound.extattrs.attr2" tms-auto-update tms-wait=1000 tms-update="updateRound('extattrs')">
                     </div>
                 </div>
             </uib-tab>
@@ -240,6 +239,16 @@
             </form>
         </div>
     </nav>
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container-fluid text-center">
+            <form class="navbar-form" style='display:inline-block'>
+                <button class='btn btn-lg btn-success' ng-disabled="!app.sourceApp||!rounds.length" ng-click="execute()">进行分组</button>
+            </form>
+            <form class="navbar-form navbar-right">
+                <button class='btn btn-lg btn-default' ng-click="remove()">删除活动</button>
+            </form>
+        </div>
+    </nav>
     <!-- end bottom nav -->
 </div>
 <script type="text/ng-template" id="configRule.html">
@@ -255,7 +264,7 @@
                     <input type='text' class="form-control" ng-model="rule.count">
                 </div>
             </div>
-            <div class='form-group'>
+            <div class='form-group hide'>
                 <label class="col-md-3 control-label">每组人数</label>
                 <div class="col-md-9">
                     <input type='text' class="form-control" ng-model="rule.times">
@@ -315,7 +324,7 @@
 <script type="text/ng-template" id="targetEditor.html">
     <div class="modal-header">
         <button class="close" type="button" ng-click="cancel()">×</button>
-        <h5 class="modal-title">抽取条件</h5>
+        <h5 class="modal-title">分组条件</h5>
     </div>
     <div class="modal-body">
         <form class="form-horizontal">
