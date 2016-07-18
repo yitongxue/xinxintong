@@ -9,11 +9,12 @@ body{background:#f8f8f8;position:relative;overflow:hidden;display:flex;flex-dire
 /*setting*/
 #viewSetting .attrs{flex:1.0;overflow-y:auto;overflow-x:hidden;padding-left:15px;padding-right:15px;}
 #viewSetting .navbar.tms-top{margin:-1px -1px 15px;}
-#viewSetting .navbar.tms-bottom{margin:0 -1px;}
+#viewSetting .navbar.tms-bottom{margin:15px -1px 0 0;}
 
 /*phase*/
 #viewSetting .phases{phase}
 #viewSetting .phases .phase{counter-increment:phase;position:relative;}
+#viewSetting .phases label{margin:5px 0;}
 #viewSetting .list-group-item.phase:after{content:counter(phase);background:#eee;position:absolute;top:-1px;left:-1px;width:18px;height:18px;line-height:18px;text-align:center;}
 #viewSetting .phases .phase .action{position:absolute;top:-1px;right:-1px;}
 

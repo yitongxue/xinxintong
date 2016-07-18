@@ -1,15 +1,16 @@
 html,body{height:100%;width:100%}
 body{background:#f8f8f8;position:relative;overflow:hidden;display:flex;flex-direction:column;}
 .ng-cloak{display:none;}
-.navbar{min-height:52px;}
-.site.navbar-nav{position:absolute;left:50%;margin-left:-208px;float:none;}
+body>nav{display:flex;}
+body>nav>ul:nth-child(2){flex-grow:1;text-align:center;}
+body>nav>ul:nth-child(2)>li{display:inline-block;float:none;}
 .site.navbar-nav .active:after{content:' ';position:absolute;left:0;right:0;bottom:-1px;height:3px;background:red;}
 .container{flex:1.0;overflow:hidden;position:relative;display:flex;padding:0;}
 #viewMissions,#viewMatter{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:4px;background:#fff;}
 #viewMissions{flex:1.0;margin-right:8px;}
 #viewMatter{flex:2.0;}
 .navbar.ytx-top{margin:-1px -1px 0;}
-.navbar.ytx-bottom{margin:0 -1px;}
+.navbar.ytx-bottom{margin:0 -1px;min-height:64px;}
 .navbar.ytx-bottom .container-fluid{text-align:center;}
 .navbar.ytx-bottom .container-fluid .navbar-form{display:inline-block;}
 

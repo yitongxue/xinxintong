@@ -31,12 +31,14 @@ define(['require'], function() {
 		http2.get('/rest/pl/fe/matter/article/get?site=' + $scope.siteId + '&id=' + $scope.id, function(rsp) {
 			var url;
 			$scope.editing = rsp.data;
-			!$scope.editing.attachments && ($scope.editing.attachments = []);
-			url = 'http://' + location.host + '/rest/site/fe/matter?site=' + ls.site + '&id=' + ls.id + '&type=article';
-			$scope.entry = {
-				url: url,
-				qrcode: '/rest/pl/fe/matter/article/qrcode?url=' + encodeURIComponent(url),
-			};
+			if ($scope.editing) {
+				!$scope.editing.attachments && ($scope.editing.attachments = []);
+				url = 'http://' + location.host + '/rest/site/fe/matter?site=' + ls.site + '&id=' + ls.id + '&type=article';
+				$scope.entry = {
+					url: url,
+					qrcode: '/rest/site/fe/matter/article/qrcode?site=' + ls.site + '&url=' + encodeURIComponent(url),
+				};
+			}
 		});
 	}]);
 	/***/

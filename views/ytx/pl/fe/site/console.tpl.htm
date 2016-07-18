@@ -9,7 +9,6 @@
 		<title>我的站点</title>
 	</head>
 	<body ng-app='app' ng-controller='ctrlSite' ng-cloak class='ng-cloak'>
-		<notice-box err='errmsg' info='infomsg' delay='1000'></notice-box>
 		<!-- top navbar-->
 		<nav class='navbar navbar-inverse tms-large'>
 			<ul class='nav navbar-nav'>
@@ -73,7 +72,7 @@
 				<nav class="navbar navbar-default ytx-bottom">
 					<div class="container-fluid">
 						<div class="navbar-form">
-							<button class="btn btn-success" ng-click="addMission()"><span class='glyphicon glyphicon-plus'></span>生成新项目</button>
+							<button class="btn btn-lg btn-success" ng-click="addMission()"><span class='glyphicon glyphicon-plus'></span>生成新项目</button>
 						</div>
 					</div>
 				</nav>
@@ -120,7 +119,7 @@
 				<nav class="navbar navbar-default ytx-bottom">
 			        <div class="container-fluid" ng-if="matterType!=='recent'">
 			            <form class="navbar-form">
-			                <button class='btn btn-success' ng-click="addMatter()"><span class='glyphicon glyphicon-plus'></span>新建</button>
+			                <button class='btn btn-lg btn-success' ng-click="addMatter()"><span class='glyphicon glyphicon-plus'></span>新建</button>
 			            </form>
 			        </div>
 			    </nav>
