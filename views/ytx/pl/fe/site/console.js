@@ -100,7 +100,7 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
         }
     };
     $scope.removeMatter = function(evt, matter) {
-        var type = (matter.matter_type || $scope.matterType),
+        var type = (matter.matter_type || matter.type || $scope.matterType),
             id = (matter.matter_id || matter.id),
             title = (matter.title || matter.matter_title),
             url = '/rest/pl/fe/matter/';
@@ -123,7 +123,7 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
         }
     };
     $scope.copyMatter = function(evt, matter) {
-        var type = (matter.matter_type || $scope.matterType),
+        var type = (matter.matter_type || matter.type || $scope.matterType),
             id = (matter.matter_id || matter.id),
             url = '/rest/pl/fe/matter/';
 
