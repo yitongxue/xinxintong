@@ -242,6 +242,8 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
         searchMatters(true);
     };
     $scope.chooseMatterType = function(matterType) {
+        $scope.matters = [];
+        $scope.indicators = [];
         $scope.matterType = matterType;
         if (matterType === 'recent') {
             searchRecent();
