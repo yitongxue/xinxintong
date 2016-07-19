@@ -8,7 +8,7 @@ define(['require', 'page'], function(require, pageLib) {
 			this.resolve = {
 				load: function($q) {
 					var defer = $q.defer();
-					require([baseURL + name + '.js'], function() {
+					require([baseURL + name + '.js?_=' + (new Date() * 1)], function() {
 						defer.resolve();
 					});
 					return defer.promise;
