@@ -121,7 +121,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				if (i === -1) return;
 			}
 			$scope.ep = page;
-			tinymce.activeEditor.setContent(page.html);
 		};
 		$scope.newSchema = function(type) {
 			var i, newSchema, mission;
@@ -397,8 +396,9 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				$scope.activeWrap = $scope.ep.selectWrap(domWrap);
 			});
 		});
-		$scope.$on('tinymce.content.editing', function(event, node) {
-			var domNodeWrap = $(node).parents('[wrap]');
+		$scope.$on('tinymce.node.editing', function(event, data) {
+			var node = data.node,
+				domNodeWrap = $(node).parents('[wrap]');
 			if (domNodeWrap.length === 1) {
 				if (/label/i.test(node.nodeName)) {
 					/* schema's wrap */
@@ -421,8 +421,9 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 					if (/radio|checkbox/.test($domParentWrap.attr('wrap'))) {
 						oOptionWrap = wrapLib.input.dataByDom(domNodeWrap[0]);
 						if (oOptionWrap.schema && oOptionWrap.schema.ops && oOptionWrap.schema.ops.length === 1) {
-							for (var i = $scope.app.data_schemas.length - 1; i > -0; i--) {
+							for (var i = $scope.app.data_schemas.length - 1; i >= 0; i--) {
 								editingSchema = $scope.app.data_schemas[i];
+								console.log('owrap', editingSchema);
 								if (oOptionWrap.schema.id === editingSchema.id) {
 									for (var j = editingSchema.ops.length - 1; j >= 0; j--) {
 										if (oOptionWrap.schema.ops[0].v === editingSchema.ops[j].v) {
@@ -448,16 +449,29 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 		$scope.$on('tinymce.instance.init', function() {
 			var $body;
 			tinymceEditor = tinymce.get('tinymce-page');
-			$body = $(tinymceEditor.getBody());
-			$body.find('input[type=text],textarea').attr('readonly', true);
-			$body.find('input[type=radio],input[type=checkbox]').attr('disabled', true);
 			wrapLib.setEditor(tinymceEditor);
-			$scope.ep && $scope.ep.setEditor(tinymceEditor);
+			if ($scope.ep) {
+				$scope.ep.setEditor(tinymceEditor);
+				tinymceEditor.setContent($scope.ep.html);
+				$body = $(tinymceEditor.getBody());
+				$body.find('input[type=text],textarea').attr('readonly', true);
+				$body.find('input[type=text],textarea').attr('disabled', true);
+				$body.find('input[type=radio],input[type=checkbox]').attr('readonly', true);
+				$body.find('input[type=radio],input[type=checkbox]').attr('disabled', true);
+			}
 		});
 		$scope.$watch('ep', function(page) {
 			if (page) {
 				$scope.setActiveWrap(null);
-				tinymceEditor && page.setEditor(tinymceEditor);
+				if (tinymceEditor) {
+					page.setEditor(tinymceEditor);
+					tinymceEditor.setContent(page.html);
+					$body = $(tinymceEditor.getBody());
+					$body.find('input[type=text],textarea').attr('readonly', true);
+					$body.find('input[type=text],textarea').attr('disabled', true);
+					$body.find('input[type=radio],input[type=checkbox]').attr('readonly', true);
+					$body.find('input[type=radio],input[type=checkbox]').attr('disabled', true);
+				}
 			}
 		});
 	}]);
