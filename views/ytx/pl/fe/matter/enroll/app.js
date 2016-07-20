@@ -719,8 +719,9 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 		$scope.onPageChange = function() {
 			$scope.ep.$$modified = true;
 		};
-		$scope.$on('tinymce.content.editing', function(event, node) {
-			var domNodeWrap = $(node).parents('[wrap]');
+		$scope.$on('tinymce.node.editing', function(event, data) {
+			var node = data.node,
+				domNodeWrap = $(node).parents('[wrap]');
 			if (domNodeWrap.length === 1) {
 				if (/label/i.test(node.nodeName)) {
 					/* schema's wrap */
@@ -743,7 +744,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 					if (/radio|checkbox/.test($domParentWrap.attr('wrap'))) {
 						oOptionWrap = wrapLib.input.dataByDom(domNodeWrap[0]);
 						if (oOptionWrap.schema && oOptionWrap.schema.ops && oOptionWrap.schema.ops.length === 1) {
-							for (var i = $scope.app.data_schemas.length - 1; i > -0; i--) {
+							for (var i = $scope.app.data_schemas.length - 1; i >= 0; i--) {
 								editingSchema = $scope.app.data_schemas[i];
 								if (oOptionWrap.schema.id === editingSchema.id) {
 									for (var j = editingSchema.ops.length - 1; j >= 0; j--) {
