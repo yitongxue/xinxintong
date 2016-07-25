@@ -122,10 +122,8 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 		$scope.updPage = function(page, names) {
 			var defer = $q.defer(),
 				url, p = {};
+
 			angular.isString(names) && (names = [names]);
-			if (page === $scope.ep && names.indexOf('html') !== -1) {
-				$scope.ep.purifyHtml();
-			}
 			angular.forEach(names, function(name) {
 				p[name] = name === 'html' ? encodeURIComponent(page[name]) : page[name];
 			});
@@ -197,10 +195,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				}
 			});
 		};
-		$scope.$watch('app', function(app) {
-			if (!app) return;
-			$scope.ep = app.pages[0];
-		});
 		$scope.choosePage = function(page) {
 			if (angular.isString(page)) {
 				for (var i = $scope.app.pages.length - 1; i >= 0; i--) {
@@ -243,6 +237,10 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 				$scope.$broadcast('xxt.matter.signin.app.data_schemas.created', newSchema);
 			});
 		};
+		$scope.$watch('app', function(app) {
+			if (!app) return;
+			$scope.ep = app.pages[0];
+		});
 	}]);
 	ngApp.provider.controller('ctrlRound', ['$scope', '$uibModal', 'http2', 'noticebox', function($scope, $uibModal, http2, noticebox) {
 		$scope.batch = function() {
@@ -689,16 +687,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 		$scope.setActiveWrap = function(domWrap) {
 			$scope.activeWrap = $scope.ep.setActiveWrap(domWrap);
 		};
-		$scope.$on('tinymce.wrap.add', function(event, domWrap) {
-			$scope.$apply(function() {
-				$scope.activeWrap = $scope.ep.selectWrap(domWrap);
-			});
-		});
-		$scope.$on('tinymce.wrap.select', function(event, domWrap) {
-			$scope.$apply(function() {
-				$scope.activeWrap = $scope.ep.selectWrap(domWrap);
-			});
-		});
 		$scope.wrapEditorHtml = function() {
 			var url = '/views/default/pl/fe/matter/enroll/wrap/' + $scope.activeWrap.type + '.html?_=18';
 			return url;
@@ -866,9 +854,60 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 		$scope.gotoCode = function() {
 			window.open('/rest/pl/fe/code?site=' + $scope.siteId + '&name=' + $scope.ep.code_name, '_self');
 		};
-		$scope.onPageChange = function() {
-			$scope.ep.$$modified = true;
-		};
+		var _timerOfPageUpdate = null;
+		$scope.$on('tinymce.content.change', function(event, changed) {
+			var status, html;
+
+			if (changed) {
+				status = $scope.ep.contentChange(changed.node, $scope.activeWrap, $timeout);
+			} else {
+				status = {
+					htmlChanged: true
+				};
+				$scope.ep.purifyInput(tinymceEditor.getContent(), true);
+			}
+
+			/*提交页面内容的修改*/
+			if (status.htmlChanged) {
+				if (_timerOfPageUpdate !== null) {
+					$timeout.cancel(_timerOfPageUpdate);
+				}
+				_timerOfPageUpdate = $timeout(function() {
+					var updatedFields = ['html'];
+					status.actionChanged && updatedFields.push('act_schemas');
+					if (status.schemaChanged === true) {
+						/* 更新应用的定义 */
+						$scope.update('data_schemas').then(function() {
+							/* 更新当前页面 */
+							updatedFields.push('data_schemas');
+							$scope.updPage($scope.ep, updatedFields);
+							/* 更新其它页面 */
+							angular.forEach($scope.app.pages, function(page) {
+								if (page !== $scope.ep) {
+									page.updateBySchema($scope.activeWrap.schema);
+									$scope.updPage(page, ['data_schemas', 'html']);
+								}
+							});
+						});
+					} else {
+						$scope.updPage($scope.ep, updatedFields);
+					}
+				}, 1000);
+				_timerOfPageUpdate.then(function() {
+					_timerOfPageUpdate = null;
+				});
+			}
+		});
+		$scope.$on('tinymce.wrap.add', function(event, domWrap) {
+			$scope.$apply(function() {
+				$scope.activeWrap = $scope.ep.selectWrap(domWrap);
+			});
+		});
+		$scope.$on('tinymce.wrap.select', function(event, domWrap) {
+			$scope.$apply(function() {
+				$scope.activeWrap = $scope.ep.selectWrap(domWrap);
+			});
+		});
 		$scope.$on('tinymce.multipleimage.open', function(event, callback) {
 			var options = {
 				callback: callback,
@@ -877,60 +916,35 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			};
 			mediagallery.open($scope.siteId, options);
 		});
-		$scope.$on('tinymce.node.editing', function(event, data) {
-			var node = data.node,
-				domNodeWrap = $(node).parents('[wrap]');
-			if (domNodeWrap.length === 1) {
-				if (/label/i.test(node.nodeName)) {
-					/* schema's wrap */
-					(function freshSchemaByDom() {
-						var oWrap = wrapLib.dataByDom($scope.activeWrap.dom);
-						if (oWrap) {
-							if (oWrap.schema.title !== $scope.activeWrap.schema.title) {
-								$timeout(function() {
-									$scope.activeWrap.schema.title = oWrap.schema.title;
-								});
-							}
-						}
-					})();
-				}
-			} else if (domNodeWrap.length === 2) {
-				/* schema option's wrap */
-				(function() {
-					var $domParentWrap = $(domNodeWrap[0]),
-						oOptionWrap, editingSchema;
-					if (/radio|checkbox/.test($domParentWrap.attr('wrap'))) {
-						oOptionWrap = wrapLib.input.dataByDom(domNodeWrap[0]);
-						if (oOptionWrap.schema && oOptionWrap.schema.ops && oOptionWrap.schema.ops.length === 1) {
-							for (var i = $scope.app.data_schemas.length - 1; i > -0; i--) {
-								editingSchema = $scope.app.data_schemas[i];
-								if (oOptionWrap.schema.id === editingSchema.id) {
-									for (var j = editingSchema.ops.length - 1; j >= 0; j--) {
-										if (oOptionWrap.schema.ops[0].v === editingSchema.ops[j].v) {
-											editingSchema.ops[j].l = oOptionWrap.schema.ops[0].l;
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-				})();
-			}
-		});
-		$scope.$on('tinymce.instance.init', function() {
-			var $body;
-			tinymceEditor = tinymce.get('tinymce-page');
-			$body = $(tinymceEditor.getBody());
-			$body.find('input[type=text],textarea').attr('readonly', true);
-			$body.find('input[type=radio],input[type=checkbox]').attr('disabled', true);
-			wrapLib.setEditor(tinymceEditor);
-			$scope.ep && $scope.ep.setEditor(tinymceEditor);
-		});
+		/*切换编辑的页面*/
 		$scope.$watch('ep', function(page) {
-			if (page) {
-				$scope.setActiveWrap(null);
-				tinymceEditor && page.setEditor(tinymceEditor);
+			var html;
+			if (!page) return;
+			$scope.setActiveWrap(null);
+			if (tinymceEditor) {
+				wrapLib.setEditor(tinymceEditor);
+				page.setEditor(tinymceEditor);
+				if (page.type === 'I') {
+					html = page.disableInput();
+				} else {
+					html = page.html;
+				}
+				tinymceEditor.setContent(html);
+			}
+
+		});
+		$scope.$on('tinymce.instance.init', function(event, editor) {
+			var html;
+			tinymceEditor = editor;
+			if ($scope.ep) {
+				wrapLib.setEditor(tinymceEditor);
+				$scope.ep.setEditor(editor);
+				if ($scope.ep.type === 'I') {
+					html = $scope.ep.disableInput();
+				} else {
+					html = $scope.ep.html;
+				}
+				editor.setContent($scope.ep.html);
 			}
 		});
 	}]);
