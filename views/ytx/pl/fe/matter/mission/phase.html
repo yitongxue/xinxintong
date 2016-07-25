@@ -6,7 +6,7 @@
             </div>
             <label>期数名称</label>
             <input type="text" class="form-control" ng-model="p.title" tms-auto-update tms-wait=1000 tms-update="update(p,'title')">
-            <label>期数说明</label>
+            <label>期数说明（可选）</label>
             <input type='text' class="form-control" ng-model="p.summary" tms-auto-update tms-wait=1000 tms-update="update(p,'summary')">
             <label>期数开始时间</label>
             <tms-datepicker class='tms-datepicker' tms-title='开始时间' tms-obj="p" tms-date='p.start_at' tms-state='phase.start_at' tms-mask="y,m,d"></tms-datepicker>
