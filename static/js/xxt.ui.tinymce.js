@@ -18,9 +18,11 @@ directive('tinymce', function($timeout) {
             /**
              * 通知编辑的内容发生变化
              */
-            var _notifyChangeContent = function(e) {
-                var content, phase;
-                content = tinymce.get(scope.id).getContent();
+            var _notifyChangeContent = function() {
+                var editor = tinymce.get(scope.id),
+                    content = editor.getContent(),
+                    phase;
+                console.log('change content', content, editor.isDirty());
                 if (scope.content !== content) {
                     phase = scope.$root.$$phase;
                     if (phase === '$digest' || phase === '$apply') {
@@ -51,8 +53,8 @@ directive('tinymce', function($timeout) {
                 content_css: '/static/css/bootstrap.min.css,/static/css/tinymce.css?v=' + (new Date() * 1),
                 setup: function(editor) {
                     /*编辑的内容发生变化*/
-                    editor.on('change', _notifyChangeContent);
-                    editor.on('blur', _notifyChangeContent);
+                    //editor.on('change', _notifyChangeContent);
+                    //editor.on('blur', _notifyChangeContent);
                     /*选择节点*/
                     editor.on('NodeChange', function(e) {
                         var wrap;
@@ -69,6 +71,10 @@ directive('tinymce', function($timeout) {
                             } else {
                                 scope.$emit('tinymce.wrap.select', editor.getBody());
                             }
+                        } else {
+                            //var content = editor.getContent();
+                            //console.log('NodeChange', content, editor.isDirty());
+                            _notifyChangeContent();
                         }
                     });
                     /*编辑节点*/
@@ -194,29 +200,39 @@ directive('tinymce', function($timeout) {
                 },
                 init_instance_callback: function() {
                     var editor = tinymce.get(scope.id);
-                    if (scope.content && scope.content.length) {
+                    if (scope.content) {
                         editor.setContent(scope.content);
                         editor.undoManager.clear();
                     }
                     if (scope.contenteditable !== undefined) {
                         $(editor.getBody()).attr('contenteditable', scope.contenteditable);
                     }
-                    scope.$emit('tinymce.instance.init');
+                    scope.initialized = true;
+                    scope.$emit('tinymce.instance.init', editor);
                 }
             };
             if (scope.toolbar) {
                 tinymceConfig.toolbar += ' ' + scope.toolbar;
             }
-            scope.$watch('content', function(nv) {
-                if (nv && nv.length) {
-                    tinymce.init(tinymceConfig);
+            scope.$watch('content', function(content) {
+                var editor;
+                if (content !== undefined) {
+                    if (!scope.initialized) {
+                        tinymce.init(tinymceConfig);
+                    } else {
+                        editor = tinymce.get(scope.id);
+                        if (content !== editor.getContent()) {
+                            editor.setContent(content);
+                            editor.undoManager.clear();
+                        }
+                    }
                 }
             });
             scope.$on('$destroy', function() {
-                var tinyInstance;
-                if (tinyInstance = tinymce.get(scope.id)) {
-                    tinyInstance.remove();
-                    tinyInstance = null;
+                var editor;
+                if (editor = tinymce.get(scope.id)) {
+                    editor.remove();
+                    editor = null;
                 }
             });
         }
