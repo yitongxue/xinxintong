@@ -859,16 +859,19 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			var status, html;
 
 			if (changed) {
+				// 文档中的节点发生变化
 				status = $scope.ep.contentChange(changed.node, $scope.activeWrap, $timeout);
 			} else {
-				status = {
-					htmlChanged: true
-				};
-				$scope.ep.purifyInput(tinymceEditor.getContent(), true);
+				html = $scope.ep.purifyInput(tinymceEditor.getContent());
+				if (html !== $scope.ep.html) {
+					$scope.ep.html = html;
+					status = {
+						htmlChanged: true
+					};
+				}
 			}
-
 			/*提交页面内容的修改*/
-			if (status.htmlChanged) {
+			if (status && status.htmlChanged) {
 				if (_timerOfPageUpdate !== null) {
 					$timeout.cancel(_timerOfPageUpdate);
 				}
