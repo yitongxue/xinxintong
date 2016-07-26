@@ -84,7 +84,7 @@ define(['require', 'page'], function(require, pageLib) {
 			}
 		}
 	});
-	ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', 'srvApp', function($scope, $location, $uibModal, $q, http2, srvApp) {
+	ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', 'srvApp', 'mattersgallery', function($scope, $location, $uibModal, $q, http2, srvApp, mattersgallery) {
 		var ls = $location.search();
 
 		$scope.id = ls.id;
