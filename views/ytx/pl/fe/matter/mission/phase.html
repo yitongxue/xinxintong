@@ -14,9 +14,12 @@
             <tms-datepicker class='tms-datepicker' tms-title='结束时间' tms-obj="p" tms-date='p.end_at' tms-state='phase.end_at' tms-mask="y,m,d,23,59"></tms-datepicker>
         </div>
     </div>
-    <div class='help-block'>如果您的项目多于1期／次，请点击下面按钮</div>
+    <div class='help-block' ng-if="!phases.length">如果您的项目多于1期／次，请添加期数</div>
     <div class='input-group'>
-        <span class="input-group-addon">指定阶段数量</span>
+        <span class="input-group-addon">
+            <span ng-if="!phases.length">指定期数数量</span>
+            <span ng-if="phases.length">增加期数数量</span>
+        </span>
         <input type='text' class='form-control' ng-model="numberOfNewPhases">
         <span class='input-group-btn'>
             <button class='btn btn-success' ng-click="add()">添加</button>

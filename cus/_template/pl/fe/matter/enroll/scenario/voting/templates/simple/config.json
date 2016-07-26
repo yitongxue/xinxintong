@@ -29,7 +29,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -57,7 +57,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -85,7 +85,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -113,7 +113,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -141,7 +141,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -169,7 +169,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -197,7 +197,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -225,7 +225,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -253,7 +253,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -281,7 +281,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -309,7 +309,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -337,7 +337,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -365,7 +365,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -393,7 +393,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -421,7 +421,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
@@ -449,7 +449,7 @@
 				"required": "Y",
 				"showname": "label",
 				"component": "R",
-				"align": "H"
+				"align": "V"
 			}
 		}, {
 			"schema": {
