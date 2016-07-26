@@ -115,10 +115,6 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                 $scope.$broadcast('xxt.matter.enroll.app.data_schemas.created', newSchema);
             });
         };
-        $scope.wrapEditorHtml = function() {
-            var url = '/views/default/pl/fe/matter/enroll/wrap/' + $scope.activeWrap.type + '.html?_=21';
-            return url;
-        };
         $scope.$watch('app', function(app) {
             if (!app) return;
             $scope.ep = app.pages[0];
@@ -136,6 +132,10 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
             url: '/rest/pl/fe/matter'
         }];
         $scope.buttons = schemaLib.buttons;
+        $scope.wrapEditorHtml = function() {
+            var url = '/views/default/pl/fe/matter/enroll/wrap/' + $scope.activeWrap.type + '.html?_=22';
+            return url;
+        };
         $scope.setActiveWrap = function(domWrap) {
             $scope.activeWrap = $scope.ep.setActiveWrap(domWrap);
         };

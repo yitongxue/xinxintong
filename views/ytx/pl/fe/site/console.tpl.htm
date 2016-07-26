@@ -54,7 +54,7 @@
 									<div class='operator_name' ng-bind='m.creater_name'></div>
 									<div class='modify_at' title='修改时间' ng-bind="m.join_at*1000|date:'yy-MM-dd'"></div>
 								</div>
-								<div class='actions' ng-if="entered">
+								<div class='actions' ng-if="entered||m===selectedMission">
 									<button class='btn btn-default' title='打开' ng-click="open($event,m)"><span class='glyphicon glyphicon-edit'></span></button>
 								</div>
 							</div>
