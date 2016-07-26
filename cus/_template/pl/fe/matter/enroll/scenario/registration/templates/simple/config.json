@@ -136,25 +136,13 @@
 				"splitLine": "Y"
 			},
 			"schema": {
-				"id": "department",
-				"title": "部门",
-				"type": "shorttext"
-			}
-		}, {
-			"config": {
-				"id": "s6",
-				"pattern": "record",
-				"inline": "Y",
-				"splitLine": "Y"
-			},
-			"schema": {
 				"id": "position",
 				"title": "职务",
 				"type": "shorttext"
 			}
 		}, {
 			"config": {
-				"id": "s7",
+				"id": "s6",
 				"pattern": "record",
 				"inline": "Y",
 				"splitLine": "Y"

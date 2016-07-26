@@ -22,14 +22,14 @@ define(['require', 'page'], function(require, pageLib) {
 		};
 		$routeProvider
 			.when('/rest/pl/fe/matter/enroll/preview', new RouteParam('preview'))
+			.when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
 			.when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish'))
 			.when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
-			.when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
 			.when('/rest/pl/fe/matter/enroll/event', new RouteParam('event'))
 			.when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
 			.when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
 			.when('/rest/pl/fe/matter/enroll/config', new RouteParam('config'))
-			.otherwise(new RouteParam('app'));
+			.otherwise(new RouteParam('preview'));
 
 		$locationProvider.html5Mode(true);
 
@@ -92,7 +92,6 @@ define(['require', 'page'], function(require, pageLib) {
 		$scope.update = function(names) {
 			return srvApp.update(names);
 		};
-
 		$scope.remove = function() {
 			if (window.confirm('确定删除？')) {
 				http2.get('/rest/pl/fe/matter/enroll/remove?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
@@ -130,6 +129,29 @@ define(['require', 'page'], function(require, pageLib) {
 
 			return deferred.promise;
 		};
+		$scope.assignMission = function() {
+			mattersgallery.open($scope.siteId, function(matters, type) {
+				var app;
+				if (matters.length === 1) {
+					app = {
+						id: $scope.id,
+						type: 'enroll'
+					};
+					http2.post('/rest/pl/fe/matter/mission/matter/add?site=' + $scope.siteId + '&id=' + matters[0].mission_id, app, function(rsp) {
+						$scope.app.mission = rsp.data;
+						$scope.app.mission_id = rsp.data.id;
+						$scope.update('mission_id');
+					});
+				}
+			}, {
+				matterTypes: [{
+					value: 'mission',
+					title: '项目',
+					url: '/rest/pl/fe/matter'
+				}],
+				singleMatter: true
+			});
+		};
 		$scope.summaryOfRecords = function() {
 			var deferred = $q.defer(),
 				url = '/rest/pl/fe/matter/enroll/record/summary';
@@ -142,6 +164,38 @@ define(['require', 'page'], function(require, pageLib) {
 		};
 		http2.get('/rest/pl/fe/site/member/schema/list?valid=Y&site=' + $scope.siteId, function(rsp) {
 			$scope.memberSchemas = rsp.data;
+			angular.forEach(rsp.data, function(ms) {
+				var schemas = [];
+				if (ms.attr_name[0] === '0') {
+					schemas.push({
+						id: 'member.name',
+						title: '姓名',
+					});
+				}
+				if (ms.attr_mobile[0] === '0') {
+					schemas.push({
+						id: 'member.mobile',
+						title: '手机',
+					});
+				}
+				if (ms.attr_email[0] === '0') {
+					schemas.push({
+						id: 'member.email',
+						title: '邮箱',
+					});
+				}
+				(function() {
+					var i, ea;
+					for (var i = ms.extattr.length - 1; i >= 0; i--) {
+						ea = ms.extattr[i];
+						schemas.push({
+							id: 'member.extattr.' + ea.id,
+							title: ea.label,
+						});
+					};
+				})();
+				ms._schemas = schemas;
+			});
 		});
 		srvApp.get().then(function(app) {
 			var mapOfAppSchemas = {};
