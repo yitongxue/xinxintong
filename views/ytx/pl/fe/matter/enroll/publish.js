@@ -1,5 +1,9 @@
 define(['frame'], function(ngApp) {
+	'use strict';
 	ngApp.provider.controller('ctrlPublish', ['$scope', 'http2', 'mediagallery', function($scope, http2, mediagallery) {
+		(function() {
+			new ZeroClipboard(document.querySelectorAll('.text2Clipboard'));
+		})();
 		$scope.$watch('app', function(app) {
 			if (!app) return;
 			var entry = {},
