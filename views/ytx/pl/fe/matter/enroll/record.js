@@ -24,7 +24,7 @@ define(['frame'], function(ngApp) {
             url += '?site=' + $scope.siteId; // todo
             url += '&app=' + $scope.app.id;
             url += $scope.page.joinParams();
-            http2.get(url, function(rsp) {
+            http2.post(url, $scope.criteria, function(rsp) {
                 if (rsp.data) {
                     $scope.records = rsp.data.records ? rsp.data.records : [];
                     rsp.data.total && ($scope.page.total = rsp.data.total);
