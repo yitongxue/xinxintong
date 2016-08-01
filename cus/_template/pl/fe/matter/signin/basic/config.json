@@ -26,10 +26,10 @@
 			}
 		}],
 		"act_schemas": [{
-			"id": "act1",
+			"id": "btnSubmit",
 			"name": "submit",
 			"label": "提交信息",
-			"next": "result"
+			"next": "_autoForward"
 		}]
 	}, {
 		"name": "success",

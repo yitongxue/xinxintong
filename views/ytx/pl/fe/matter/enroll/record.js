@@ -23,11 +23,6 @@ define(['frame'], function(ngApp) {
             url = '/rest/pl/fe/matter/enroll/record/list';
             url += '?site=' + $scope.siteId; // todo
             url += '&app=' + $scope.app.id;
-            if ($scope.app.can_signin === 'Y') {
-                url += '&signinStartAt=' + $scope.signinStartAt;
-                url += '&signinEndAt=' + $scope.signinEndAt;
-            }
-            url += '&tags=' + $scope.page.tags.join(',');
             url += $scope.page.joinParams();
             http2.get(url, function(rsp) {
                 if (rsp.data) {
@@ -37,32 +32,34 @@ define(['frame'], function(ngApp) {
                     $scope.records = [];
                 }
                 angular.forEach($scope.records, function(record) {
-                    record.data.member && (record.data.member = JSON.parse(record.data.member));
-                    if ($scope.mapOfSchemaByType['image'] && $scope.mapOfSchemaByType['image'].length) {
-                        angular.forEach($scope.mapOfSchemaByType['image'], function(schemaId) {
-                            var imgs = record.data[schemaId] ? record.data[schemaId].split(',') : [];
-                            record.data[schemaId] = imgs;
-                        });
+                    if (record.data) {
+                        if ($scope.mapOfSchemaByType['image'] && $scope.mapOfSchemaByType['image'].length) {
+                            angular.forEach($scope.mapOfSchemaByType['image'], function(schemaId) {
+                                var imgs = record.data[schemaId] ? record.data[schemaId].split(',') : [];
+                                record.data[schemaId] = imgs;
+                            });
+                        }
                     }
                 });
             });
         };
+        // 过滤条件
+        $scope.criteria = {
+            record: {
+                searchBy: '',
+                keyword: ''
+            }
+        };
+        // 分页条件
         $scope.page = {
             at: 1,
             size: 30,
-            keyword: '',
-            tags: [],
-            searchBy: 'nickname',
             orderBy: 'time',
             joinParams: function() {
                 var p;
                 p = '&page=' + this.at + '&size=' + this.size;
-                if (this.keyword !== '') {
-                    p += '&kw=' + this.keyword;
-                    p += '&by=' + this.searchBy;
-                }
+                this.byRound && (p += '&rid=' + this.byRound);
                 p += '&orderby=' + this.orderBy;
-                p += '&rid=' + (this.byRound ? this.byRound : 'ALL');
                 return p;
             }
         };
@@ -175,6 +172,22 @@ define(['frame'], function(ngApp) {
                 return {};
             }
         };
+        $scope.filter = function() {
+            $uibModal.open({
+                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordFilter.html?_=1',
+                controller: 'ctrlFilter',
+                windowClass: 'auto-height',
+                backdrop: 'static',
+                resolve: {
+                    app: function() {
+                        return $scope.app;
+                    }
+                }
+            }).result.then(function(criteria) {
+                $scope.criteria.data = criteria;
+                $scope.doSearch(1);
+            });
+        };
         $scope.editRecord = function(record) {
             $uibModal.open({
                 templateUrl: '/views/default/pl/fe/matter/enroll/component/recordEditor.html?_=1',
@@ -194,7 +207,6 @@ define(['frame'], function(ngApp) {
                 var p, tags;
                 p = updated[0];
                 http2.post('/rest/pl/fe/matter/enroll/record/update?site=' + $scope.siteId + '&app=' + $scope.id + '&ek=' + record.enroll_key, p, function(rsp) {
-                    //tags = updated[1];
                     var data = rsp.data.data;
                     if ($scope.mapOfSchemaByType['image'] && $scope.mapOfSchemaByType['image'].length) {
                         angular.forEach($scope.mapOfSchemaByType['image'], function(schemaId) {
@@ -202,8 +214,7 @@ define(['frame'], function(ngApp) {
                             data[schemaId] = imgs;
                         });
                     }
-                    angular.extend(record, p);
-                    //$scope.app.tags = tags;
+                    angular.extend(record, rsp.data);
                 });
             });
         };
@@ -309,6 +320,22 @@ define(['frame'], function(ngApp) {
                 matterTypes: $scope.notifyMatterTypes
             });
         };
+        $scope.export = function() {
+            var url, params = {};
+
+            url = '/rest/pl/fe/matter/enroll/record/export';
+            url += '?site=' + $scope.siteId + '&app=' + $scope.id;
+
+            http2.post(url, params, function(rsp) {
+                var blob;
+
+                blob = new Blob([rsp.data], {
+                    type: "text/plain;charset=utf-8"
+                });
+
+                saveAs(blob, $scope.app.title);
+            });
+        };
         $scope.$watch('selectAll', function(nv) {
             if (nv !== undefined) {
                 for (var i = $scope.records.length - 1; i >= 0; i--) {
@@ -360,6 +387,35 @@ define(['frame'], function(ngApp) {
             }
         }
     });
+    /**
+     * 设置过滤条件
+     */
+    ngApp.provider.controller('ctrlFilter', ['$scope', '$uibModalInstance', 'app', function($scope, $mi, app) {
+        var canFilteredSchemas = [];
+        angular.forEach(app.data_schemas, function(schema) {
+            if (false === /image|file/.test(schema.type)) {
+                canFilteredSchemas.push(schema);
+            }
+        });
+        $scope.schemas = canFilteredSchemas;
+        $scope.criteria = {};
+        $scope.ok = function() {
+            var criteria = $scope.criteria,
+                optionCriteria;
+            // 将单选题/多选题的结果拼成字符串
+            angular.forEach(app.data_schemas, function(schema) {
+                if (/single|phase|multiple/.test(schema.type)) {
+                    if ((optionCriteria = criteria[schema.id])) {
+                        criteria[schema.id] = Object.keys(optionCriteria).join(',');
+                    }
+                }
+            });
+            $mi.close(criteria);
+        };
+        $scope.cancel = function() {
+            $mi.dismiss('cancel');
+        };
+    }]);
     ngApp.provider.controller('ctrlEditor', ['$scope', '$uibModalInstance', '$sce', 'app', 'record', function($scope, $uibModalInstance, $sce, app, record) {
         var p, col, files;
         for (p in app.data_schemas) {
@@ -401,9 +457,6 @@ define(['frame'], function(ngApp) {
             } else {
                 return {};
             }
-        };
-        $scope.signin = function() {
-            $scope.record.signin_at = Math.round((new Date()).getTime() / 1000);
         };
         $scope.ok = function() {
             var record = $scope.record,
