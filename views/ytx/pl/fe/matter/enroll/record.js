@@ -4,18 +4,6 @@ define(['frame'], function(ngApp) {
             value: 'article',
             title: '单图文',
             url: '/rest/pl/fe/matter'
-        }, {
-            value: 'news',
-            title: '多图文',
-            url: '/rest/pl/fe/matter'
-        }, {
-            value: 'channel',
-            title: '频道',
-            url: '/rest/pl/fe/matter'
-        }, {
-            value: 'enroll',
-            title: '登记活动',
-            url: '/rest/pl/fe/matter'
         }];
         $scope.doSearch = function(page) {
             var url;
@@ -48,7 +36,8 @@ define(['frame'], function(ngApp) {
             record: {
                 searchBy: '',
                 keyword: ''
-            }
+            },
+            tags: []
         };
         // 分页条件
         $scope.page = {
@@ -70,25 +59,16 @@ define(['frame'], function(ngApp) {
         $scope.orderBys = [{
             n: '登记时间',
             v: 'time'
-        }, {
-            n: '邀请数',
-            v: 'follower'
-        }, {
-            n: '点赞数',
-            v: 'score'
-        }, {
-            n: '评论数',
-            v: 'remark'
         }];
         $scope.selected = {};
         $scope.selectAll;
         $scope.$on('search-tag.xxt.combox.done', function(event, aSelected) {
-            $scope.page.tags = $scope.page.tags.concat(aSelected);
+            $scope.criteria.tags = $scope.criteria.tags.concat(aSelected);
             $scope.doSearch();
         });
         $scope.$on('search-tag.xxt.combox.del', function(event, removed) {
-            var i = $scope.page.tags.indexOf(removed);
-            $scope.page.tags.splice(i, 1);
+            var i = $scope.criteria.tags.indexOf(removed);
+            $scope.criteria.tags.splice(i, 1);
             $scope.doSearch();
         });
         $scope.$on('batch-tag.xxt.combox.done', function(event, aSelected) {
@@ -240,7 +220,6 @@ define(['frame'], function(ngApp) {
                 p = updated[0];
                 tags = updated[1];
                 http2.post('/rest/pl/fe/matter/enroll/record/add?site=' + $scope.siteId + '&app=' + $scope.id, p, function(rsp) {
-                    //$scope.app.tags = tags;
                     var record = rsp.data;
                     if ($scope.mapOfSchemaByType['image'] && $scope.mapOfSchemaByType['image'].length) {
                         angular.forEach($scope.mapOfSchemaByType['image'], function(schemaId) {
@@ -450,25 +429,16 @@ define(['frame'], function(ngApp) {
         $scope.record = record;
         $scope.record.aTags = (!record.tags || record.tags.length === 0) ? [] : record.tags.split(',');
         $scope.aTags = app.tags;
-        $scope.json2Obj = function(json) {
-            if (json && json.length) {
-                obj = JSON.parse(json);
-                return obj;
-            } else {
-                return {};
-            }
-        };
         $scope.ok = function() {
             var record = $scope.record,
                 p = {
-                    //tags: record.aTags.join(','),
+                    tags: record.aTags.join(','),
                     data: {}
                 };
+
             record.tags = p.tags;
-            //if (record.id) {
-            //p.signin_at = record.signin_at;
+            record.comment && (p.comment = record.comment);
             p.verified = record.verified;
-            //}
 
             angular.forEach($scope.app.data_schemas, function(col) {
                 p.data[col.id] = $scope.record.data[col.id];

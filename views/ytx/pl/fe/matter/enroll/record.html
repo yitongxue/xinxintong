@@ -1,22 +1,8 @@
 <div id='record-view'>
     <div class='form-group form-inline'>
-        <div class='form-group hide'>
-            <select class='form-control' ng-model="criteria.record.searchBy" ng-options="s.v as s.n for s in searchBys"></select>
-        </div>
-        <div class='form-group hide' style='max-width:200px'>
-            <div class="input-group">
-                <input type='text' class='form-control' ng-model='page.keyword' placeholder='搜索条件' ng-keyup='keywordKeyup($event)'>
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click='doSearch(1)'>
-                        <span class="glyphicon glyphicon-search"></span>
-                    </button>
-                </span>
-            </div>
-        </div>
-        <div class='form-group' ng-if='app.rounds'>
-            <select class='form-control' title='登记轮次' ng-model='page.byRound' ng-options='r.rid as r.title for r in app.rounds' ng-change='doSearch(1)'>
-                <option value=>全部</option>
-            </select>
+        <div class='form-group'>
+            <label>标签</label>
+            <combox evt-prefix='search-tag' readonly='true' existing='criteria.tags' options='app.tags'></combox>
         </div>
         <div class='form-group pull-right'>
             <div class='input-group'>
@@ -47,7 +33,8 @@
                     <th style='width:100px'>登记时间</th>
                     <th class='custom-col' ng-repeat="c in  app.data_schemas" title="{{c.ops}}">{{c.title}}</th>
                     <th style='width:80px'>审核通过</th>
-                    <th style='width:60px' ng-if="app.can_invite==='Y'">邀请</th>
+                    <th style='width:140px'>标签</th>
+                    <th style='width:140px'>备注</th>
                     <th style='width:72px'>操作</th>
                 </tr>
             </thead>
@@ -66,7 +53,8 @@
                         </span>
                     </td>
                     <td>{{r.verified}}</td>
-                    <td ng-if="app.can_invite==='Y'">{{r.follower_num}}</td>
+                    <td>{{r.tags}}</td>
+                    <td>{{r.comment}}</td>
                     <td>
                         <button class='btn btn-xs btn-danger' ng-click='removeRecord(r)'>
                             <span class='glyphicon glyphicon-remove'></span>
@@ -87,6 +75,18 @@
         boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at"
         previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="doSearch()"></pagination>
     </div>
+    <!-- bottom navbar -->
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container-fluid" style='text-align:center'>
+            <form class="navbar-form" style='display:inline-block'>
+                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/enroll/preview?site={{siteId}}&id={{id}}">活动设置</a>
+            </form>
+            <form class="navbar-form navbar-right" style='display:inline-block'>
+                <button class='btn btn-lg btn-default' ng-click="remove()">删除活动</button>
+            </form>
+        </div>
+    </nav>
+    <!-- end bottom navbar -->
 </div>
 <script type="text/ng-template" id="userPicker.html">
     <div class="modal-header">
