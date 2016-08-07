@@ -185,7 +185,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
         }];
         $scope.buttons = schemaLib.buttons;
         $scope.wrapEditorHtml = function() {
-            var url = '/views/default/pl/fe/matter/enroll/wrap/' + $scope.activeWrap.type + '.html?_=25';
+            var url = '/views/default/pl/fe/matter/enroll/wrap/' + $scope.activeWrap.type + '.html?_=26';
             return url;
         };
         $scope.setActiveWrap = function(domWrap) {
