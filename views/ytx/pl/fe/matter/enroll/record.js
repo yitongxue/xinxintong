@@ -35,9 +35,11 @@ define(['frame'], function(ngApp) {
         $scope.criteria = {
             record: {
                 searchBy: '',
-                keyword: ''
+                keyword: '',
+                verified: ''
             },
-            tags: []
+            tags: [],
+            data: {}
         };
         // 分页条件
         $scope.page = {
@@ -52,10 +54,6 @@ define(['frame'], function(ngApp) {
                 return p;
             }
         };
-        $scope.searchBys = [{
-            n: '昵称',
-            v: 'nickname'
-        }];
         $scope.orderBys = [{
             n: '登记时间',
             v: 'time'
@@ -154,17 +152,20 @@ define(['frame'], function(ngApp) {
         };
         $scope.filter = function() {
             $uibModal.open({
-                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordFilter.html?_=1',
+                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordFilter.html?_=3',
                 controller: 'ctrlFilter',
                 windowClass: 'auto-height',
                 backdrop: 'static',
                 resolve: {
                     app: function() {
                         return $scope.app;
+                    },
+                    criteria: function() {
+                        return angular.copy($scope.criteria);
                     }
                 }
             }).result.then(function(criteria) {
-                $scope.criteria.data = criteria;
+                $scope.criteria = criteria;
                 $scope.doSearch(1);
             });
         };
@@ -288,10 +289,12 @@ define(['frame'], function(ngApp) {
                     url += '?site=' + $scope.siteId;
                     url += '&app=' + $scope.id;
                     url += '&tmplmsg=' + notify.tmplmsg.id;
-                    //url += '&tags=' + $scope.page.tags.join(',');
-                    //url += $scope.page.joinParams();
-                    http2.post(url, notify.message, function(data) {
-                        $scope.$root.infomsg = '发送成功';
+                    url += $scope.page.joinParams();
+                    http2.post(url, {
+                        message: notify.message,
+                        criteria: $scope.criteria
+                    }, function(data) {
+                        noticebox.success('发送成功');
                     });
                 }
             }, {
@@ -369,7 +372,7 @@ define(['frame'], function(ngApp) {
     /**
      * 设置过滤条件
      */
-    ngApp.provider.controller('ctrlFilter', ['$scope', '$uibModalInstance', 'app', function($scope, $mi, app) {
+    ngApp.provider.controller('ctrlFilter', ['$scope', '$uibModalInstance', 'app', 'criteria', function($scope, $mi, app, lastCriteria) {
         var canFilteredSchemas = [];
         angular.forEach(app.data_schemas, function(schema) {
             if (false === /image|file/.test(schema.type)) {
@@ -377,15 +380,15 @@ define(['frame'], function(ngApp) {
             }
         });
         $scope.schemas = canFilteredSchemas;
-        $scope.criteria = {};
+        $scope.criteria = lastCriteria;
         $scope.ok = function() {
             var criteria = $scope.criteria,
                 optionCriteria;
             // 将单选题/多选题的结果拼成字符串
             angular.forEach(app.data_schemas, function(schema) {
                 if (/multiple/.test(schema.type)) {
-                    if ((optionCriteria = criteria[schema.id])) {
-                        criteria[schema.id] = Object.keys(optionCriteria).join(',');
+                    if ((optionCriteria = criteria.data[schema.id])) {
+                        criteria.data[schema.id] = Object.keys(optionCriteria).join(',');
                     }
                 }
             });
