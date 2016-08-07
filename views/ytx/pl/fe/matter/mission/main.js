@@ -400,7 +400,7 @@ ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope,
 			var typeCount = {};
 			angular.forEach(rsp.data, function(matter) {
 				matter._operator = matter.modifier_name || matter.creater_name;
-				matter._operateAt = matter.modifiy_at || matter.create_at;
+				matter._operateAt = matter.modify_at || matter.create_at;
 				if (matter.type === 'enroll') {
 					typeCount[matter.scenario] ? typeCount[matter.scenario]++ : (typeCount[matter.scenario] = 1);
 				} else {
