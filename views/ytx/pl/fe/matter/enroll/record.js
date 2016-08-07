@@ -58,8 +58,9 @@ define(['frame'], function(ngApp) {
             n: '登记时间',
             v: 'time'
         }];
+        // 选中的记录
         $scope.selected = {};
-        $scope.selectAll;
+        $scope.selectAll = undefined;
         $scope.$on('search-tag.xxt.combox.done', function(event, aSelected) {
             $scope.criteria.tags = $scope.criteria.tags.concat(aSelected);
             $scope.doSearch();
@@ -277,9 +278,29 @@ define(['frame'], function(ngApp) {
             http2.get('/rest/pl/fe/matter/enroll/record/verifyAll?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
                 angular.forEach($scope.records, function(record) {
                     record.verified = 'Y';
-                    $scope.$root.infomsg = '完成操作';
                 });
+                $scope.$root.infomsg = '完成操作';
             });
+        };
+        $scope.batchVerify = function() {
+            var eks = [];
+            for (var p in $scope.selected) {
+                if ($scope.selected[p] === true) {
+                    eks.push($scope.records[p].enroll_key);
+                }
+            }
+            if (eks.length) {
+                http2.post('/rest/pl/fe/matter/enroll/record/batchVerify?site=' + $scope.siteId + '&app=' + $scope.id, {
+                    eks: eks
+                }, function(rsp) {
+                    for (var p in $scope.selected) {
+                        if ($scope.selected[p] === true) {
+                            $scope.records[p].verified = 'Y';
+                        }
+                    }
+                    noticebox.success('完成操作');
+                });
+            }
         };
         $scope.notify = function() {
             pushnotify.open($scope.siteId, function(notify) {
@@ -319,7 +340,7 @@ define(['frame'], function(ngApp) {
             });
         };
         $scope.$watch('selectAll', function(nv) {
-            if (nv !== undefined) {
+            if (nv !== undefined && $scope.records) {
                 for (var i = $scope.records.length - 1; i >= 0; i--) {
                     $scope.selected[i] = nv;
                 }
