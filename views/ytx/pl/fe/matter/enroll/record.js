@@ -1,5 +1,5 @@
 define(['frame'], function(ngApp) {
-    ngApp.provider.controller('ctrlRecord', ['$scope', 'http2', '$uibModal', 'mattersgallery', 'pushnotify', function($scope, http2, $uibModal, mattersgallery, pushnotify) {
+    ngApp.provider.controller('ctrlRecord', ['$scope', 'http2', '$uibModal', 'mattersgallery', 'pushnotify', 'noticebox', function($scope, http2, $uibModal, mattersgallery, pushnotify, noticebox) {
         $scope.notifyMatterTypes = [{
             value: 'article',
             title: '单图文',
@@ -279,7 +279,7 @@ define(['frame'], function(ngApp) {
                 angular.forEach($scope.records, function(record) {
                     record.verified = 'Y';
                 });
-                $scope.$root.infomsg = '完成操作';
+                noticebox.success('完成操作');
             });
         };
         $scope.batchVerify = function() {
