@@ -909,6 +909,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                 $timeout.cancel(timerOfUpdate);
             }
             timerOfUpdate = $timeout(function() {
+                $scope.ep.purifyInput(tinymce.activeEditor.getContent(), true);
                 $scope.updPage($scope.ep, ['act_schemas', 'html']);
             }, 1000);
             timerOfUpdate.then(function() {
