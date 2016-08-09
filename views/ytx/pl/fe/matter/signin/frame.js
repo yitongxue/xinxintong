@@ -105,6 +105,7 @@ define(['require', 'page'], function(require, pageLib) {
 			http2.get('/rest/pl/fe/matter/signin/get?site=' + $scope.siteId + '&id=' + $scope.id, function(rsp) {
 				var app = rsp.data,
 					mapOfAppSchemas = {};
+					
 				app.tags = (!app.tags || app.tags.length === 0) ? [] : app.tags.split(',');
 				app.type = 'signin';
 				app.data_schemas = app.data_schemas && app.data_schemas.length ? JSON.parse(app.data_schemas) : [];
@@ -117,7 +118,9 @@ define(['require', 'page'], function(require, pageLib) {
 					angular.extend(page, pageLib);
 					page.arrange(mapOfAppSchemas);
 				});
-				//$scope.persisted = angular.copy(app);
+				if (app.enrollApp && app.enrollApp.data_schemas) {
+					app.enrollApp.data_schemas = JSON.parse(app.enrollApp.data_schemas);
+				}
 				$scope.app = app;
 				$scope.url = 'http://' + location.host + '/rest/site/fe/matter/signin?site=' + $scope.siteId + '&app=' + $scope.id;
 			});
