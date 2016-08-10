@@ -21,13 +21,13 @@ define(['require', 'page'], function(require, pageLib) {
 			directive: $compileProvider.directive
 		};
 		$routeProvider
-			.when('/rest/pl/fe/matter/enroll/preview', new RouteParam('preview'))
+			.when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish'))
 			.when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
 			.when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
 			.when('/rest/pl/fe/matter/enroll/event', new RouteParam('event'))
 			.when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
 			.when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
-			.otherwise(new RouteParam('preview'));
+			.otherwise(new RouteParam('publish'));
 
 		$locationProvider.html5Mode(true);
 
@@ -49,39 +49,6 @@ define(['require', 'page'], function(require, pageLib) {
 			srvPageProvider.setAppId(appId);
 		})();
 	}]);
-	ngApp.directive('relativeFixed', function() {
-		return {
-			restrict: 'A',
-			link: function(scope, elem, attrs) {
-				var elem = elem[0],
-					initial = {
-						top: elem.style.top,
-						left: elem.style.left,
-						position: elem.style.position,
-					},
-					fixedHeight = parseInt(attrs.fixedHeight),
-					bodyOffsetTop = elem.offsetTop,
-					bodyOffsetLeft = elem.offsetLeft,
-					offsetParent = elem.offsetParent;
-				while (offsetParent.offsetParent) {
-					bodyOffsetTop += offsetParent.offsetTop;
-					bodyOffsetLeft += offsetParent.offsetLeft;
-					offsetParent = offsetParent.offsetParent;
-				}
-				window.addEventListener('scroll', function(event) {
-					if (document.body.scrollTop + fixedHeight > bodyOffsetTop) {
-						elem.style.position = 'fixed';
-						elem.style.top = fixedHeight + 'px';
-						elem.style.left = bodyOffsetLeft + 'px';
-					} else {
-						elem.style.position = initial.position;
-						elem.style.top = initial.top;
-						elem.style.left = initial.left;
-					}
-				});
-			}
-		}
-	});
 	ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', 'srvApp', 'mattersgallery', function($scope, $location, $uibModal, $q, http2, srvApp, mattersgallery) {
 		var ls = $location.search();
 

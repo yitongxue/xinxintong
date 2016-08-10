@@ -13,7 +13,7 @@
                     </div>
                     <div class='form-group' ng-if="app.mission.multi_phase==='Y'">
                         <label>课程期数</label>
-                        <select class='form-control' ng-model="app.mission_phase_id" ng-change="choosePhase()" ng-options="phase.phase_id as phase.title for phase in app.mission.phases">
+                        <select class='form-control' ng-model="app.mission_phase_id" ng-change="choosePhase()" ng-options="phase.phase_id as phase.title for phase in phases">
                             <option></option>
                         </select>
                     </div>
@@ -76,10 +76,10 @@
             </div>
         </div>
     </div>
-    <div class='col-md-5' style='text-align:center'>
+    <div class='col-md-5' style='text-align:center' ng-controller="ctrlPreview">
         <iframe id='simulator' ng-src={{previewURL}}></iframe>
     </div>
-    <div class='col-md-4' ng-controller="ctrlPublish">
+    <div class='col-md-4'>
         <div class='tile records' ng-if="!app.rounds">
             <div class='help-block'>
                 <span>已登记数量</span>
