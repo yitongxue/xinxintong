@@ -342,6 +342,15 @@ define(['frame'], function(ngApp) {
                 saveAs(blob, $scope.app.title + '.csv');
             });
         };
+        $scope.countSelected = function() {
+            var count = 0;
+            for (var p in $scope.selected) {
+                if ($scope.selected[p] === true) {
+                    count++;
+                }
+            }
+            return count;
+        };
         $scope.$watch('selectAll', function(nv) {
             if (nv !== undefined && $scope.records) {
                 for (var i = $scope.records.length - 1; i >= 0; i--) {
