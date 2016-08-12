@@ -371,7 +371,14 @@ define(['frame'], function(ngApp) {
 			vcode = prompt('是否要删除所有登记信息？，若是，请输入活动名称。');
 			if (vcode === $scope.app.title) {
 				http2.get('/rest/pl/fe/matter/group/player/empty?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
-					$scope.doSearch(1);
+					var round = $scope.editingRound;
+					if (round === null) {
+						$scope.allPlayers();
+					} else if (round === false) {
+						$scope.pendings();
+					} else {
+						$scope.winners(round);
+					}
 				});
 			}
 		};
