@@ -325,7 +325,9 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
         };
         $scope.moveWrap = function(action) {
             $scope.activeWrap = $scope.ep.moveWrap(action);
-            $scope.updPage($scope.ep, ['html']);
+            if (action === 'up' || action === 'down') {
+                $scope.updPage($scope.ep, ['html']);
+            }
         };
         $scope.embedMatter = function(page) {
             var options = {
@@ -840,6 +842,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                 $timeout.cancel(timerOfUpdate);
             }
             timerOfUpdate = $timeout(function() {
+                $scope.ep.html = tinymce.activeEditor.getContent();
                 $scope.updPage($scope.ep, ['data_schemas', 'html']);
             }, 1000);
             timerOfUpdate.then(function() {
