@@ -25,10 +25,9 @@ define(['frame'], function(ngApp) {
             http2.post(url, $scope.criteria, function(rsp) {
                 if (rsp.data) {
                     $scope.records = rsp.data.records ? rsp.data.records : [];
-                    $scope.page.total = rsp.data.total;
+                    rsp.data.total && ($scope.page.total = rsp.data.total);
                 } else {
                     $scope.records = [];
-                    $scope.page.total = 0;
                 }
                 angular.forEach($scope.records, function(record) {
                     record.data.member && (record.data.member = JSON.parse(record.data.member));
@@ -114,14 +113,8 @@ define(['frame'], function(ngApp) {
                 return d.getTime();
             }
         };
-        $scope.signinStartAt = startAt.getTime() / 1000;
-        $scope.signinEndAt = endAt.getTime() / 1000;
         $scope.selected = {};
         $scope.selectAll = undefined;
-        $scope.$on('xxt.tms-datepicker.change', function(evt, data) {
-            $scope[data.state] = data.value;
-            $scope.doSearch(1);
-        });
         $scope.$on('search-tag.xxt.combox.done', function(event, aSelected) {
             $scope.criteria.tags = $scope.criteria.tags.concat(aSelected);
             $scope.doSearch();
@@ -131,12 +124,6 @@ define(['frame'], function(ngApp) {
             $scope.criteria.tags.splice(i, 1);
             $scope.doSearch();
         });
-        $scope.viewUser = function(fan) {
-            //location.href = '/rest/mp/user?openid=' + fan.openid;
-        };
-        $scope.keywordKeyup = function(evt) {
-            evt.which === 13 && $scope.doSearch();
-        };
         $scope.memberAttr = function(val, key) {
             var keys;
             if (val.member) {
@@ -320,6 +307,7 @@ define(['frame'], function(ngApp) {
 
             url = '/rest/pl/fe/matter/signin/record/export';
             url += '?site=' + $scope.siteId + '&app=' + $scope.id;
+            $scope.page.byRound && (url += '&round=' + $scope.page.byRound);
 
             http2.post(url, params, function(rsp) {
                 var blob;
@@ -486,8 +474,10 @@ define(['frame'], function(ngApp) {
                 criteria: $scope.criteria
             };
 
-            url = '/rest/pl/fe/matter/enroll/record/export';
-            url += '?site=' + $scope.siteId + '&app=' + $scope.app.enrollApp.id;
+            url = '/rest/pl/fe/matter/signin/record/exportByEnroll';
+            url += '?site=' + $scope.siteId; // todo
+            url += '&app=' + $scope.id;
+            $scope.page.byRound && (url += '&round=' + $scope.page.byRound);
 
             http2.post(url, params, function(rsp) {
                 var blob;
