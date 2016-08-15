@@ -1,8 +1,21 @@
 define(['frame'], function(ngApp) {
+    'use strict';
     ngApp.provider.controller('ctrlRecord', ['$scope', 'http2', '$uibModal', 'mattersgallery', 'pushnotify', 'noticebox', function($scope, http2, $uibModal, mattersgallery, pushnotify, noticebox) {
         $scope.notifyMatterTypes = [{
             value: 'article',
             title: '单图文',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'news',
+            title: '多图文',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'channel',
+            title: '频道',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'enroll',
+            title: '登记活动',
             url: '/rest/pl/fe/matter'
         }];
         $scope.doSearch = function(page) {
@@ -18,7 +31,7 @@ define(['frame'], function(ngApp) {
                     $scope.page.total = rsp.data.total;
                 } else {
                     $scope.records = [];
-                    rsp.data.total = 0;
+                    $scope.page.total = 0;
                 }
                 angular.forEach($scope.records, function(record) {
                     if (record.data) {
@@ -42,11 +55,11 @@ define(['frame'], function(ngApp) {
             tags: [],
             data: {}
         };
-        // 分页条件
         $scope.page = {
             at: 1,
             size: 30,
             orderBy: 'time',
+            byRound: '',
             joinParams: function() {
                 var p;
                 p = '&page=' + this.at + '&size=' + this.size;
@@ -58,10 +71,16 @@ define(['frame'], function(ngApp) {
         $scope.orderBys = [{
             n: '登记时间',
             v: 'time'
+        }, {
+            n: '邀请数',
+            v: 'follower'
+        }, {
+            n: '点赞数',
+            v: 'score'
+        }, {
+            n: '评论数',
+            v: 'remark'
         }];
-        // 选中的记录
-        $scope.selected = {};
-        $scope.selectAll = undefined;
         $scope.$on('search-tag.xxt.combox.done', function(event, aSelected) {
             $scope.criteria.tags = $scope.criteria.tags.concat(aSelected);
             $scope.doSearch();
@@ -75,8 +94,8 @@ define(['frame'], function(ngApp) {
             var i, record, records, eks, posted;
             records = [];
             eks = [];
-            for (i in $scope.selected) {
-                if ($scope.selected) {
+            for (i in $scope.rows.selected) {
+                if ($scope.rows.selected) {
                     record = $scope.records[i];
                     eks.push(record.enroll_key);
                     records.push(record);
@@ -104,15 +123,9 @@ define(['frame'], function(ngApp) {
                 });
             }
         });
-        $scope.viewUser = function(fan) {
-            //location.href = '/rest/mp/user?openid=' + fan.openid;
-        };
-        $scope.keywordKeyup = function(evt) {
-            evt.which === 13 && $scope.doSearch();
-        };
         $scope.memberAttr = function(val, key) {
             var keys;
-            if (val.member) {
+            if (val && val.member) {
                 keys = key.split('.');
                 if (keys.length === 2) {
                     return val.member[keys[1]];
@@ -173,7 +186,7 @@ define(['frame'], function(ngApp) {
         };
         $scope.editRecord = function(record) {
             $uibModal.open({
-                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordEditor.html?_=2',
+                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordEditor.html?_=1',
                 controller: 'ctrlEditor',
                 backdrop: 'static',
                 windowClass: 'auto-height',
@@ -203,7 +216,7 @@ define(['frame'], function(ngApp) {
         };
         $scope.addRecord = function() {
             $uibModal.open({
-                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordEditor.html?_=2',
+                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordEditor.html?_=1',
                 controller: 'ctrlEditor',
                 windowClass: 'auto-height',
                 resolve: {
@@ -287,8 +300,8 @@ define(['frame'], function(ngApp) {
         };
         $scope.batchVerify = function() {
             var eks = [];
-            for (var p in $scope.selected) {
-                if ($scope.selected[p] === true) {
+            for (var p in $scope.rows.selected) {
+                if ($scope.rows.selected[p] === true) {
                     eks.push($scope.records[p].enroll_key);
                 }
             }
@@ -296,8 +309,8 @@ define(['frame'], function(ngApp) {
                 http2.post('/rest/pl/fe/matter/enroll/record/batchVerify?site=' + $scope.siteId + '&app=' + $scope.id, {
                     eks: eks
                 }, function(rsp) {
-                    for (var p in $scope.selected) {
-                        if ($scope.selected[p] === true) {
+                    for (var p in $scope.rows.selected) {
+                        if ($scope.rows.selected[p] === true) {
                             $scope.records[p].verified = 'Y';
                         }
                     }
@@ -327,7 +340,9 @@ define(['frame'], function(ngApp) {
             });
         };
         $scope.export = function() {
-            var url, params = {};
+            var url, params = {
+                criteria: $scope.criteria
+            };
 
             url = '/rest/pl/fe/matter/enroll/record/export';
             url += '?site=' + $scope.siteId + '&app=' + $scope.id;
@@ -344,20 +359,29 @@ define(['frame'], function(ngApp) {
         };
         $scope.countSelected = function() {
             var count = 0;
-            for (var p in $scope.selected) {
-                if ($scope.selected[p] === true) {
+            for (var p in $scope.rows.selected) {
+                if ($scope.rows.selected[p] === true) {
                     count++;
                 }
             }
             return count;
         };
-        $scope.$watch('selectAll', function(nv) {
-            if (nv !== undefined && $scope.records) {
-                for (var i = $scope.records.length - 1; i >= 0; i--) {
-                    $scope.selected[i] = nv;
+        // 选中的记录
+        $scope.rows = {
+            allSelected: 'N',
+            selected: {}
+        };
+        $scope.$watch('rows.allSelected', function(checked) {
+            var index = 0;
+            if (checked === 'Y') {
+                while (index < $scope.records.length) {
+                    $scope.rows.selected[index++] = true;
                 }
+            } else if (checked === 'N') {
+                $scope.rows.selected = {};
             }
         });
+        $scope.tmsTableWrapReady = 'N'; // 表格定义是否已经准备完毕
         $scope.$watch('app', function(app) {
             if (!app) return;
             var mapOfSchemaByType = {};
@@ -366,6 +390,7 @@ define(['frame'], function(ngApp) {
                 mapOfSchemaByType[schema.type].push(schema.id);
             });
             $scope.mapOfSchemaByType = mapOfSchemaByType;
+            $scope.tmsTableWrapReady = 'Y';
             $scope.doSearch();
         });
     }]);
@@ -433,31 +458,33 @@ define(['frame'], function(ngApp) {
     }]);
     ngApp.provider.controller('ctrlEditor', ['$scope', '$uibModalInstance', '$sce', 'app', 'record', function($scope, $uibModalInstance, $sce, app, record) {
         var p, col, files;
-        for (p in app.data_schemas) {
-            col = app.data_schemas[p];
-            if (record.data[col.id]) {
-                if (col.type === 'file') {
-                    files = JSON.parse(record.data[col.id]);
-                    angular.forEach(files, function(file) {
-                        file.url = $sce.trustAsResourceUrl(file.url);
-                    });
-                    record.data[col.id] = files;
-                } else if (col.type === 'multiple') {
-                    var value = record.data[col.id].split(','),
-                        obj = {};
-                    angular.forEach(value, function(p) {
-                        obj[p] = true;
-                    });
-                    record.data[col.id] = obj;
-                } else if (col.type === 'image') {
-                    var value = record.data[col.id],
-                        obj = [];
-                    angular.forEach(value, function(p) {
-                        obj.push({
-                            imgSrc: p
+        if (record.data) {
+            for (p in app.data_schemas) {
+                col = app.data_schemas[p];
+                if (record.data[col.id]) {
+                    if (col.type === 'file') {
+                        files = JSON.parse(record.data[col.id]);
+                        angular.forEach(files, function(file) {
+                            file.url = $sce.trustAsResourceUrl(file.url);
                         });
-                    });
-                    record.data[col.id] = obj;
+                        record.data[col.id] = files;
+                    } else if (col.type === 'multiple') {
+                        var value = record.data[col.id].split(','),
+                            obj = {};
+                        angular.forEach(value, function(p) {
+                            obj[p] = true;
+                        });
+                        record.data[col.id] = obj;
+                    } else if (col.type === 'image') {
+                        var value = record.data[col.id],
+                            obj = [];
+                        angular.forEach(value, function(p) {
+                            obj.push({
+                                imgSrc: p
+                            });
+                        });
+                        record.data[col.id] = obj;
+                    }
                 }
             }
         }
@@ -541,4 +568,4 @@ define(['frame'], function(ngApp) {
             $scope.record.aTags.splice($scope.record.aTags.indexOf(removed), 1);
         });
     }]);
-})
+});
