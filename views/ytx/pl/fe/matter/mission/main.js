@@ -255,89 +255,6 @@ ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope,
 		});
 	};
 	$scope.addEnroll = function(assignedScenario) {
-		/*$uibModal.open({
-			templateUrl: '/views/ytx/pl/fe/_module/enroll-template.html',
-			backdrop: 'static',
-			windowClass: 'auto-height template',
-			controller: ['$scope', '$uibModalInstance', function($scope2, $mi) {
-				$scope2.data = {};
-				$scope2.cancel = function() {
-					$mi.dismiss();
-				};
-				$scope2.blank = function() {
-					$mi.close();
-				};
-				$scope2.ok = function() {
-					$mi.close($scope2.data);
-				};
-				$scope2.chooseScenario = function() {};
-				$scope2.chooseTemplate = function() {
-					if (!$scope2.data.template) return;
-					var url;
-					url = '/rest/pl/fe/matter/enroll/template/config';
-					url += '?scenario=' + $scope2.data.scenario.name;
-					url += '&template=' + $scope2.data.template.name;
-					http2.get(url, function(rsp) {
-						var elSimulator, url;
-						$scope2.data.simpleSchema = rsp.data.simpleSchema ? rsp.data.simpleSchema : '';
-						$scope2.pages = rsp.data.pages;
-						$scope2.data.selectedPage = $scope2.pages[0];
-						elSimulator = document.querySelector('#simulator');
-						url = 'http://' + location.host;
-						url += '/rest/site/fe/matter/enroll/template';
-						url += '?scenario=' + $scope2.data.scenario.name;
-						url += '&template=' + $scope2.data.template.name;
-						url += '&_=' + (new Date()).getTime();
-						elSimulator.src = url;
-						elSimulator.onload = function() {
-							$scope.$apply(function() {
-								$scope2.choosePage();
-							});
-						};
-					});
-				};
-				$scope2.choosePage = function() {
-					var elSimulator, page;
-					elSimulator = document.querySelector('#simulator');
-					config = {
-						simpleSchema: $scope2.data.simpleSchema
-					};
-					page = $scope2.data.selectedPage.name;
-					elSimulator.contentWindow.renew(page, config);
-				};
-				http2.get('/rest/pl/fe/matter/enroll/template/list', function(rsp) {
-					var keysOfTemplate;
-					$scope2.templates = rsp.data;
-					if (assignedScenario) {
-						$scope2.data.scenario = $scope2.templates[assignedScenario];
-						keysOfTemplate = Object.keys($scope2.data.scenario.templates);
-						if (keysOfTemplate.length) {
-							$scope2.data.template = $scope2.data.scenario.templates[keysOfTemplate[0]];
-							$scope2.chooseTemplate();
-						}
-						$scope2.fixedScenario = true;
-					}
-				});
-			}]
-		}).result.then(function(data) {
-			var url, config;
-			url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.siteId + '&mission=' + $scope.id;
-			config = {
-				proto: {
-					title: $scope.editing.title + '-报名'
-				}
-			};
-			if (data) {
-				url += '&scenario=' + data.scenario.name;
-				url += '&template=' + data.template.name;
-				if (data.simpleSchema && data.simpleSchema.length) {
-					config.simpleSchema = data.simpleSchema;
-				}
-			}
-			http2.post(url, config, function(rsp) {
-				location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
-			});
-		});*/
 		var url, config;
 		url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.siteId + '&mission=' + $scope.id;
 		if (assignedScenario === 'registration') {
@@ -383,9 +300,17 @@ ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope,
 			location.href = '/rest/pl/fe/matter/group?site=' + $scope.siteId + '&id=' + rsp.data.id;
 		});
 	};
+	$scope.addMatter = function() {
+		if (/voting|registration/.test($scope.matterType)) {
+			$scope.addEnroll($scope.matterType);
+		} else {
+			$scope['add' + $scope.matterType[0].toUpperCase() + $scope.matterType.substr(1)]();
+		}
+	};
 	$scope.open = function(matter) {
-		var type = matter.type,
+		var type = matter.type || $scope.matterType,
 			id = matter.id;
+
 		switch (type) {
 			case 'article':
 			case 'enroll':
@@ -395,25 +320,62 @@ ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', function($scope,
 				break;
 		}
 	};
-	$scope.fetch = function() {
-		http2.get('/rest/pl/fe/matter/mission/matter/list?site=' + $scope.siteId + '&id=' + $scope.id + '&_=' + (new Date()).getTime(), function(rsp) {
-			var typeCount = {};
-			angular.forEach(rsp.data, function(matter) {
-				matter._operator = matter.modifier_name || matter.creater_name;
-				matter._operateAt = matter.modify_at || matter.create_at;
-				if (matter.type === 'enroll') {
-					typeCount[matter.scenario] ? typeCount[matter.scenario]++ : (typeCount[matter.scenario] = 1);
+	$scope.matterType = '';
+	$scope.list = function(matterType) {
+		var url;
+
+		matterType === undefined && (matterType = '');
+		$scope.matterType = matterType;
+
+		if (matterType === '') {
+			http2.get('/rest/pl/fe/matter/mission/matter/list?site=' + $scope.siteId + '&id=' + $scope.id + '&_=' + (new Date()).getTime(), function(rsp) {
+				var typeCount = {};
+				angular.forEach(rsp.data, function(matter) {
+					matter._operator = matter.modifier_name || matter.creater_name;
+					matter._operateAt = matter.modify_at || matter.create_at;
+					if (matter.type === 'enroll') {
+						typeCount[matter.scenario] ? typeCount[matter.scenario]++ : (typeCount[matter.scenario] = 1);
+					} else {
+						typeCount[matter.type] ? typeCount[matter.type]++ : (typeCount[matter.type] = 1);
+					}
+				});
+				$scope.matters = rsp.data;
+				$scope.indicators = [];
+				!typeCount.registration && $scope.indicators.push(indicators.registration);
+				!typeCount.signin && $scope.indicators.push(indicators.signin);
+				!typeCount.group && $scope.indicators.push(indicators.group);
+				!typeCount.voting && $scope.indicators.push(indicators.voting);
+			});
+		} else {
+			var scenario;
+			url = '/rest/pl/fe/matter/';
+			if (/registration|voting/.test(matterType)) {
+				url += 'enroll'
+				scenario = $scope.matterType;
+			} else {
+				url += matterType;
+			}
+			url += '/list?site=' + $scope.siteId;
+			url += '&mission=' + $scope.id;
+			scenario && (url += '&scenario=' + scenario);
+			url += '&_=' + (new Date() * 1);
+			http2.get(url, function(rsp) {
+				$scope.indicators = [];
+				if (/article/.test(matterType)) {
+					$scope.matters = rsp.data.articles;
+					if (rsp.data.total == 0) {
+						indicators.article && $scope.indicators.push(indicators.article);
+					}
+				} else if (/enroll|voting|registration|signin|group/.test(matterType)) {
+					$scope.matters = rsp.data.apps;
+					if (rsp.data.total == 0) {
+						indicators[matterType] && $scope.indicators.push(indicators[matterType]);
+					}
 				} else {
-					typeCount[matter.type] ? typeCount[matter.type]++ : (typeCount[matter.type] = 1);
+					$scope.matters = rsp.data;
 				}
 			});
-			$scope.matters = rsp.data;
-			$scope.indicators = [];
-			!typeCount.registration && $scope.indicators.push(indicators.registration);
-			!typeCount.signin && $scope.indicators.push(indicators.signin);
-			!typeCount.group && $scope.indicators.push(indicators.group);
-			!typeCount.voting && $scope.indicators.push(indicators.voting);
-		});
+		}
 	};
-	$scope.fetch();
+	$scope.list();
 }]);
