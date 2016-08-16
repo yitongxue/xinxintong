@@ -20,6 +20,14 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
             });
         };
         $scope.updPage = function(page, names) {
+            if (page === $scope.ep) {
+                if (page.type === 'I') {
+                    page.purifyInput(tinymce.activeEditor.getContent(), true);
+                } else {
+                    page.html = tinymce.activeEditor.getContent();
+                }
+            }
+            
             return srvPage.update(page, names);
         };
         $scope.delPage = function() {

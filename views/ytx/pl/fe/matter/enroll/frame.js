@@ -1,4 +1,4 @@
-define(['require', 'page'], function(require, pageLib) {
+define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
 	'use strict';
 	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tmplshop.ui.xxt', 'service.enroll', 'tinymce.enroll', 'ui.xxt', 'channel.fe.pl']);
 	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvAppProvider', 'srvPageProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvAppProvider, srvPageProvider) {
@@ -166,6 +166,7 @@ define(['require', 'page'], function(require, pageLib) {
 			var mapOfAppSchemas = {};
 			// 将页面的schema指向应用的schema
 			angular.forEach(app.data_schemas, function(schema) {
+				schemaLib._upgrade(schema);
 				mapOfAppSchemas[schema.id] = schema;
 			});
 			angular.forEach(app.pages, function(page) {

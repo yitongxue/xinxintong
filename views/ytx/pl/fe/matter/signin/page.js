@@ -26,10 +26,12 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			angular.isString(names) && (names = [names]);
 			angular.forEach(names, function(name) {
 				if (name === 'html') {
-					if (page.type === 'I') {
-						page.purifyInput(tinymce.activeEditor.getContent(), true);
-					} else {
-						page.html = tinymce.activeEditor.getContent();
+					if (page === $scope.ep) {
+						if (page.type === 'I') {
+							page.purifyInput(tinymce.activeEditor.getContent(), true);
+						} else {
+							page.html = tinymce.activeEditor.getContent();
+						}
 					}
 					p.html = encodeURIComponent(page.html);
 				} else {
