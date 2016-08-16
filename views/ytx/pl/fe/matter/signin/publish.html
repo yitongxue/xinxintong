@@ -103,17 +103,19 @@
     <div class="panel panel-default">
         <div class="panel-heading">签到链接：复制或分享给用户进行签到</div>
         <div class="panel-body">
-            <div class='form-control' style='overflow:hidden;white-space:nowrap;' ng-bind='entry.url'></div>
-            <button class='btn btn-default text2Clipboard' data-clipboard-text="{{entry.url}}">复制</button>
+            <div class='input-group'>
+                <input class='form-control' readonly value="{{entry.url}}">
+                <span class='input-group-btn'>
+                    <button class='btn btn-default text2Clipboard' data-clipboard-text="{{entry.url}}">复制</button>
+                </span>
+            </div>
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">二维码签到</div>
+        <div class="panel-heading">签到二维码</div>
         <div class="panel-body">
-            <div><img id='entryQrcode' ng-src="{{entry.qrcode}}"></div>
-            <div>
-                <button class='btn btn-default' ng-click="downloadQrcode(entry.qrcode)">下载</button>
-            </div>
+            <span><img id='entryQrcode' ng-src="{{entry.qrcode}}"></span>
+            <button class='btn btn-default' ng-click="downloadQrcode(entry.qrcode)">下载</button>
         </div>
     </div>
     <div class="panel panel-default hide">
