@@ -89,8 +89,12 @@
         <div class='tile'>
             <div class='form-group compact'>
                 <div class='help-block'>投影地址</div>
-                <div class='form-control' ng-bind="opUrl" style="height:auto;word-break:break-all;"></div>
-                <button class='btn btn-default text2Clipboard' data-clipboard-text="{{opUrl}}">复制</button>
+                <div class='input-group'>
+                    <input class='form-control' readonly value="{{opUrl}}">
+                    <span class='input-group-btn'>
+                        <button class='btn btn-default text2Clipboard' data-clipboard-text="{{opUrl}}">复制</button>
+                    </span>
+                </div>
             </div>
             <div class='form-group'>
                 <a href="javascript:void(0)" ng-click="gotoCode()">编辑页面</a>
@@ -103,7 +107,7 @@
     <div class='col-md-8' ng-if="!activeRound&&app.sourceApp">
         <!-- result -->
         <div class='tile' ng-controller='ctrlPlayers'>
-            <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=1'">
+            <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=2'">
             </div>
             <div class='form-group'>
                 <div class='form-inline'>
@@ -139,7 +143,7 @@
             <uib-tab index="1" heading="分组结果">
                 <!-- result -->
                 <div class='tile' ng-controller='ctrlPlayers'>
-                    <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=1'">
+                    <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=2'">
                     </div>
                     <div class='form-group'>
                         <button class="btn btn-default" ng-disabled="selectedPlayers.length===0" ng-click='quitGroup(selectedPlayers)'>移出分组</button>
