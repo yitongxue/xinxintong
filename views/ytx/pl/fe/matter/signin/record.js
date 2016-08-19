@@ -21,10 +21,10 @@ define(['frame'], function(ngApp) {
                 signinAt;
 
             if (record && record.signin_log && round && round.late_at) {
-                signinAt = record.signin_log[roundId];
+                signinAt = parseInt(record.signin_log[roundId]);
                 if (signinAt) {
                     // 忽略秒的影响
-                    return signinAt > round.late_at + 59;
+                    return signinAt > parseInt(round.late_at) + 59;
                 }
             }
             return false;
