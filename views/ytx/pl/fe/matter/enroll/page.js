@@ -150,6 +150,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                         });
                     }
                 });
+                $scope.update('data_schemas');
             });
         };
         $scope.$watch('app', function(app) {
