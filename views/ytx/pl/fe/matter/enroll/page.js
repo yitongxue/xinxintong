@@ -112,6 +112,46 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                 $scope.$broadcast('xxt.matter.enroll.app.data_schemas.created', newSchema);
             });
         };
+        $scope.batchSingleScore = function() {
+            $uibModal.open({
+                templateUrl: '/views/default/pl/fe/matter/enroll/component/batchSingleScore.html?_=1',
+                backdrop: 'static',
+                resolve: {
+                    app: function() {
+                        return $scope.app;
+                    }
+                },
+                controller: ['$scope', '$uibModalInstance', 'app', function($scope2, $mi, app) {
+                    var maxOpNum = 0,
+                        opScores = [];
+
+                    app.data_schemas.forEach(function(schema) {
+                        if (schema.type === 'single') {
+                            schema.ops.length > maxOpNum && (maxOpNum = schema.ops.length);
+                        }
+                    });
+                    while (opScores.length < maxOpNum) {
+                        opScores.push(maxOpNum - opScores.length);
+                    }
+
+                    $scope2.opScores = opScores;
+                    $scope2.close = function() {
+                        $mi.dismiss();
+                    };
+                    $scope2.ok = function() {
+                        $mi.close(opScores);
+                    };
+                }]
+            }).result.then(function(result) {
+                $scope.app.data_schemas.forEach(function(schema) {
+                    if (schema.type === 'single') {
+                        schema.ops.forEach(function(op, index) {
+                            op.score = result[index];
+                        });
+                    }
+                });
+            });
+        };
         $scope.$watch('app', function(app) {
             if (!app) return;
             $scope.ep = app.pages[0];
@@ -193,7 +233,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
         }];
         $scope.buttons = schemaLib.buttons;
         $scope.wrapEditorHtml = function() {
-            var url = '/views/default/pl/fe/matter/enroll/wrap/' + $scope.activeWrap.type + '.html?_=26';
+            var url = '/views/default/pl/fe/matter/enroll/wrap/' + $scope.activeWrap.type + '.html?_=27';
             return url;
         };
         $scope.setActiveWrap = function(domWrap) {
