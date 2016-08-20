@@ -27,7 +27,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                     page.html = tinymce.activeEditor.getContent();
                 }
             }
-            
+
             return srvPage.update(page, names);
         };
         $scope.delPage = function() {
@@ -754,7 +754,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
         });
         var timerOfUpdate = null;
         $scope.updWrap = function(obj, names) {
-            wrapLib.input.modify($scope.activeWrap.dom, $scope.activeWrap);
+            wrapLib[$scope.activeWrap.type].modify($scope.activeWrap.dom, $scope.activeWrap);
             if (timerOfUpdate !== null) {
                 $timeout.cancel(timerOfUpdate);
             }
