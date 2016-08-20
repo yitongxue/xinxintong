@@ -33,6 +33,9 @@
                 <button class='btn btn-default' ng-click="newSchema('location')">上传位置</button>
                 <button class='btn btn-default' ng-click="newSchema('phase')">课程期数</button>
             </div>
+            <div class='form-group tile' ng-if="app.scenario==='voting'">
+                <button class='btn btn-default' ng-click="batchSingleScore()">批量设置单选题分值</button>
+            </div>
             <!-- end create input wrap -->
             <!-- create button wrap -->
             <div class='tile'>

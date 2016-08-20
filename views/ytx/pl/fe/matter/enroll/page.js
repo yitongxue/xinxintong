@@ -2,7 +2,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
     /**
      * app setting controller
      */
-    ngApp.provider.controller('ctrlPage', ['$scope', 'srvPage', function($scope, srvPage) {
+    ngApp.provider.controller('ctrlPage', ['$scope', 'srvPage', '$uibModal', function($scope, srvPage, $uibModal) {
         window.onbeforeunload = function(e) {
             var message;
             if ($scope.ep.$$modified) {
