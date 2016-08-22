@@ -1,4 +1,4 @@
-var ngApp = angular.module('app', ['ngRoute', 'ui.tms']);
+var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tmplshop.ui.xxt']);
 ngApp.config(['$locationProvider', function($lp) {
     $lp.html5Mode(true);
 }]);
@@ -52,7 +52,7 @@ ngApp.controller('ctrlMission', ['$scope', 'http2', function($scope, http2) {
     };
     searchMissions(false);
 }]);
-ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
+ngApp.controller('ctrlMatters', ['$scope', 'http2', 'templateShop', function($scope, http2, templateShop) {
     var indicators = {
         registration: {
             title: '在线报名',
@@ -282,27 +282,47 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', function($scope, http2) {
         });
     };
     $scope.addEnroll = function(assignedScenario) {
-        var url, config;
-        url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.siteId;
-        if (assignedScenario === 'registration') {
-            config = {
-                proto: {
-                    title: '在线报名'
+        templateShop.choose('enroll', assignedScenario).then(function(choice) {
+            if (choice) {
+                if (choice.source === 'share') {
+                    var url, data = choice.data;
+                    url = '/rest/pl/fe/matter/enroll/createByOther?site=' + $scope.siteId + '&template=' + data.id;
+                    http2.get(url, function(rsp) {
+                        location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
+                    });
+                } else if (choice.source === 'platform') {
+                    var url, config, data = choice.data;
+                    url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.siteId;
+                    config = {
+                        proto: {}
+                    };
+                    if (assignedScenario === 'registration') {
+                        config.proto.title = '在线报名';
+                        url += '&scenario=registration';
+                        url += '&template=simple';
+                    } else if (assignedScenario === 'voting') {
+                        config.proto.title = '评价';
+                        url += '&scenario=voting';
+                        url += '&template=simple';
+                    }
+                    if (data) {
+                        url += '&scenario=' + data.scenario.name;
+                        url += '&template=' + data.template.name;
+                        if (data.simpleSchema && data.simpleSchema.length) {
+                            config.simpleSchema = data.simpleSchema;
+                        }
+                    }
+                    http2.post(url, config, function(rsp) {
+                        location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
+                    });
                 }
-            };
-            url += '&scenario=registration';
-            url += '&template=simple';
-        } else if (assignedScenario === 'voting') {
-            config = {
-                proto: {
-                    title: '评价'
-                }
-            };
-            url += '&scenario=voting';
-            url += '&template=simple';
-        }
-        http2.post(url, config, function(rsp) {
-            location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
+            } else {
+                var url;
+                url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.siteId;
+                http2.post(url, {}, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
+                });
+            }
         });
     };
     $scope.addSignin = function() {
