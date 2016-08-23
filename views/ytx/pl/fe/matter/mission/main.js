@@ -372,12 +372,12 @@ ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', 'templateShop', 
 		evt.stopPropagation();
 		switch (type) {
 			case 'article':
-				url += type + '/copy?id=' + id + '&site=' + $scope.siteId;
+				url += type + '/copy?id=' + id + '&site=' + $scope.siteId + '&mission=' + $scope.id;;
 				break;
 			case 'enroll':
 			case 'signin':
 			case 'group':
-				url += type + '/copy?app=' + id + '&site=' + $scope.siteId;
+				url += type + '/copy?app=' + id + '&site=' + $scope.siteId + '&mission=' + $scope.id;;
 				break;
 		}
 		http2.get(url, function(rsp) {
