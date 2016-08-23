@@ -255,7 +255,7 @@ ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', 'templateShop', 
 		});
 	};
 	$scope.addEnroll = function(assignedScenario) {
-		templateShop.choose('enroll', 'assignedScenario').then(function(choice) {
+		templateShop.choose('enroll', assignedScenario).then(function(choice) {
 			if (choice) {
 				if (choice.source === 'share') {
 					var url, data = choice.data;

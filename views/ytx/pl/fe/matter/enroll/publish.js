@@ -1,18 +1,9 @@
 define(['frame'], function(ngApp) {
 	'use strict';
-	ngApp.provider.controller('ctrlPublish', ['$scope', 'http2', 'mediagallery', function($scope, http2, mediagallery) {
+	ngApp.provider.controller('ctrlPublish', ['$scope', 'http2', 'mediagallery', 'templateShop', function($scope, http2, mediagallery, templateShop) {
 		(function() {
 			new ZeroClipboard(document.querySelectorAll('.text2Clipboard'));
 		})();
-		$scope.$watch('app', function(app) {
-			if (!app) return;
-			var entry;
-			entry = {
-				url: $scope.url,
-				qrcode: '/rest/site/fe/matter/enroll/qrcode?site=' + $scope.siteId + '&url=' + encodeURIComponent($scope.url),
-			};
-			$scope.entry = entry;
-		});
 		$scope.opUrl = 'http://' + location.host + '/rest/site/op/matter/enroll?site=' + $scope.siteId + '&app=' + $scope.id;
 		$scope.setPic = function() {
 			var options = {
@@ -32,6 +23,18 @@ define(['frame'], function(ngApp) {
 		};
 		$scope.summaryOfRecords().then(function(data) {
 			$scope.summary = data;
+		});
+		$scope.shareAsTemplate = function() {
+			templateShop.share($scope.siteId, $scope.app);
+		};
+		$scope.$watch('app', function(app) {
+			if (!app) return;
+			var entry;
+			entry = {
+				url: $scope.url,
+				qrcode: '/rest/site/fe/matter/enroll/qrcode?site=' + $scope.siteId + '&url=' + encodeURIComponent($scope.url),
+			};
+			$scope.entry = entry;
 		});
 	}]);
 	/**
