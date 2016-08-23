@@ -253,12 +253,15 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
 			}
 		};
 		$scope.removeSchema = function(removedSchema) {
+			var deferred = $q.defer();
 			if (window.confirm('确定删除所有页面上的登记项？')) {
 				removeSchema(removedSchema).then(function() {
 					/* 通知应用删除登记项 */
 					$scope.$broadcast('xxt.matter.signin.page.data_schemas.removed', removedSchema, 'app');
+					deferred.resolve();
 				});
 			}
+			return deferred.promise;
 		};
 		$scope.removeWrap = function() {
 			var wrapType = $scope.activeWrap.type,
