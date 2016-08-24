@@ -13,8 +13,8 @@
         <style ng-if="page.css" ng-bind='page.css'></style>
     </head>
     
-    <body ng-cloak class='ng-cloak'>
-        <div class="app">
+    <body>
+        <div ng-cloak class='ng-cloak app'>
             <div id='errmsg' class='alert alert-danger' ng-class="{'active':errmsg}" ng-click="errmsg=''" ng-bind='errmsg'></div>
             <div class='container'>
                 <div class='row'>
@@ -24,6 +24,6 @@
             </div>
         </div>
         <div class="loading"><div class='loading-indicator'><i></i></div></div>
-        <script src="static/js/require.js" defer async data-main="/views/default/site/fe/matter/enroll/preview-loader.js?_=1"></script>
+        <script src="static/js/require.js?_=1" defer async data-main="/views/default/site/fe/matter/enroll/preview-loader.js?_=1"></script>
     </body>
 </html>
