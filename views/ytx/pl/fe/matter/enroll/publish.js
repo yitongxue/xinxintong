@@ -241,10 +241,6 @@ define(['frame'], function(ngApp) {
 	ngApp.provider.controller('ctrlReceiver', ['$scope', 'http2', '$interval', function($scope, http2, $interval) {
 		var baseURL = '/rest/pl/fe/matter/enroll/receiver/';
 		$scope.qrcodeShown = false;
-		$scope.supportQrcode = {
-			wx: 'N',
-			yx: 'N'
-		};
 		$scope.qrcode = function(snsName) {
 			if ($scope.qrcodeShown === false) {
 				var url = '/rest/pl/fe/site/sns/' + snsName + '/qrcode/createOneOff';
@@ -296,11 +292,6 @@ define(['frame'], function(ngApp) {
 		};
 		http2.get(baseURL + 'list?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
 			$scope.receivers = rsp.data;
-		});
-		http2.get('/rest/pl/fe/site/snsList?site=' + $scope.siteId, function(rsp) {
-			var snsConfig = rsp.data;
-			snsConfig.wx && (snsConfig.wx.can_qrcode === 'Y') && ($scope.supportQrcode.wx = 'Y');
-			snsConfig.yx && (snsConfig.yx.can_qrcode === 'Y') && ($scope.supportQrcode.yx = 'Y');
 		});
 	}]);
 });
