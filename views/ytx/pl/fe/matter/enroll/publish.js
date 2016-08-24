@@ -258,6 +258,7 @@ define(['frame'], function(ngApp) {
 						url2 = '/rest/pl/fe/site/sns/' + snsName + '/qrcode/get';
 						url2 += '?site=' + qrcode.siteid;
 						url2 += '&id=' + rsp.data.id;
+						url2 += '&cascaded=N';
 						fnCheckQrcode = $interval(function() {
 							http2.get(url2, function(rsp) {
 								if (rsp.data == false) {
