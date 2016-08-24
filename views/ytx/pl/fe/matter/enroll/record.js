@@ -2,6 +2,10 @@ define(['frame'], function(ngApp) {
     'use strict';
     ngApp.provider.controller('ctrlRecord', ['$scope', 'http2', '$uibModal', 'mattersgallery', 'pushnotify', 'noticebox', function($scope, http2, $uibModal, mattersgallery, pushnotify, noticebox) {
         $scope.notifyMatterTypes = [{
+            value: 'tmplmsg',
+            title: '模板消息',
+            url: '/rest/pl/fe/matter'
+        }, {
             value: 'article',
             title: '单图文',
             url: '/rest/pl/fe/matter'
@@ -320,24 +324,33 @@ define(['frame'], function(ngApp) {
                 });
             }
         };
-        $scope.notify = function() {
+        $scope.notify = function(isBatch) {
             pushnotify.open($scope.siteId, function(notify) {
-                var url;
+                var url, targetAndMsg = {};
                 if (notify.matters.length) {
+                    if (isBatch) {
+                        targetAndMsg.users = [];
+                        Object.keys($scope.rows.selected).forEach(function(key) {
+                            if ($scope.rows.selected[key] === true) {
+                                targetAndMsg.users.push($scope.records[key].userid);
+                            }
+                        });
+                    } else {
+                        targetAndMsg.criteria = $scope.criteria;
+                    }
+                    targetAndMsg.message = notify.message;
+
                     url = '/rest/pl/fe/matter/enroll/record/notify';
                     url += '?site=' + $scope.siteId;
                     url += '&app=' + $scope.id;
                     url += '&tmplmsg=' + notify.tmplmsg.id;
                     url += $scope.page.joinParams();
-                    http2.post(url, {
-                        message: notify.message,
-                        criteria: $scope.criteria
-                    }, function(data) {
+
+                    http2.post(url, targetAndMsg, function(data) {
                         noticebox.success('发送成功');
                     });
                 }
             }, {
-                singleMatter: 'Y',
                 matterTypes: $scope.notifyMatterTypes
             });
         };
