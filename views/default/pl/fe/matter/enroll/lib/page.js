@@ -81,6 +81,24 @@ define(['wrap'], function(wrapLib) {
 
 			return _activeWrap;
 		},
+		moveSchema: function(moved, prev) {
+			var movedWrap = this.wrapBySchema(moved),
+				prevWrap, $html, $movedHtml, $prevHtml;
+
+			this.data_schemas.splice(this.data_schemas.indexOf(movedWrap), 1);
+			$html = $('<div>' + this.html + '</div>');
+			$movedHtml = $html.find('[schema=' + moved.id + ']');
+			if (prev) {
+				prevWrap = this.wrapBySchema(prev);
+				this.data_schemas.splice(this.data_schemas.indexOf(prevWrap), 0, movedWrap);
+				$prevHtml = $html.find("[schema='" + prev.id + "']");
+				$prevHtml.after($movedHtml);
+			} else {
+				this.data_schemas.splice(0, 0, movedWrap);
+				$($html.find('[schema]').get(0)).before($movedHtml);
+			}
+			this.html = $html.html();
+		},
 		moveWrap: function(action) {
 			var $active = $(_activeWrap.dom);
 			if (action === 'up') {
@@ -162,7 +180,7 @@ define(['wrap'], function(wrapLib) {
 						var config = item.config,
 							schema = item.schema,
 							matched = false;
-						if (config.pattern === 'record') {
+						if (config && config.pattern === 'record') {
 							if (schema && schema.id) {
 								if (schema.id === 'enrollAt') {
 									matched = true;
@@ -293,12 +311,48 @@ define(['wrap'], function(wrapLib) {
 			return false;
 		},
 		updateBySchema: function(schema) {
+			var $html, $wrap, $label, $input, oPage = this;
 			if (schema) {
-				if (this.type === 'V' || this.type === 'L') {
-					var $html = $('<div>' + this.html + '</div>');
+				$html = $('<div>' + this.html + '</div>');
+				if (this.type === 'I') {
+					$wrap = $html.find("[schema='" + schema.id + "']");
+					$label = $wrap.find('label').html(schema.title);
+					if (/name|email|mobile|shorttext|longtext|member/.test(schema.type)) {
+						$input = $wrap.find('input,select,textarea');
+						$input.attr('title', schema.title);
+						if ($input.attr('placeholder')) {
+							$input.attr('placeholder', schema.title);
+						}
+					} else if (/single|phase/.test(schema.type)) {
+						(function(lib) {
+							var html, wrapSchema;
+							if (schema.ops && schema.ops.length > 0) {
+								wrapSchema = oPage.wrapBySchema(schema);
+								$wrap.children('ul,select').remove();
+								if (wrapSchema.config.component === 'R') {
+									html = lib.input._htmlSingleRadio(wrapSchema);
+									$wrap.append(html);
+								} else if (wrapSchema.config.component === 'S') {
+									html = lib.input._htmlSingleSelect(wrapSchema);
+									$wrap.append(html);
+								}
+							}
+						})(wrapLib);
+					} else if ('multiple' === schema.type) {
+						(function(lib) {
+							var html, wrapSchema;
+							if (schema.ops && schema.ops.length > 0) {
+								wrapSchema = oPage.wrapBySchema(schema);
+								html = lib.input._htmlMultiple(wrapSchema);
+								$wrap.children('ul').remove();
+								$wrap.append(html);
+							}
+						})(wrapLib);
+					}
+				} else if (this.type === 'V' || this.type === 'L') {
 					$html.find("[schema='" + schema.id + "']").find('label').html(schema.title);
-					this.html = $html.html();
 				}
+				this.html = $html.html();
 			}
 		},
 		removeBySchema: function(schema) {

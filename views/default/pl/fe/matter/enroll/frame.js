@@ -22,6 +22,7 @@ define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
 		};
 		$routeProvider
 			.when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish'))
+			.when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema'))
 			.when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
 			.when('/rest/pl/fe/matter/enroll/event', new RouteParam('event'))
 			.when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
@@ -177,6 +178,7 @@ define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
 				page.arrange(mapOfAppSchemas);
 			});
 			$scope.app = app;
+			app.__schemasOrderConsistent = 'Y'; //页面上登记项显示顺序与定义顺序一致
 			$scope.url = 'http://' + location.host + '/rest/site/fe/matter/enroll?site=' + $scope.siteId + '&app=' + $scope.id;
 		});
 	}]);
