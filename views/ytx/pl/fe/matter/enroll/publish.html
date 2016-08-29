@@ -25,7 +25,6 @@
         </nav>
     </div>
     <!-- end app -->
-    <!-- preview -->
     <div class='col-md-3' ng-controller="ctrlApp">
         <div class='tile' ng-if="app.scenarioConfig.can_period!=='D'">
             <div class='form-group compact'>
@@ -77,9 +76,12 @@
             </div>
         </div>
     </div>
+    <!-- preview -->
     <div class='col-md-5' style='text-align:center' ng-controller="ctrlPreview">
         <iframe id='simulator' ng-src={{previewURL}}></iframe>
     </div>
+    <!-- end preview -->
+    <!-- publish -->
     <div class='col-md-4'>
         <div class='tile records' ng-if="!app.rounds">
             <div class='help-block'>
@@ -163,6 +165,88 @@
                 </div>
             </div>
         </div>
+        <!-- access rule -->
+        <div class="panel panel-default" ng-controller="ctrlAccessRule">
+            <div class="panel-heading">用户进入规则</div>
+            <div class="panel-body">
+                <div class='form-group'>
+                    <div class='radio'>
+                        <label><input type='radio' value='none' ng-model="rule.scope" ng-change="changeUserScope()">不限用户来源</label>
+                    </div>
+                    <div class='radio' ng-if="memberSchemas.length">
+                        <label><input type='radio' value='member' ng-model="rule.scope" ng-change="changeUserScope()">限自定义用户访问</label>
+                    </div>
+                    <div class='radio' ng-if="sns">
+                        <label><input type='radio' value='sns' ng-model="rule.scope" ng-change="changeUserScope()">限公众号关注用户访问</label>
+                    </div>
+                    <table class='table table-bordered' ng-if="rule.scope==='none'">
+                        <tbody>
+                            <tr>
+                                <td>缺省进入页面</td>
+                                <td style='padding:0'>
+                                    <select style='border:0' class='form-control' ng-change="updateEntryRule()" ng-model='app.entry_rule.otherwise.entry' ng-options="p.name as p.title for p in app.pages"></select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class='table table-bordered' ng-if="rule.scope==='member'">
+                        <tbody>
+                            <tr ng-repeat="ms in memberSchemas">
+                                <td>{{ms.title}}</td>
+                                <td style='padding:0'>
+                                    <select style='border:0' class='form-control' ng-change="updateEntryRule()" ng-model="app.entry_rule.member[ms.id].entry" ng-options="p.name as p.title for p in app.pages">
+                                        <option value=''></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>不满足条件用户</td>
+                                <td style='padding:0'>
+                                    <select style='border:0' class='form-control' ng-change="updateEntryRule()" ng-model='app.entry_rule.other.entry' ng-options="p.name as p.title for p in pages4NonMember"></select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class='table table-bordered' ng-if="rule.scope==='sns'">
+                        <tbody>
+                            <tr ng-if="sns.wx">
+                                <td>微信公众号关注用户</td>
+                                <td style='padding:0'>
+                                    <select style='border:0' class='form-control' ng-change="updateEntryRule()" ng-model='app.entry_rule.sns.wx.entry' ng-options='p.name as p.title for p in app.pages'>
+                                        <option value=''></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr ng-if="sns.qy">
+                                <td>微信企业号关注用户</td>
+                                <td style='padding:0'>
+                                    <select style='border:0' class='form-control' ng-change="updateEntryRule()" ng-model='app.entry_rule.sns.qy.entry' ng-options='p.name as p.title for p in app.pages'>
+                                        <option value=''></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr ng-if="sns.yx">
+                                <td>易信公众号关注用户</td>
+                                <td style='padding:0'>
+                                    <select style='border:0' class='form-control' ng-change="updateEntryRule()" ng-model='app.entry_rule.sns.yx.entry' ng-options='p.name as p.title for p in app.pages'>
+                                        <option value=''></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>不满足条件用户</td>
+                                <td style='padding:0'>
+                                    <select style='border:0' class='form-control' ng-change="updateEntryRule()" ng-model='app.entry_rule.other.entry' ng-options="p.name as p.title for p in pages4Nonfan"></select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class='btn btn-block btn-success' ng-click="reset()">重置进入规则</button>
+                </div>
+            </div>
+        </div>
+        <!-- end access rule -->
+        <!-- sns share -->
         <div class="panel panel-default">
             <div class="panel-heading">公众号分享设置</div>
             <div class="panel-body">
@@ -202,8 +286,9 @@
                 </div>
             </div>
         </div>
+        <!-- end sns share -->
     </div>
-    <!-- end preview -->
+    <!-- end publish -->
     <!-- bottom navbar -->
     <nav class="navbar navbar-default navbar-fixed-bottom">
         <div class="container-fluid" style='text-align:center'>
