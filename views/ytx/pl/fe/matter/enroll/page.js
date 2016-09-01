@@ -114,7 +114,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
         };
         $scope.batchSingleScore = function() {
             $uibModal.open({
-                templateUrl: '/views/default/pl/fe/matter/enroll/component/batchSingleScore.html?_=2',
+                templateUrl: '/views/default/pl/fe/matter/enroll/component/batchSingleScore.html?_=3',
                 backdrop: 'static',
                 resolve: {
                     app: function() {
@@ -123,11 +123,15 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                 },
                 controller: ['$scope', '$uibModalInstance', 'app', function($scope2, $mi, app) {
                     var maxOpNum = 0,
-                        opScores = [];
+                        opScores = [],
+                        singleSchemas = [];
 
                     app.data_schemas.forEach(function(schema) {
                         if (schema.type === 'single') {
-                            schema.ops.length > maxOpNum && (maxOpNum = schema.ops.length);
+                            if (schema.score === 'Y') {
+                                schema.ops.length > maxOpNum && (maxOpNum = schema.ops.length);
+                            }
+                            singleSchemas.push(schema);
                         }
                     });
                     while (opScores.length < maxOpNum) {
@@ -135,6 +139,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                     }
 
                     $scope2.opScores = opScores;
+                    $scope2.singleSchemas = singleSchemas;
                     $scope2.close = function() {
                         $mi.dismiss();
                     };
@@ -144,7 +149,7 @@ define(['frame', 'schema', 'wrap'], function(ngApp, schemaLib, wrapLib) {
                 }]
             }).result.then(function(result) {
                 $scope.app.data_schemas.forEach(function(schema) {
-                    if (schema.type === 'single') {
+                    if (schema.type === 'single' && schema.score === 'Y') {
                         schema.ops.forEach(function(op, index) {
                             op.score = result[index];
                         });
