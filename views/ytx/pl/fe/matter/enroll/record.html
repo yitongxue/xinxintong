@@ -1,62 +1,65 @@
 <div id='record-view'>
-    <!-- actions -->
-    <div class='form-group form-inline top'>
-        <div class='form-group' ng-if='app.rounds'>
-            <select class='form-control' title='登记轮次' ng-model='page.byRound' ng-options='r.rid as r.title for r in app.rounds' ng-change='doSearch(1)'>
-                <option value=>全部</option>
-            </select>
-        </div>
-        <div class='form-group'>
-            <label>标签</label>
-            <combox evt-prefix='search-tag' readonly='true' existing='criteria.tags' options='app.tags'></combox>
-        </div>
-        <div class='form-group pull-right'>
-            <div class='input-group'>
-                <span class="input-group-addon">每页条数</span>
-                <input class='form-control' ng-model='page.size' style='width:48px'>
-                <span class='input-group-btn'>
-                    <button class='btn btn-default' ng-click='doSearch(1)'>
-                        <span class='glyphicon glyphicon-refresh'></span>
-                    </button>
-                </span>
+    <ul class="nav nav-tabs top" style="margin-bottom:15px;" ng-if="app.enroll_app_id">
+        <li ng-class="{'active':recordSet==='signin'}">
+            <a ng-click="chooseRecordSet('signin')">签到记录</a>
+        </li>
+        <li ng-class="{'active':recordSet==='enroll'}">
+            <a ng-click="chooseRecordSet('enroll')">报名记录</a>
+        </li>
+    </ul>
+    <!-- signin -->
+    <div class='middle' ng-if="recordSet==='signin'" ng-controller="ctrlSigninRecords">
+        <div class='form-group form-inline'>
+            <div class='form-group' ng-if='app.rounds'>
+                <label>轮次</label>
+                <select class='form-control' ng-model='page.byRound' ng-options='r.rid as r.title for r in app.rounds' ng-change='doSearch(1)'>
+                    <option value=>全部</option>
+                </select>
+            </div>
+            <div class='form-group'>
+                <label>标签</label>
+                <combox evt-prefix='search-tag' readonly='true' existing='criteria.tags' options='app.tags'></combox>
+            </div>
+            <div class='form-group'>
+                <button class='btn btn-success' ng-click='filter()'>筛选</button>
+                <button class='btn btn-primary hide' ng-click="notify()">发送信息</button>
+                <button class='btn btn-primary' ng-click="export()">导出全部数据</button>
+            </div>
+            <div class='form-group pull-right'>
+                <div class='input-group'>
+                    <span class="input-group-addon">每页条数</span>
+                    <input class='form-control' ng-model='page.size' style='width:48px'>
+                    <span class='input-group-btn'>
+                        <button class='btn btn-default' ng-click='doSearch(1)'>
+                            <span class='glyphicon glyphicon-refresh'></span>
+                        </button>
+                    </span>
+                </div>
             </div>
         </div>
-        <div class='form-group hide'>
-            <select class='form-control' title="排序条件" ng-model='page.orderBy' ng-options='o.v as o.n for o in orderBys' ng-change='doSearch(1)'></select>
-        </div>
-        <button class='btn btn-success' ng-click='filter()'>筛选</button>
-        <button class='btn btn-success' ng-click='verifyAll()'>全部通过审核</button>
-        <button class='btn btn-success' ng-disabled="!countSelected()" ng-click='batchVerify()'>批量通过审核</button>
-        <button class='btn btn-primary' ng-if="app.entry_rule.scope==='sns'" ng-click="notify()">全部发送信息</button>
-        <button class='btn btn-primary' ng-if="app.entry_rule.scope==='sns'" ng-disabled="!countSelected()" ng-click="notify(true)">批量发送信息</button>
-        <button class='btn btn-primary' ng-click="export()">导出全部数据</button>
-    </div>
-    <!-- end actions -->
-    <!-- records -->
-    <div class='middle'>
-        <div id='enrollRecords' class='form-group' tms-table-wrap ready='tmsTableWrapReady'>
+        <div id='signinRecords' class='form-group' tms-table-wrap ready='tmsTableWrapReady'>
             <table class='table table-bordered'>
                 <thead>
                     <tr>
                         <th style='width:72px'>操作</th>
+                        <th style='width:40px'></th>
                         <th style='width:40px'>
                             <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model="rows.allSelected">
                         </th>
-                        <th style='width:40px'></th>
                         <th style='width:100px'>登记时间</th>
-                        <th class='custom-col' ng-repeat="c in app.data_schemas" title="{{c.ops}}">{{c.title}}</th>
-                        <th style='width:140px'>昵称</th>
-                        <th style='width:80px'>审核通过</th>
-                        <th ng-if="app.scenario==='voting'" style='width:80px'>总分数</th>
-                        <th ng-if="app.scenario==='voting'" style='width:80px'>平均分数</th>
+                        <th class='custom-col signin' ng-repeat="c in app.data_schemas" title="{{c.ops}}">{{c.title}}</th>
+                        <th class='custom-col enroll' ng-repeat="c in enrollDataSchemas" title="{{c.ops}}">{{c.title}}</th>
+                        <th style='width:75px'>验证通过</th>
+                        <th ng-if="page.byRound" style='width:100px'>签到时间</th>
+                        <th ng-if="!page.byRound" style='width:75px'>签到次数</th>
+                        <th ng-if="!page.byRound" ng-repeat="r in app.rounds"><span>{{r.title}}</span></th>
                         <th style='width:140px' ng-if="app.tags.length">标签</th>
                         <th style='width:140px'>备注</th>
-                        <th style='width:60px' ng-if="app.can_invite==='Y'">邀请</th>
                         <th style='width:72px'>操作</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat='r in records' class='record'>
+                    <tr ng-repeat='r in records'>
                         <td>
                             <button class='btn btn-xs btn-danger' ng-click='removeRecord(r)'>
                                 <span class='glyphicon glyphicon-remove'></span>
@@ -65,10 +68,10 @@
                                 <span class='glyphicon glyphicon-edit'></span>
                             </button>
                         </td>
-                        <td><input type='checkbox' ng-model="rows.selected[$index]"></td>
                         <td>{{(page.at-1)*page.size+$index+1}}</td>
+                        <td><input type='checkbox' ng-model="rows.selected[$index]"></td>
                         <td>{{(r.enroll_at*1000)|date:'MM-dd HH:mm'}}</td>
-                        <td ng-repeat="c in app.data_schemas">
+                        <td class='signin' ng-repeat="c in app.data_schemas">
                             <span ng-if="c.id.indexOf('member')===0">{{memberAttr(r.data, c.id)}}</span>
                             <span ng-if="c.type!=='image'&&c.type!=='file'">{{value2Label(r.data[c.id], c.id)}}</span>
                             <span ng-if="c.type==='image'">
@@ -78,13 +81,22 @@
                                 <span ng-repeat='file in files'><a href='{{file.url}}' target="_blank">{{file.name}}</a></span>
                             </span>
                         </td>
-                        <td>{{r.nickname}}</td>
+                        <td class='enroll' ng-repeat="c in enrollDataSchemas">
+                            <span ng-if="c.id.indexOf('member')===0">{{memberAttr(r.data, c.id)}}</span>
+                            <span ng-if="c.type!=='image'&&c.type!=='file'">{{value2Label2(r.data[c.id], c.id)}}</span>
+                            <span ng-if="c.type==='image'">
+                                <img ng-repeat="img in r.data[c.id]" ng-src='{{img}}' />
+                            </span>
+                            <span ng-if="c.type==='file'" ng-init="files=json2Obj(r.data[c.id])">
+                                <span ng-repeat='file in files'><a href='{{file.url}}' target="_blank">{{file.name}}</a></span>
+                            </span>
+                        </td>
                         <td>{{r.verified}}</td>
-                        <td ng-if="app.scenario==='voting'">{{r._score}}</td>
-                        <td ng-if="app.scenario==='voting'">{{r._average|number:2}}</td>
+                        <td ng-if="page.byRound"><span ng-class="{'signin_late':isSigninLate(r,page.byRound)}" ng-if="r.signin_log[page.byRound]">{{r.signin_log[page.byRound]*1000|date:'MM-dd HH:mm'}}</span></td>
+                        <td ng-if="!page.byRound">{{r.signin_num}}</td>
+                        <td ng-if="!page.byRound" ng-repeat="rnd in app.rounds"><span ng-class="{'signin_late':isSigninLate(r,rnd.rid)}" ng-if="r.signin_log[rnd.rid]">{{r.signin_log[rnd.rid]*1000|date:'MM-dd HH:mm'}}</span></td>
                         <td ng-if="app.tags.length">{{r.tags}}</td>
                         <td>{{r.comment}}</td>
-                        <td ng-if="app.can_invite==='Y'">{{r.follower_num}}</td>
                         <td>
                             <button class='btn btn-xs btn-danger' ng-click='removeRecord(r)'>
                                 <span class='glyphicon glyphicon-remove'></span>
@@ -99,19 +111,93 @@
         </div>
         <div class='form-group form-inline'>
             <button class='btn btn-danger' ng-click='empty()'>清空记录</button>
-            <button class='btn btn-default' ng-click='addRecord()'>手工添加</button>
+            <button type="button" class="btn btn-default" ng-click='addRecord()'>添加签到记录</button>
             <span>总数：{{page.total}}</span>
             <ul uib-pagination style="margin:0;vertical-align:bottom;cursor:pointer" ng-show="page.total>page.size" boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="doSearch()"></ul>
         </div>
     </div>
-    <!-- end records -->
+    <!-- end signin -->
+    <!-- enroll -->
+    <div class='middle' ng-if="recordSet==='enroll'" ng-controller="ctrlEnrollRecords">
+        <div class='form-group form-inline'>
+            <div class='form-group' ng-if='app.rounds'>
+                <label>轮次</label>
+                <select class='form-control' ng-model='page.byRound' ng-options='r.rid as r.title for r in app.rounds' ng-change='doSearch(1)'>
+                    <option value=>全部</option>
+                </select>
+            </div>
+            <div class='form-group'>
+                <button class='btn btn-primary' ng-click="export()">导出全部数据</button>
+            </div>
+            <div class='form-group pull-right'>
+                <div class='input-group'>
+                    <span class="input-group-addon">每页条数</span>
+                    <input class='form-control' ng-model='page.size' style='width:48px'>
+                    <span class='input-group-btn'>
+                        <button class='btn btn-default' ng-click='doSearch(1)'>
+                            <span class='glyphicon glyphicon-refresh'></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id='enrollRecords' class-'form-group' tms-table-wrap ready='tmsTableWrapReady'>
+            <table class='table table-bordered'>
+                <thead>
+                    <tr>
+                        <th style='width:40px'></th>
+                        <th style='width:100px'>登记时间</th>
+                        <th class='custom-col' ng-repeat="c in app.enrollApp.data_schemas" title="{{c.ops}}">{{c.title}}</th>
+                        <th style='width:75px'>审核通过</th>
+                        <th style='width:140px' ng-if="app.enrollApp.tags.length">标签</th>
+                        <th style='width:140px'>报名备注</th>
+                        <th style='width:140px'>报名标签</th>
+                        <th ng-if="page.byRound" style='width:100px'>签到时间</th>
+                        <th ng-if="!page.byRound" style='width:75px'>签到次数</th>
+                        <th ng-if="!page.byRound" ng-repeat="r in app.rounds"><span>{{r.title}}</span></th>
+                        <th style='width:140px'>签到备注</th>
+                        <th style='width:140px'>签到标签</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat='r in records'>
+                        <td>{{(page.at-1)*page.size+$index+1}}</td>
+                        <td>{{(r.enroll_at*1000)|date:'MM-dd HH:mm'}}</td>
+                        <td ng-repeat="c in app.enrollApp.data_schemas">
+                            <span ng-if="c.id.indexOf('member')===0">{{memberAttr(r.data, c.id)}}</span>
+                            <span ng-if="c.type!=='image'&&c.type!=='file'">{{value2Label(r.data[c.id], c.id)}}</span>
+                            <span ng-if="c.type==='image'">
+                                <img ng-repeat="img in r.data[c.id]" ng-src='{{img}}' />
+                            </span>
+                            <span ng-if="c.type==='file'" ng-init="files=json2Obj(r.data[c.id])">
+                                <span ng-repeat='file in files'><a href='{{file.url}}' target="_blank">{{file.name}}</a></span>
+                            </span>
+                        </td>
+                        <td>{{r.verified}}</td>
+                        <td ng-if="app.enrollApp.tags.length">{{r.tags}}</td>
+                        <td>{{r.comment}}</td>
+                        <td>{{r.tags}}</td>
+                        <td ng-if="page.byRound"><span ng-class="{'signin_late':isSigninLate(r._signinRecord,page.byRound)}" ng-if="r._signinRecord.signin_log[page.byRound]">{{r._signinRecord.signin_log[page.byRound]*1000|date:'MM-dd HH:mm'}}</span></td>
+                        <td ng-if="!page.byRound">{{r._signinRecord.signin_num}}</td>
+                        <td ng-if="!page.byRound" ng-repeat="rnd in app.rounds"><span ng-class="{'signin_late':isSigninLate(r._signinRecord,rnd.rid)}" ng-if="r._signinRecord.signin_log[rnd.rid]">{{r._signinRecord.signin_log[rnd.rid]*1000|date:'MM-dd HH:mm'}}</span></td>
+                        <td>{{r._signinRecord.comment}}</td>
+                        <td>{{r._signinRecord.tags}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+         <div class='form-group form-inline'>
+            <span>总数：{{page.total}}</span>
+            <ul uib-pagination style="margin:0;vertical-align:bottom;cursor:pointer" ng-show="page.total>page.size" boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="doSearch()"></ul>
+        </div>
+    </div>
+    <!-- end enroll -->
     <!-- bottom navbar -->
     <nav class="navbar navbar-default bottom">
         <div class="container-fluid" style='text-align:center'>
             <form class="navbar-form" style='display:inline-block'>
-                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/enroll/publish?site={{siteId}}&id={{id}}">发布设置</a>
-                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/enroll/page?site={{siteId}}&id={{id}}">页面设置</a>
-                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/enroll/stat?site={{siteId}}&id={{id}}" ng-if="app.scenario==='voting'">统计图表</a>
+                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/signin/page?site={{siteId}}&id={{id}}">页面设置</a>
+                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/signin/publish?site={{siteId}}&id={{id}}">发布设置</a>
             </form>
             <form class="navbar-form navbar-right" style='display:inline-block'>
                 <button class='btn btn-lg btn-default' ng-click="remove()">删除活动</button>
@@ -120,10 +206,41 @@
     </nav>
     <!-- end bottom navbar -->
 </div>
+<script type="text/ng-template" id="tagByData.html">
+    <div class="modal-header">
+        <button class="close" type="button" ng-click="cancel()">×</button>
+        <h5 class="modal-title">筛选条件</h5>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal record-editor">
+            <div class="form-group" ng-repeat="def in schema" ng-if="def.id.indexOf('member')!==0">
+                <label class="col-md-3 control-label">{{def.title}}</label>
+                <div class="col-md-9" ng-if="def.type!=='single'&&def.type!=='multiple'">
+                    <input type='text' class='form-control' ng-model="data.filter[def.id]">
+                </div>
+                <div class="col-md-9" ng-if="def.type==='single'||def.type==='multiple'">
+                    <select class='form-control' ng-model="data.filter[def.id]" ng-options="op.v as op.label for op in def.ops">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <hr>
+            <div class='form-group'>
+                <label class="col-md-3 control-label">标签</label>
+                <div class="col-md-9">
+                    <input type='text' class='form-control' ng-model="data.tag">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">确定</button>
+    </div>
+</script>
 <script type="text/ng-template" id="userPicker.html">
     <div class="modal-header">
         <button class="close" type="button" ng-click="cancel()">×</button>
-        <h5 class="modal-title">选择自定义用户</h5>
+        <h5 class="modal-title">选择认证用户</h5>
     </div>
     <div class="modal-body">
         <userpicker user-set='userSet' user-config='userConfig'></userpicker>
