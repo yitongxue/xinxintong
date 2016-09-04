@@ -688,7 +688,7 @@
 			}
 		}, {
 			"config": {
-				"id": "s9",
+				"id": "s10",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
@@ -700,7 +700,7 @@
 			}
 		}, {
 			"config": {
-				"id": "s10",
+				"id": "s11",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
@@ -712,7 +712,7 @@
 			}
 		}, {
 			"config": {
-				"id": "s11",
+				"id": "s12",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
@@ -724,7 +724,7 @@
 			}
 		}, {
 			"config": {
-				"id": "s12",
+				"id": "s13",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
@@ -736,31 +736,19 @@
 			}
 		}, {
 			"config": {
-				"id": "s13",
-				"pattern": "record",
-				"inline": "N",
-				"splitLine": "Y"
-			},
-			"schema": {
-				"id": "c3001",
-				"title": "培训经理有很强的专业度和责任心",
-				"type": "single"
-			}
-		}, {
-			"config": {
-				"id": "s13",
-				"pattern": "record",
-				"inline": "N",
-				"splitLine": "Y"
-			},
-			"schema": {
-				"id": "c3001",
-				"title": "培训经理有很强的专业度和责任心",
-				"type": "single"
-			}
-		}, {
-			"config": {
 				"id": "s14",
+				"pattern": "record",
+				"inline": "N",
+				"splitLine": "Y"
+			},
+			"schema": {
+				"id": "c3001",
+				"title": "培训经理有很强的专业度和责任心",
+				"type": "single"
+			}
+		}, {
+			"config": {
+				"id": "s15",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
@@ -772,7 +760,7 @@
 			}
 		}, {
 			"config": {
-				"id": "s15",
+				"id": "s16",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
@@ -784,7 +772,7 @@
 			}
 		}, {
 			"config": {
-				"id": "s16",
+				"id": "s17",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
@@ -796,7 +784,7 @@
 			}
 		}, {
 			"config": {
-				"id": "s17",
+				"id": "s18",
 				"pattern": "record",
 				"inline": "N",
 				"splitLine": "Y"
