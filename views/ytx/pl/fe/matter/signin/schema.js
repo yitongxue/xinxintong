@@ -85,7 +85,7 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 		};
 		$scope.removeSchema = function(removedSchema) {
 			var deferred = $q.defer();
-			if (window.confirm('确定从所有页面上删除登记项［' + removedSchema.title + '］？')) {
+			if (window.confirm('确定删除所有页面上的登记项？')) {
 				removeSchema(removedSchema).then(function() {
 					deferred.resolve();
 				});

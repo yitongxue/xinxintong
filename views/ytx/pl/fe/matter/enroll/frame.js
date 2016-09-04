@@ -1,4 +1,4 @@
-define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
+define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 	'use strict';
 	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tmplshop.ui.xxt', 'service.enroll', 'tinymce.enroll', 'ui.xxt', 'channel.fe.pl']);
 	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvAppProvider', 'srvPageProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvAppProvider, srvPageProvider) {
@@ -86,7 +86,7 @@ define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
 			}).result.then(function(options) {
 				http2.post('/rest/pl/fe/matter/enroll/page/add?site=' + $scope.siteId + '&app=' + $scope.id, options, function(rsp) {
 					var page = rsp.data;
-					angular.extend(page, pageLib);
+					angular.extend(page, pageProxy);
 					page.arrange();
 					$scope.app.pages.push(page);
 					deferred.resolve(page);
@@ -116,6 +116,65 @@ define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
 					url: '/rest/pl/fe/matter'
 				}],
 				singleMatter: true
+			});
+		};
+		$scope.batchSingleScore = function() {
+			$uibModal.open({
+				templateUrl: '/views/default/pl/fe/matter/enroll/component/batchSingleScore.html?_=5',
+				backdrop: 'static',
+				resolve: {
+					app: function() {
+						return $scope.app;
+					}
+				},
+				controller: ['$scope', '$uibModalInstance', 'app', function($scope2, $mi, app) {
+					var maxOpNum = 0,
+						opScores = [],
+						singleSchemas = [];
+
+					app.data_schemas.forEach(function(schema) {
+						if (schema.type === 'single') {
+							if (schema.score === 'Y') {
+								schema.ops.length > maxOpNum && (maxOpNum = schema.ops.length);
+							}
+							singleSchemas.push(schema);
+						}
+					});
+					while (opScores.length < maxOpNum) {
+						opScores.push(maxOpNum - opScores.length);
+					}
+
+					$scope2.opScores = opScores;
+					$scope2.singleSchemas = singleSchemas;
+					$scope2.shiftScoreSchema = function() {
+						maxOpNum = 0;
+						singleSchemas.forEach(function(schema) {
+							if (schema.score === 'Y') {
+								schema.ops.length > maxOpNum && (maxOpNum = schema.ops.length);
+							}
+						});
+						opScores = [];
+						while (opScores.length < maxOpNum) {
+							opScores.push(maxOpNum - opScores.length);
+						}
+						$scope2.opScores = opScores;
+					};
+					$scope2.close = function() {
+						$mi.dismiss();
+					};
+					$scope2.ok = function() {
+						$mi.close(opScores);
+					};
+				}]
+			}).result.then(function(result) {
+				$scope.app.data_schemas.forEach(function(schema) {
+					if (schema.type === 'single' && schema.score === 'Y') {
+						schema.ops.forEach(function(op, index) {
+							op.score = result[index];
+						});
+					}
+				});
+				$scope.update('data_schemas');
 			});
 		};
 		$scope.summaryOfRecords = function() {
@@ -174,7 +233,7 @@ define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
 				mapOfAppSchemas[schema.id] = schema;
 			});
 			angular.forEach(app.pages, function(page) {
-				angular.extend(page, pageLib);
+				pageProxy.enhance(page);
 				page.arrange(mapOfAppSchemas);
 			});
 			$scope.app = app;
