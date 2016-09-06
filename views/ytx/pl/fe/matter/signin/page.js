@@ -28,7 +28,7 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
 			angular.forEach(names, function(name) {
 				if (name === 'html') {
 					if ($scope.ep === page) {
-						editorProxy.purifyInput(editorProxy.getEditor(), true);
+						editorProxy.purifyInput(editorProxy.getEditor().getContent(), true);
 					}
 					p.html = encodeURIComponent(page.html);
 				} else {
