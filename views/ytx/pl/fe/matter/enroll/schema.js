@@ -13,7 +13,7 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 			if (type === 'phase') {
 				mission = $scope.app.mission;
 				if (!mission || !mission.phases || mission.phases.length === 0) {
-					alert('请先指定项目的阶段');
+					alert('请先指定项目的课程期数');
 					return;
 				}
 			}

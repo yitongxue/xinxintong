@@ -356,7 +356,7 @@ class record extends \pl\fe\matter\base {
 			$dbData = new \stdClass;
 			foreach ($record->data as $cn => $cv) {
 				if (is_array($cv) && isset($cv[0]->imgSrc)) {
-					// 上传图片
+					//上传图片
 					$vv = [];
 					$fsuser = $this->model('fs/user', $site);
 					foreach ($cv as $img) {
