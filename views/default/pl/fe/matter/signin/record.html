@@ -21,9 +21,10 @@
                 <combox evt-prefix='search-tag' readonly='true' existing='criteria.tags' options='app.tags'></combox>
             </div>
             <div class='form-group'>
-                <button class='btn btn-success' ng-click='filter()'>筛选</button>
+                <button class='btn btn-default' ng-click='filter()'>筛选</button>
                 <button class='btn btn-primary hide' ng-click="notify()">发送信息</button>
-                <button class='btn btn-primary' ng-click="export()">导出全部数据</button>
+                <button class='btn btn-default' ng-click="export()">导出全部数据</button>
+                <button class='btn btn-success' ng-disabled="!countSelected()" ng-click='batchTag()'>批量打标签</button>
             </div>
             <div class='form-group pull-right'>
                 <div class='input-group'>
@@ -196,56 +197,13 @@
     <nav class="navbar navbar-default bottom">
         <div class="container-fluid" style='text-align:center'>
             <form class="navbar-form" style='display:inline-block'>
-                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/signin/page?site={{siteId}}&id={{id}}">页面设置</a>
-                <a class='btn btn-lg btn-success' href="/rest/pl/fe/matter/signin/publish?site={{siteId}}&id={{id}}">发布设置</a>
+                <a class='btn btn-success' href="/rest/pl/fe/matter/signin/page?site={{siteId}}&id={{id}}">页面设置</a>
+                <a class='btn btn-success' href="/rest/pl/fe/matter/signin/publish?site={{siteId}}&id={{id}}">发布设置</a>
             </form>
             <form class="navbar-form navbar-right" style='display:inline-block'>
-                <button class='btn btn-lg btn-default' ng-click="remove()">删除活动</button>
+                <button class='btn btn-default' ng-click="remove()">删除活动</button>
             </form>
         </div>
     </nav>
     <!-- end bottom navbar -->
 </div>
-<script type="text/ng-template" id="tagByData.html">
-    <div class="modal-header">
-        <button class="close" type="button" ng-click="cancel()">×</button>
-        <h5 class="modal-title">筛选条件</h5>
-    </div>
-    <div class="modal-body">
-        <form class="form-horizontal record-editor">
-            <div class="form-group" ng-repeat="def in schema" ng-if="def.id.indexOf('member')!==0">
-                <label class="col-md-3 control-label">{{def.title}}</label>
-                <div class="col-md-9" ng-if="def.type!=='single'&&def.type!=='multiple'">
-                    <input type='text' class='form-control' ng-model="data.filter[def.id]">
-                </div>
-                <div class="col-md-9" ng-if="def.type==='single'||def.type==='multiple'">
-                    <select class='form-control' ng-model="data.filter[def.id]" ng-options="op.v as op.label for op in def.ops">
-                        <option></option>
-                    </select>
-                </div>
-            </div>
-            <hr>
-            <div class='form-group'>
-                <label class="col-md-3 control-label">标签</label>
-                <div class="col-md-9">
-                    <input type='text' class='form-control' ng-model="data.tag">
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">确定</button>
-    </div>
-</script>
-<script type="text/ng-template" id="userPicker.html">
-    <div class="modal-header">
-        <button class="close" type="button" ng-click="cancel()">×</button>
-        <h5 class="modal-title">选择认证用户</h5>
-    </div>
-    <div class="modal-body">
-        <userpicker user-set='userSet' user-config='userConfig'></userpicker>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">确定</button>
-    </div>
-</script>
