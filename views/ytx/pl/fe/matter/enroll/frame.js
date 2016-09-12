@@ -1,4 +1,4 @@
-define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
+define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
 	'use strict';
 	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tmplshop.ui.xxt', 'service.enroll', 'tinymce.enroll', 'ui.xxt', 'channel.fe.pl']);
 	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvAppProvider', 'srvPageProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvAppProvider, srvPageProvider) {
@@ -24,9 +24,9 @@ define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 			.when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish'))
 			.when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema'))
 			.when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
-			.when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
 			.when('/rest/pl/fe/matter/enroll/event', new RouteParam('event'))
 			.when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
+			.when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
 			.when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
 			.otherwise(new RouteParam('publish'));
 
@@ -60,7 +60,7 @@ define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 		};
 		$scope.remove = function() {
 			if (window.confirm('确定删除？')) {
-				http2.get('/rest/pl/fe/matter/enroll/remove?site=' + $scope.siteId + '&app=' + $scope.id, function(rsp) {
+				srvApp.remove().then(function() {
 					if ($scope.app.mission) {
 						location = "/rest/pl/fe/matter/mission?site=" + $scope.siteId + "&id=" + $scope.app.mission.id;
 					} else {
@@ -86,8 +86,8 @@ define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 			}).result.then(function(options) {
 				http2.post('/rest/pl/fe/matter/enroll/page/add?site=' + $scope.siteId + '&app=' + $scope.id, options, function(rsp) {
 					var page = rsp.data;
-					angular.extend(page, pageProxy);
-					page.arrange();
+					pageLib.enhance(page);
+					page.arrange($scope.mapOfAppSchemas);
 					$scope.app.pages.push(page);
 					deferred.resolve(page);
 				});
@@ -117,6 +117,16 @@ define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 				}],
 				singleMatter: true
 			});
+		};
+		$scope.summaryOfRecords = function() {
+			var deferred = $q.defer(),
+				url = '/rest/pl/fe/matter/enroll/record/summary';
+			url += '?site=' + $scope.siteId;
+			url += '&app=' + $scope.id;
+			http2.get(url, function(rsp) {
+				deferred.resolve(rsp.data);
+			});
+			return deferred.promise;
 		};
 		$scope.batchSingleScore = function() {
 			$uibModal.open({
@@ -177,16 +187,6 @@ define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 				$scope.update('data_schemas');
 			});
 		};
-		$scope.summaryOfRecords = function() {
-			var deferred = $q.defer(),
-				url = '/rest/pl/fe/matter/enroll/record/summary';
-			url += '?site=' + $scope.siteId;
-			url += '&app=' + $scope.id;
-			http2.get(url, function(rsp) {
-				deferred.resolve(rsp.data);
-			});
-			return deferred.promise;
-		};
 		http2.get('/rest/pl/fe/site/member/schema/list?valid=Y&site=' + $scope.siteId, function(rsp) {
 			$scope.memberSchemas = rsp.data;
 			angular.forEach(rsp.data, function(ms) {
@@ -211,13 +211,15 @@ define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 				}
 				(function() {
 					var i, ea;
-					for (var i = ms.extattr.length - 1; i >= 0; i--) {
-						ea = ms.extattr[i];
-						schemas.push({
-							id: 'member.extattr.' + ea.id,
-							title: ea.label,
-						});
-					};
+					if (ms.extattr) {
+						for (i = ms.extattr.length - 1; i >= 0; i--) {
+							ea = ms.extattr[i];
+							schemas.push({
+								id: 'member.extattr.' + ea.id,
+								title: ea.label,
+							});
+						};
+					}
 				})();
 				ms._schemas = schemas;
 			});
@@ -225,16 +227,16 @@ define(['require', 'page', 'schema'], function(require, pageProxy, schemaLib) {
 		http2.get('/rest/pl/fe/site/snsList?site=' + $scope.siteId, function(rsp) {
 			$scope.sns = rsp.data;
 		});
+		$scope.mapOfAppSchemas = {};
 		srvApp.get().then(function(app) {
-			var mapOfAppSchemas = {};
 			// 将页面的schema指向应用的schema
-			angular.forEach(app.data_schemas, function(schema) {
+			app.data_schemas.forEach(function(schema) {
 				schemaLib._upgrade(schema);
-				mapOfAppSchemas[schema.id] = schema;
+				$scope.mapOfAppSchemas[schema.id] = schema;
 			});
-			angular.forEach(app.pages, function(page) {
-				pageProxy.enhance(page);
-				page.arrange(mapOfAppSchemas);
+			app.pages.forEach(function(page) {
+				pageLib.enhance(page);
+				page.arrange($scope.mapOfAppSchemas);
 			});
 			$scope.app = app;
 			app.__schemasOrderConsistent = 'Y'; //页面上登记项显示顺序与定义顺序一致
