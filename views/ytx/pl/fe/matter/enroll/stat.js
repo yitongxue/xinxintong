@@ -104,27 +104,30 @@ define(['frame'], function(ngApp) {
 				saveAs(blob, $scope.app.title + '.doc');
 			});
 		};
-
 		$scope.$watch('app', function(app) {
 			if (!app) return;
 			var url = '/rest/pl/fe/matter/enroll/stat/get';
 			url += '?site=' + $scope.siteId;
 			url += '&app=' + app.id;
 			http2.get(url, function(rsp) {
+				var stat = {};
 				app.data_schemas.forEach(function(schema) {
 					if (rsp.data[schema.id]) {
 						rsp.data[schema.id]._schema = schema;
+						stat[schema.id] = rsp.data[schema.id];
 					}
 				});
-				$scope.stat = rsp.data;
+				$scope.stat = stat;
 				$timeout(function() {
-					angular.forEach(rsp.data, function(item) {
+					var p, item;
+					for (p in stat) {
+						item = stat[p];
 						if (/single|phase/.test(item._schema.type)) {
 							drawPieChart(item);
 						} else if (/multiple/.test(item._schema.type)) {
 							drawBarChart(item);
 						}
-					});
+					}
 				});
 			});
 		});
