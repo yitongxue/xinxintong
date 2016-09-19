@@ -201,7 +201,7 @@ define(['frame'], function(ngApp) {
         };
         $scope.filter = function() {
             $uibModal.open({
-                templateUrl: '/views/default/pl/fe/matter/signin/component/recordFilter.html?_=4',
+                templateUrl: '/views/default/pl/fe/matter/signin/component/recordFilter.html?_=2',
                 controller: 'ctrlSigninFilter',
                 windowClass: 'auto-height',
                 backdrop: 'static',
@@ -253,7 +253,7 @@ define(['frame'], function(ngApp) {
         };
         $scope.addRecord = function() {
             $uibModal.open({
-                templateUrl: '/views/default/pl/fe/matter/signin/component/recordEditor.html?_=3',
+                templateUrl: '/views/default/pl/fe/matter/signin/component/recordEditor.html?_=4',
                 controller: 'ctrlEditor',
                 windowClass: 'auto-height middle-width',
                 resolve: {
@@ -388,23 +388,13 @@ define(['frame'], function(ngApp) {
             }
         };
         $scope.export = function() {
-            var url, params = {
-                criteria: $scope.criteria
-            };
+            var url;
 
             url = '/rest/pl/fe/matter/signin/record/export';
             url += '?site=' + $scope.siteId + '&app=' + $scope.id;
             $scope.page.byRound && (url += '&round=' + $scope.page.byRound);
 
-            http2.post(url, params, function(rsp) {
-                var blob;
-
-                blob = new Blob([rsp.data], {
-                    type: "text/plain;charset=utf-8"
-                });
-
-                saveAs(blob, $scope.app.title + '.csv');
-            });
+            window.open(url);
         };
         $scope.countSelected = function() {
             var count = 0;
@@ -447,7 +437,7 @@ define(['frame'], function(ngApp) {
             // 关联的报名登记项
             if (app.enrollApp && app.enrollApp.data_schemas) {
                 $scope.enrollDataSchemas = [];
-                angular.forEach(app.enrollApp.data_schemas, function(item) {
+                app.enrollApp.data_schemas.forEach(function(item) {
                     if (mapOfSchemaById[item.id] === undefined) {
                         $scope.enrollDataSchemas.push(item);
                     }
@@ -575,24 +565,14 @@ define(['frame'], function(ngApp) {
             });
         };
         $scope.export = function() {
-            var url, params = {
-                criteria: $scope.criteria
-            };
+            var url;
 
             url = '/rest/pl/fe/matter/signin/record/exportByEnroll';
             url += '?site=' + $scope.siteId; // todo
             url += '&app=' + $scope.id;
             $scope.page.byRound && (url += '&round=' + $scope.page.byRound);
 
-            http2.post(url, params, function(rsp) {
-                var blob;
-
-                blob = new Blob([rsp.data], {
-                    type: "text/plain;charset=utf-8"
-                });
-
-                saveAs(blob, $scope.app.title + '.csv');
-            });
+            window.open(url);
         };
         $scope.tmsTableWrapReady = 'N';
         $scope.$watch('app', function(app) {
@@ -702,12 +682,12 @@ define(['frame'], function(ngApp) {
             return data;
         };
         if (record.data) {
-            angular.forEach(app.data_schemas, function(col) {
+            app.data_schemas.forEach(function(col) {
                 if (record.data[col.id]) {
                     _convertRecord(col, record.data);
                 }
             });
-            angular.forEach(enrollDataSchemas, function(col) {
+            enrollDataSchemas.forEach(function(col) {
                 if (record.data[col.id]) {
                     _convertRecord(col, record.data);
                 }
