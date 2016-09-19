@@ -558,8 +558,6 @@ class record extends \pl\fe\matter\base {
 			return new \ResponseTimeout();
 		}
 
-		$invalidChar = "/[\r\n\t]/";
-
 		// 登记活动
 		$app = $this->model('matter\enroll')->byId($app, ['fields' => 'id,title,data_schemas,scenario', 'cascaded' => 'N']);
 		$schemas = json_decode($app->data_schemas);
@@ -571,43 +569,58 @@ class record extends \pl\fe\matter\base {
 		}
 		$records = $records->records;
 
-		// 登记记录转换成下载数据
-		$exportedData = [];
-		$size = 0;
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/PHPExcel.php';
+
+		// Create new PHPExcel object
+		$objPHPExcel = new \PHPExcel();
+		// Set properties
+		$objPHPExcel->getProperties()->setCreator("信信通")
+			->setLastModifiedBy("信信通")
+			->setTitle($app->title)
+			->setSubject($app->title)
+			->setDescription($app->title);
+
+		$objActiveSheet = $objPHPExcel->getActiveSheet();
+
+		$objActiveSheet->setCellValueByColumnAndRow(0, 1, '登记时间');
+		$objActiveSheet->setCellValueByColumnAndRow(1, 1, '审核通过');
+
 		// 转换标题
-		$titles = ['登记时间', '审核通过'];
-		foreach ($schemas as $schema) {
-			$titles[] = $schema->title;
+		for ($i = 0, $ii = count($schemas); $i < $ii; $i++) {
+			$schema = $schemas[$i];
+			$objActiveSheet->setCellValueByColumnAndRow($i + 2, 1, $schema->title);
 		}
-		$titles[] = '备注';
+		$objActiveSheet->setCellValueByColumnAndRow($i + 2, 1, '备注');
+		$objActiveSheet->setCellValueByColumnAndRow($i + 3, 1, '标签');
 		// 记录分数
 		if ($app->scenario === 'voting') {
+			$objActiveSheet->setCellValueByColumnAndRow($i + 4, 1, '总分数');
+			$objActiveSheet->setCellValueByColumnAndRow($i + 5, 1, '平均分数');
 			$titles[] = '总分数';
 			$titles[] = '平均分数';
 		}
-		$titles = implode("\t", $titles);
-		$size += strlen($titles);
-		$exportedData[] = $titles;
 		// 转换数据
-		foreach ($records as $record) {
-			$row = [];
-			$row[] = date('y-m-j H:i', $record->enroll_at);
-			$row[] = $record->verified;
+		for ($j = 0, $jj = count($records); $j < $jj; $j++) {
+			$record = $records[$j];
+			$rowIndex = $j + 2;
+			$objActiveSheet->setCellValueByColumnAndRow(0, $rowIndex, date('y-m-j H:i', $record->enroll_at));
+			$objActiveSheet->setCellValueByColumnAndRow(1, $rowIndex, $record->verified);
 			// 处理登记项
 			$data = $record->data;
-			foreach ($schemas as $schema) {
+			for ($i = 0, $ii = count($schemas); $i < $ii; $i++) {
+				$schema = $schemas[$i];
 				$v = isset($data->{$schema->id}) ? $data->{$schema->id} : '';
 				switch ($schema->type) {
 				case 'single':
 				case 'phase':
 					foreach ($schema->ops as $op) {
 						if ($op->v === $v) {
-							$row[] = $op->l;
+							$objActiveSheet->setCellValueByColumnAndRow($i + 2, $rowIndex, $op->l);
 							$disposed = true;
 							break;
 						}
 					}
-					empty($disposed) && $row[] = $v;
+					empty($disposed) && $objActiveSheet->setCellValueByColumnAndRow($i + 2, $rowIndex, $v);
 					break;
 				case 'multiple':
 					$labels = [];
@@ -620,36 +633,30 @@ class record extends \pl\fe\matter\base {
 							}
 						}
 					}
-					$row[] = implode(',', $labels);
+					$objActiveSheet->setCellValueByColumnAndRow($i + 2, $rowIndex, implode(',', $labels));
 					break;
 				default:
-					$row[] = $v;
+					$objActiveSheet->setCellValueByColumnAndRow($i + 2, $rowIndex, $v);
 					break;
 				}
 			}
 			// 备注
-			$row[] = preg_replace($invalidChar, ' ', $record->comment);
+			$objActiveSheet->setCellValueByColumnAndRow($i + 2, $rowIndex, $record->comment);
+			// 标签
+			$objActiveSheet->setCellValueByColumnAndRow($i + 3, $rowIndex, $record->tags);
 			// 记录分数
 			if ($app->scenario === 'voting') {
-				$row[] = $record->_score;
-				$row[] = sprintf('%.2f', $record->_average);
+				$objActiveSheet->setCellValueByColumnAndRow($i + 4, $rowIndex, $record->_score);
+				$objActiveSheet->setCellValueByColumnAndRow($i + 5, $rowIndex, sprintf('%.2f', $record->_average));
 			}
-			// 将数据转换为'|'分隔的字符串
-			$row = implode("\t", $row);
-			$size += strlen($row);
-			$exportedData[] = $row;
 		}
 
-		// 文件下载
-		$size += (count($exportedData) - 1) * 2;
-		$exportedData = implode("\r\n", $exportedData);
-
-		//header("Content-Type: text/plain;charset=utf-8");
-		//header("Content-Disposition: attachment; filename=" . $app->title . '.txt');
-		//header('Content-Length: ' . $size);
-		//echo $exportedData;
-		//exit;
-
-		return new \ResponseData($exportedData);
+		// 输出
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment;filename="' . $app->title . '.xlsx"');
+		header('Cache-Control: max-age=0');
+		$objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter->save('php://output');
+		exit;
 	}
 }
