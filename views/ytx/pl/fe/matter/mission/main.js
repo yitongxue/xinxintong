@@ -39,7 +39,7 @@ ngApp.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', 'mediagallery',
 	$scope.subView = '/views/ytx/pl/fe/matter/mission/basic.html?_=6';
 	$scope.gotoSub = function(sub) {
 		$scope.sub = sub;
-		$scope.subView = '/views/ytx/pl/fe/matter/mission/' + sub + '.html?_=6';
+		$scope.subView = '/views/ytx/pl/fe/matter/mission/' + sub + '.html?_=7';
 	};
 	$scope.submit = function() {
 		http2.post('/rest/pl/fe/matter/mission/setting/update?site=' + $scope.siteId + '&id=' + $scope.id, modifiedData, function(rsp) {
