@@ -3,7 +3,7 @@ define(['require'], function() {
 	var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt']);
 	ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', function($controllerProvider, $routeProvider, $locationProvider) {
 		var RouteParam = function(name) {
-			var baseURL = '/views/ytx/pl/fe/matter/group/';
+			var baseURL = '/views/default/pl/fe/matter/group/';
 			this.templateUrl = baseURL + name + '.html?_=' + (new Date() * 1);
 			this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
 			this.resolve = {
@@ -19,8 +19,7 @@ define(['require'], function() {
 		ngApp.provider = {
 			controller: $controllerProvider.register
 		};
-		$routeProvider
-			.otherwise(new RouteParam('setting'));
+		$routeProvider.otherwise(new RouteParam('setting'));
 
 		$locationProvider.html5Mode(true);
 	}]);
@@ -107,19 +106,42 @@ define(['require'], function() {
 		});
 	}]);
 	ngApp.controller('ctrlEditor', ['$scope', '$uibModalInstance', '$sce', 'app', 'rounds', 'player', function($scope, $mi, $sce, app, rounds, player) {
+		var p, col, files;
+		if (player.data) {
+			for (p in app.data_schemas) {
+				col = app.data_schemas[p];
+				if (player.data[col.id]) {
+					if (col.type === 'file') {
+						files = JSON.parse(player.data[col.id]);
+						angular.forEach(files, function(file) {
+							file.url = $sce.trustAsResourceUrl(file.url);
+						});
+						player.data[col.id] = files;
+					} else if (col.type === 'multiple') {
+						var value = player.data[col.id].split(','),
+							obj = {};
+						angular.forEach(value, function(p) {
+							obj[p] = true;
+						});
+						player.data[col.id] = obj;
+					} else if (col.type === 'image') {
+						var value = player.data[col.id],
+							obj = [];
+						angular.forEach(value, function(p) {
+							obj.push({
+								imgSrc: p
+							});
+						});
+						player.data[col.id] = obj;
+					}
+				}
+			}
+		}
 		$scope.app = app;
 		$scope.rounds = rounds;
 		$scope.aTags = app.tags;
 		player.aTags = (!player.tags || player.tags.length === 0) ? [] : player.tags.split(',');
 		$scope.player = player;
-		$scope.json2Obj = function(json) {
-			if (json && json.length) {
-				obj = JSON.parse(json);
-				return obj;
-			} else {
-				return {};
-			}
-		};
 		$scope.ok = function() {
 			var c, p, col;
 			p = {
