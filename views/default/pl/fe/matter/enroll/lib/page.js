@@ -145,7 +145,6 @@ define(['wrap'], function(wrapLib) {
 
 			domNewWrap = this._appendWrap(wrapParam.tag, wrapParam.attrs, wrapParam.html, afterWrap);
 
-
 			return domNewWrap;
 		},
 		/**
@@ -186,6 +185,16 @@ define(['wrap'], function(wrapLib) {
 					if (schema.ops && schema.ops.length > 0) {
 						wrapSchema = oPage.wrapBySchema(schema);
 						html = lib.input._htmlMultiple(wrapSchema);
+						$wrap.children('ul').remove();
+						$wrap.append(html);
+					}
+				})(wrapLib);
+			} else if ('score' === schema.type) {
+				(function(lib) {
+					var html, wrapSchema;
+					if (schema.ops && schema.ops.length > 0) {
+						wrapSchema = oPage.wrapBySchema(schema);
+						html = lib.input._htmlScoreItem(wrapSchema);
 						$wrap.children('ul').remove();
 						$wrap.append(html);
 					}
