@@ -13,7 +13,7 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 			if (type === 'phase') {
 				mission = $scope.app.mission;
 				if (!mission || !mission.phases || mission.phases.length === 0) {
-					alert('请先指定项目的课程期数');
+					alert('请先指定项目的阶段');
 					return;
 				}
 			}
@@ -25,7 +25,7 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 				}
 			}
 			$scope.app.data_schemas.push(newSchema);
-			$scope.update('data_schemas').then(function() {
+			srvApp.update('data_schemas').then(function() {
 				$scope.app.pages.forEach(function(page) {
 					page.appendSchema(newSchema);
 					srvPage.update(page, ['data_schemas', 'html']);
@@ -99,7 +99,7 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 	/**
 	 * 应用的所有登记项
 	 */
-	ngApp.provider.controller('ctrlList', ['$scope', '$timeout', function($scope, $timeout) {
+	ngApp.provider.controller('ctrlList', ['$scope', '$timeout', 'srvPage', 'srvApp', function($scope, $timeout, srvPage, srvApp) {
 		function changeSchemaOrder(moved) {
 			$scope.update('data_schemas').then(function() {
 				var app = $scope.app;
@@ -209,11 +209,11 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 			}
 			timerOfUpdate = $timeout(function() {
 				// 更新应用的定义
-				$scope.update('data_schemas').then(function() {
+				srvApp.update('data_schemas').then(function() {
 					// 更新页面
 					$scope.app.pages.forEach(function(page) {
 						page.updateSchema(schema);
-						$scope.updPage(page, ['data_schemas', 'html']);
+						srvPage.update(page, ['data_schemas', 'html']);
 					});
 				});
 			}, 1000);
@@ -223,7 +223,7 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 		};
 		$scope.updConfig = function(prop) {
 			$scope.inputPage.updateSchema($scope.activeSchema);
-			$scope.updPage($scope.inputPage, ['data_schemas', 'html']);
+			srvPage.update($scope.inputPage, ['data_schemas', 'html']);
 		};
 		$scope.$on('schemas.orderChanged', function(e, moved) {
 			changeSchemaOrder(moved);

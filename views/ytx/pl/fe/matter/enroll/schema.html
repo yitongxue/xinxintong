@@ -30,6 +30,10 @@
         <div class='form-group tile' ng-if="app.scenario==='voting'">
             <button class='btn btn-default' ng-click="batchSingleScore()">批量设置单选题分值</button>
         </div>
+        <div class='form-group tile' ng-repeat="ms in memberSchemas">
+            <div class='help-block'>{{ms.title}}</div>
+            <button class='btn btn-default' ng-click="newMember(ms,s)" ng-repeat="s in ms._schemas">{{s.title}}</button>
+        </div>
         <!-- end create schema -->
         <!-- actions -->
         <div class='tile' ng-controller="ctrlImport">
@@ -52,7 +56,7 @@
                 </div>
                 <div ng-include="schemaHtml(schema)"></div>
                 <div class='actions'>
-                    <button class="btn btn-default btn-sm" ng-if="['single','phase','multiple'].indexOf(schema.type)!==-1" ng-click="addOption(schema)">添加选项</button>
+                    <button class="btn btn-default btn-sm" ng-if="['single','phase','multiple','score'].indexOf(schema.type)!==-1" ng-click="addOption(schema)">添加选项</button>
                     <button class="btn btn-default btn-sm" ng-click="copySchema(schema)">复制登记项</button>
                     <button class='btn btn-sm btn-default' ng-click="upSchema(schema)"><span class='glyphicon glyphicon-arrow-up'></span></button>
                     <button class='btn btn-sm btn-default' ng-click="downSchema(schema)"><span class='glyphicon glyphicon-arrow-down'></span></button>
