@@ -10,7 +10,7 @@ body>nav>ul:nth-child(2)>li{display:inline-block;float:none;}
 #viewMissions{flex:1.0;margin-right:8px;}
 #viewMatter{flex:2.0;}
 .navbar.ytx-top{margin:-1px -1px 0;}
-.navbar.ytx-bottom{margin:0 -1px;min-height:64px;}
+.navbar.ytx-bottom{margin:0 -1px;min-height:52px;}
 .navbar.ytx-bottom .container-fluid{text-align:center;}
 .navbar.ytx-bottom .container-fluid .navbar-form{display:inline-block;}
 
