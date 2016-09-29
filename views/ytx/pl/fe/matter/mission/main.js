@@ -232,6 +232,9 @@ ngApp.controller('ctrlCoworker', ['$scope', 'http2', function($scope, http2) {
 	http2.get('/rest/pl/fe/matter/mission/coworker/list?site=' + $scope.siteId + '&mission=' + $scope.id, function(rsp) {
 		$scope.coworkers = rsp.data;
 	});
+	http2.get('/rest/pl/fe/matter/mission/coworker/mine?site=' + $scope.siteId + '&mission=' + $scope.id, function(rsp) {
+		$scope.myCoworkers = rsp.data;
+	});
 }]);
 ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', 'templateShop', function($scope, $uibModal, http2, templateShop) {
 	var indicators = {
