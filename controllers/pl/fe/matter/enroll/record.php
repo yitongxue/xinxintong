@@ -41,27 +41,6 @@ class record extends \pl\fe\matter\base {
 		$mdoelRec = $this->model('matter\enroll\record');
 		$result = $mdoelRec->find($site, $enrollApp, $options, $criteria);
 
-		// 叠加签到信息
-		if ($includeSignin === 'Y') {
-			if ($result->total > 0) {
-				foreach ($result->records as &$record) {
-					$q = [
-						'aid,enroll_at,signin_at,signin_num,data,signin_log,tags,comment',
-						'xxt_signin_record',
-						"state=1 and verified_enroll_key='$record->enroll_key'",
-					];
-					if ($signinRecords = $modelApp->query_objs_ss($q)) {
-						foreach ($signinRecords as $signinRecord) {
-							$signinRecord->data = json_decode($signinRecord->data);
-							$signinRecord->signin_log = empty($signinRecord->signin_log) ? new \stdClass : json_decode($signinRecord->signin_log);
-							!isset($record->_signinRecord) && $record->_signinRecord = new \stdClass;
-							$record->_signinRecord->{$signinRecord->aid} = $signinRecord;
-						}
-					}
-				}
-			}
-		}
-
 		return new \ResponseData($result);
 	}
 	/**
@@ -174,11 +153,12 @@ class record extends \pl\fe\matter\base {
 			$updated->verified = $record->verified;
 		}
 		$modelEnl->update('xxt_enroll_record', $updated, "enroll_key='$ek'");
+		$result = $modelRec->setData(null, $site, $app, $ek, $record->data);
+
 		if ($updated->verified === 'Y') {
 			$this->_whenVerifyRecord($app, $ek);
 		}
 		/* 记录登记数据 */
-		$result = $modelRec->setData(null, $site, $app, $ek, $record->data);
 
 		/* 记录操作日志 */
 		$app->type = 'enroll';
@@ -280,13 +260,13 @@ class record extends \pl\fe\matter\base {
 	 */
 	private function _whenVerifyRecord(&$app, $enrollKey) {
 		if ($app->mission_id) {
-			$model = $this->model('matter\signin\record');
+			$modelSigninRec = $this->model('matter\signin\record');
 			$q = [
 				'id',
 				'xxt_signin',
 				"enroll_app_id='{$app->id}'",
 			];
-			$signinApps = $model->query_objs_ss($q);
+			$signinApps = $modelSigninRec->query_objs_ss($q);
 			if (count($signinApps)) {
 				$enrollRecord = $this->model('matter\enroll\record')->byId(
 					$enrollKey, ['fields' => 'userid,data', 'cascaded' => 'N']
@@ -294,13 +274,13 @@ class record extends \pl\fe\matter\base {
 				if (!empty($enrollRecord->data)) {
 					$enrollData = json_decode($enrollRecord->data);
 					foreach ($signinApps as $signinApp) {
-						// 更新对应的签到记录
+						// 更新对应的签到记录，如果签到记录已经审核通过就不更新
 						$q = [
 							'*',
 							'xxt_signin_record',
-							"state=1 and verified='N' and aid='$signinApp->id' and userid='$enrollRecord->userid'",
+							"state=1 and verified='N' and aid='$signinApp->id' and verified_enroll_key='{$enrollKey}'",
 						];
-						$signinRecords = $model->query_objs_ss($q);
+						$signinRecords = $modelSigninRec->query_objs_ss($q);
 						if (count($signinRecords)) {
 							foreach ($signinRecords as $signinRecord) {
 								if (empty($signinRecord->data)) {
@@ -314,7 +294,7 @@ class record extends \pl\fe\matter\base {
 									$signinData->{$k} = $v;
 								}
 								// 更新数据
-								$model->delete('xxt_signin_record_data', "enroll_key='$signinRecord->enroll_key'");
+								$modelSigninRec->delete('xxt_signin_record_data', "enroll_key='$signinRecord->enroll_key'");
 								foreach ($signinData as $k => $v) {
 									$ic = [
 										'aid' => $app->id,
@@ -322,15 +302,13 @@ class record extends \pl\fe\matter\base {
 										'name' => $k,
 										'value' => $v,
 									];
-									$model->insert('xxt_signin_record_data', $ic, false);
+									$modelSigninRec->insert('xxt_signin_record_data', $ic, false);
 								}
 								// 验证通过
-								$model->update(
+								$modelSigninRec->update(
 									'xxt_signin_record',
 									[
-										'verified' => 'Y',
-										'verified_enroll_key' => $enrollKey,
-										'data' => $model->toJson($signinData),
+										'data' => $modelSigninRec->toJson($signinData),
 									],
 									"enroll_key='$signinRecord->enroll_key'"
 								);
