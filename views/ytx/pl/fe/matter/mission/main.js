@@ -1,4 +1,4 @@
-var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'tmplshop.ui.xxt']);
+var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'tmplshop.ui.xxt', 'tinymce.ui.xxt']);
 ngApp.config(['$controllerProvider', '$locationProvider', '$uibTooltipProvider', function($controllerProvider, $locationProvider, $uibTooltipProvider) {
 	ngApp.provider = {
 		controller: $controllerProvider.register

@@ -16,20 +16,6 @@
                         <option></option>
                     </select>
                 </div>
-                <div class='form-group' ng-if="!app.enroll_app_id">
-                    <button class='btn btn-success' ng-click="assignEnrollApp()">指定签到名单</button>
-                </div>
-                <div class='form-group' ng-if="app.enroll_app_id">
-                    <label>签到名单</label>
-                    <div class="input-group">
-                        <div class='form-control' ng-bind="app.enrollApp.title"></div>
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button" ng-click="cancelEnrollApp()">
-                                <span class='glyphicon glyphicon-remove'></span>
-                            </button>
-                        </span>
-                    </div>
-                </div>
             </div>
             <div class="navbar-form navbar-right">
                 <button uib-popover-template="'appSetting.html'" popover-placement="bottom" popover-title="活动设置" popover-trigger="outsideClick" type="button" class="btn btn-default">活动设置 <span class="caret"></span></button>
