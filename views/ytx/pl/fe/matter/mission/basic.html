@@ -48,3 +48,37 @@
         <input type="text" class="form-control" ng-model="editing.extattrs.contact_phone" tms-auto-update tms-wait=1000 tms-update="update('extattrs')">
     </div>
 </div>
+<div class='tile'>
+    <table class='table table-bordered' style='margin:0'>
+        <tr>
+            <td>给项目中的所有活动和资料添加页眉</td>
+            <td>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-default" ng-click="makePagelet('header')">制作</button>
+                    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href='' ng-click="codePage($event,'header')">编码</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>给项目中的所有活动和资料添加页脚</td>
+            <td>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-default" ng-click="makePagelet('footer')">制作</button>
+                    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href='' ng-click="codePage($event,'footer')">编码</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
