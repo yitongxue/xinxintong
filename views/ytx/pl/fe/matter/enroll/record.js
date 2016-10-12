@@ -400,6 +400,10 @@ define(['frame'], function(ngApp) {
             }
         };
         $scope.notify = function(isBatch) {
+            var options = {
+                matterTypes: $scope.notifyMatterTypes
+            };
+            $scope.app.mission && (options.missionId = $scope.app.mission.id);
             pushnotify.open($scope.siteId, function(notify) {
                 var url, targetAndMsg = {};
                 if (notify.matters.length) {
@@ -425,9 +429,7 @@ define(['frame'], function(ngApp) {
                         noticebox.success('发送成功');
                     });
                 }
-            }, {
-                matterTypes: $scope.notifyMatterTypes
-            });
+            }, options);
         };
         $scope.export = function() {
             var url, params = {
