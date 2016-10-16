@@ -313,8 +313,12 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', 'templateShop', function($sc
                         config.simpleSchema = data.simpleSchema;
                     }
                 } else if (choice.source === 'file') {
-                    var url, config = choice.data;
+                    var url, data = choice.data;
                     url = '/rest/pl/fe/matter/enroll/createByFile?site=' + $scope.siteId;
+                    http2.post(url, data, function(rsp) {
+                        location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
+                    });
+                    return;
                 }
             } else {
                 // blank
