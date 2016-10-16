@@ -312,6 +312,9 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', 'templateShop', function($sc
                     if (data.simpleSchema && data.simpleSchema.length) {
                         config.simpleSchema = data.simpleSchema;
                     }
+                } else if (choice.source === 'file') {
+                    var url, config = choice.data;
+                    url = '/rest/pl/fe/matter/enroll/createByFile?site=' + $scope.siteId;
                 }
             } else {
                 // blank
@@ -350,7 +353,7 @@ ngApp.controller('ctrlMatters', ['$scope', 'http2', 'templateShop', function($sc
                     title: '分组'
                 }
             };
-            
+
         if ($scope.selectedMission) {
             url += '&mission=' + $scope.selectedMission.mission_id;
             config.proto.title = $scope.selectedMission.title + '-' + config.proto.title;

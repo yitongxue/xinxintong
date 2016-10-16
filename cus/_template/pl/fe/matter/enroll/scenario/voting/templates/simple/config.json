@@ -1,4 +1,5 @@
 {
+	"scenario": "voting",
 	"pages": [{
 		"name": "voting",
 		"title": "学员反馈表",
