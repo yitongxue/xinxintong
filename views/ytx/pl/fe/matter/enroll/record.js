@@ -15,6 +15,10 @@ define(['frame'], function(ngApp) {
             url: '/rest/pl/fe/matter'
         }];
         $scope.doSearch = function(page) {
+            $scope.rows = {
+                allSelected: 'N',
+                selected: {}
+            };
             var url;
             page && ($scope.page.at = page);
             url = '/rest/pl/fe/matter/enroll/record/list';

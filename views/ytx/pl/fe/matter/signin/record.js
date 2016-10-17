@@ -73,6 +73,10 @@ define(['frame'], function(ngApp) {
             url: '/rest/pl/fe/matter'
         }];
         $scope.doSearch = function(page) {
+            $scope.rows = {
+                allSelected: 'N',
+                selected: {}
+            };
             searchSigninRecords(page);
         };
         // 过滤条件
