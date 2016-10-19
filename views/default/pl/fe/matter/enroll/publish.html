@@ -77,6 +77,22 @@
                         <button uib-popover-template="'opUrlPasswd.html'" popover-append-to-body='true' popover-placement="bottom" popover-title="访问密码" popover-trigger="outsideClick" type="button" class="btn btn-default" class='btn btn-default' ng-if="opEntry.url.length">密码 <span class="caret"></span></button>
                     </div>
                 </div>
+                <div class="panel panel-default" ng-controller="ctrlReportUrl">
+                    <div class="panel-heading">统计报告链接</div>
+                    <div class="panel-body">
+                        <div class='form-group'>
+                            <div class='input-group'>
+                                <input class='form-control' readonly value="{{reportEntry.url}}">
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default text2Clipboard' data-clipboard-text="{{reportEntry.url}}">复制</button>
+                                </span>
+                            </div>
+                        </div>
+                        <button class='btn btn-default' ng-if="!reportEntry.url.length" ng-click="makeUrl()">生成</button>
+                        <button class='btn btn-default' ng-if="reportEntry.url.length" ng-click="closeUrl()">关闭</button>
+                        <button uib-popover-template="'reportUrlPwd.html'" popover-append-to-body='true' popover-placement="bottom" popover-title="访问密码" popover-trigger="outsideClick" type="button" class="btn btn-default" class='btn btn-default' ng-if="reportEntry.url.length">密码 <span class="caret"></span></button>
+                    </div>
+                </div>
             </uib-tab>
             <uib-tab index="2" heading="登记轮次" ng-if="app.scenarioConfig.can_rounds!=='D'">
                 <uib-tab-heading>
@@ -101,23 +117,23 @@
                 <!-- access time -->
                 <table class='table table-bordered' ng-if="app.scenarioConfig.can_period!=='D'">
                     <tr>
-                        <td>登记开始前</td>
+                        <td>登记开始</td>
                         <td style='padding:0;width:180px;'>
                             <tms-datepicker class='tms-datepicker' tms-title='开始时间' tms-date='app.start_at' tms-state='start_at'></tms-datepicker>
                         </td>
                         <td style='padding:0'>
-                            <select style='border:0' class='form-control' ng-model='app.before_start_page' ng-options='page.name as page.title for page in app.pages' ng-change="update('before_start_page')">
+                            <select class='form-control' ng-model='app.before_start_page' ng-options='page.name as page.title for page in app.pages' ng-change="update('before_start_page')">
                                 <option value=''>缺省提示</option>
                             </select>
                         </td>
                     </tr>
                     <tr>
-                        <td>登记结束后</td>
+                        <td>登记结束</td>
                         <td style='padding:0;width:180px;'>
                             <tms-datepicker class='tms-datepicker' tms-title='开始时间' tms-date='app.start_at' tms-state='start_at'></tms-datepicker>
                         </td>
                         <td style='padding:0'>
-                            <select style='border:0' class='form-control' ng-model='app.before_start_page' ng-options='page.name as page.title for page in app.pages' ng-change="update('before_start_page')">
+                            <select class='form-control' ng-model='app.before_start_page' ng-options='page.name as page.title for page in app.pages' ng-change="update('before_start_page')">
                                 <option value=''>缺省提示</option>
                             </select>
                         </td>
@@ -378,6 +394,18 @@
                 <input class='form-control' ng-model="opEntry.password">
                 <span class='input-group-btn'>
                     <button class='btn btn-default' ng-click="configOpUrl($event,'password')">设置</button>
+                </span>
+            </div>
+        </div>
+    <div>
+</script>
+<script type="text/ng-template" id="reportUrlPwd.html">
+    <div id="opUrlPasswd">
+        <div class='form-group'>
+            <div class='input-group'>
+                <input class='form-control' ng-model="reportEntry.password">
+                <span class='input-group-btn'>
+                    <button class='btn btn-default' ng-click="configUrl($event,'password')">设置</button>
                 </span>
             </div>
         </div>
