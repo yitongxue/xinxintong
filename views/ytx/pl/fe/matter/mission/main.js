@@ -489,5 +489,7 @@ ngApp.controller('ctrlMatter', ['$scope', '$uibModal', 'http2', 'templateShop', 
 			});
 		}
 	};
-	$scope.list();
+	$scope.$watch('editing', function(mission) {
+		mission && $scope.list();
+	});
 }]);

@@ -277,23 +277,30 @@
         <h5 class="modal-title">签到：{{popover.title}}</h5>
     </div>
     <div class="modal-body">
-            <div class='form-group'>
-                <label>签到链接：仅［{{popover.title}}］有效</label>
-                <div class='input-group'>
-                    <div class='form-control' style='height:auto;word-break:break-all' ng-bind='popover.url'></div>
-                    <span class='input-group-addon'>
-                        <button id='copyURL' class='btn btn-default' data-clipboard-text="{{popover.url}}">复制</button>
-                    </span>
-                </div>
+        <div class='form-group'>
+            <label>签到链接：仅［{{popover.title}}］有效</label>
+            <div class='input-group'>
+                <div class='form-control' style='height:auto;word-break:break-all' ng-bind='popover.url'></div>
+                <span class='input-group-addon'>
+                    <button id='copyURL' class='btn btn-default' data-clipboard-text="{{popover.url}}">复制</button>
+                </span>
             </div>
-            <div class='form-group'>
-                <label>签到二维码：仅［{{popover.title}}］有效</label>
-                <div>
-                    <img id='entryQrcode' ng-src="{{popover.qrcode}}">
-                </div>
-                <div>
-                    <button class='btn btn-default' ng-click="downloadQrcode(popover.qrcode)">下载</button>
-                </div>
+        </div>
+        <div class='form-group' ng-if="app.entry_rule.scope!=='sns'">
+            <label>签到二维码：仅［{{popover.title}}］有效</label>
+            <div>
+                <span><img style='width:135px;height:135px;' ng-src="{{popover.qrcode}}"></span>
+                <button class='btn btn-default' ng-click="downloadQrcode(popover.qrcode)">下载</button>
+            </div>
+        </div>
+        <div class='form-group' ng-if="app.entry_rule.scope==='sns'&&sns.wx.can_qrcode==='Y'">
+            <label>微信签到二维码</label>
+            <div ng-if='!qrcode'>
+                <button class='btn btn-default' ng-click="createWxQrcode()">生成微信二维码</button>
+            </div>
+            <div ng-if='qrcode'>
+                <span><img style='width:135px;height:135px;' ng-src="{{qrcode.pic}}"></span>
+                <button class='btn btn-default' ng-click="downloadWxQrcode()">下载</button>
             </div>
         </div>
     </div>
