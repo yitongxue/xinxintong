@@ -13,6 +13,10 @@ date_default_timezone_set('Asia/Shanghai');
  */
 ini_set('default_charset', 'utf-8');
 /**
+ * memory limit
+ */
+ini_set('memory_limit', '-1');
+/**
  * error and exception handle
  */
 function show_error($message) {
