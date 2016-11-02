@@ -1,5 +1,5 @@
 html,body{height:100%;width:100%}
-body{background:#f8f8f8;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+body{position:relative;overflow:hidden;display:flex;flex-direction:column;}
 .ng-cloak{display:none;}
 body>nav{display:flex;}
 body>nav>ul:nth-child(2){flex-grow:1;text-align:center;}
