@@ -27,7 +27,7 @@ define(['require'], function() {
 	ngApp.controller('ctrlArticle', ['$scope', '$location', 'http2', function($scope, $location, http2) {
 		var ls = $location.search();
 		$scope.id = ls.id;
-		http2.get('/rest/pl/fe/matter/article/get?site=' + $scope.editing.siteid + '&id=' + $scope.id, function(rsp) {
+		http2.get('/rest/pl/fe/matter/article/get?id=' + $scope.id, function(rsp) {
 			var url;
 			$scope.editing = rsp.data;
 			if ($scope.editing) {
