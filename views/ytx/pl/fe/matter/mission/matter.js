@@ -31,6 +31,7 @@ define(['frame'], function(ngApp) {
 			indicator.handler();
 		};
 		$scope.addArticle = function() {
+
 			var url = '/rest/pl/fe/matter/article/create?mission=' + $scope.id,
 				config = {
 					proto: {
@@ -93,11 +94,12 @@ define(['frame'], function(ngApp) {
 				location.href = '/rest/pl/fe/matter/group?site=' + $scope.editing.siteid + '&id=' + rsp.data.id;
 			});
 		};
-		$scope.addMatter = function() {
-			if (/voting|registration/.test($scope.matterType)) {
-				$scope.addEnroll($scope.matterType);
+		$scope.addMatter = function(matterType) {
+			$('body').click();
+			if (/voting|registration/.test(matterType)) {
+				$scope.addEnroll(matterType);
 			} else {
-				$scope['add' + $scope.matterType[0].toUpperCase() + $scope.matterType.substr(1)]();
+				$scope['add' + matterType[0].toUpperCase() + matterType.substr(1)]();
 			}
 		};
 		$scope.open = function(matter) {
