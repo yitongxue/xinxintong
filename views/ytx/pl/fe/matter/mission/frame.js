@@ -45,7 +45,7 @@ define([], function() {
 			var mission = rsp.data;
 			mission.type = 'mission';
 			mission.extattrs = (mission.extattrs && mission.extattrs.length) ? JSON.parse(mission.extattrs) : {};
-			$scope.editing = mission;
+			$scope.mission = mission;
 		});
 	}]);
 	/*bootstrap*/

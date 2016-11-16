@@ -30,14 +30,14 @@ define(['frame'], function(ngApp) {
 			}
 		};
 		$scope.update = function(name) {
-			modifiedData[name] = $scope.editing[name];
+			modifiedData[name] = $scope.mission[name];
 			$scope.modified = true;
 			$scope.submit();
 		};
 		$scope.setPic = function() {
 			var options = {
 				callback: function(url) {
-					$scope.editing.pic = url + '?_=' + (new Date()) * 1;
+					$scope.mission.pic = url + '?_=' + (new Date()) * 1;
 					$scope.update('pic');
 				}
 			};
@@ -48,14 +48,14 @@ define(['frame'], function(ngApp) {
 				pic: ''
 			};
 			http2.post('/rest/pl/fe/matter/mission/setting/update?id=' + $scope.id, nv, function() {
-				$scope.editing.pic = '';
+				$scope.mission.pic = '';
 			});
 		};
 		$scope.$on('xxt.tms-datepicker.change', function(event, data) {
 			var prop;
 			if (data.state.indexOf('mission.') === 0) {
 				prop = data.state.substr(8);
-				$scope.editing[prop] = data.value;
+				$scope.mission[prop] = data.value;
 				$scope.update(prop);
 			}
 		});
@@ -64,7 +64,7 @@ define(['frame'], function(ngApp) {
 				templateUrl: '/views/default/pl/fe/matter/mission/pagelet.html',
 				resolve: {
 					mission: function() {
-						return $scope.editing;
+						return $scope.mission;
 					}
 				},
 				controller: ['$scope', '$uibModalInstance', 'mission', 'mediagallery', function($scope2, $mi, mission, mediagallery) {
@@ -111,7 +111,7 @@ define(['frame'], function(ngApp) {
 				backdrop: 'static'
 			}).result.then(function(result) {
 				http2.post('/rest/pl/fe/matter/mission/page/update?id=' + $scope.id + '&page=' + type, result, function(rsp) {
-					$scope.editing[type + '_page'] = rsp.data;
+					$scope.mission[type + '_page'] = rsp.data;
 				});
 			});
 		};
@@ -119,13 +119,13 @@ define(['frame'], function(ngApp) {
 			event.preventDefault();
 			event.stopPropagation();
 			var prop = page + '_page_name',
-				codeName = $scope.editing[prop];
+				codeName = $scope.mission[prop];
 			if (codeName && codeName.length) {
-				location.href = '/rest/pl/fe/code?site=' + $scope.editing.siteid + '&name=' + codeName;
+				location.href = '/rest/pl/fe/code?site=' + $scope.mission.siteid + '&name=' + codeName;
 			} else {
 				http2.get('/rest/pl/fe/matter/mission/page/create?id=' + $scope.id + '&page=' + page, function(rsp) {
-					$scope.editing[prop] = rsp.data.name;
-					location.href = '/rest/pl/fe/code?site=' + $scope.editing.siteid + '&name=' + rsp.data.name;
+					$scope.mission[prop] = rsp.data.name;
+					location.href = '/rest/pl/fe/code?site=' + $scope.mission.siteid + '&name=' + rsp.data.name;
 				});
 			}
 		};
