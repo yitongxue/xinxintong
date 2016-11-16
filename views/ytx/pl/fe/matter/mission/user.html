@@ -1,29 +1,29 @@
-
 <style>
 .enroll{background:#fdd;}
 .signin{background:#dfd;}
+.signin-late{color:red;}
 .group{background:#ddf;}
 </style>
 <nav class='navbar navbar-default'>
-	<div class='container-fluid'>
-		<button class='btn btn-default navbar-btn' ng-click="extract()">抓取用户数据</button>
-		<form class='navbar-form navbar-right'>
-			<label>用户名单</label>
+    <div class='container-fluid'>
+        <button class='btn btn-default navbar-btn' ng-click="extract()">抓取用户数据</button>
+        <form class='navbar-form navbar-right'>
+            <label>用户名单</label>
             <div class="input-group">
                 <input class='form-control' title="{{mission.userApp.title}}" value="{{mission.userApp.title}}" readonly="">
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="quitMission()" ng-if="mission.userApp">
+                    <button class="btn btn-default" type="button" ng-click="cancelUserApp()" ng-if="mission.userApp">
                         <span class='glyphicon glyphicon-remove'></span>
                     </button>
-            		<button class='btn btn-success' ng-click="assignUserApp()" ng-if="!mission.userApp">指定</button>
+                    <button class='btn btn-success' ng-click="assignUserApp()" ng-if="!mission.userApp">指定</button>
                 </span>
             </div>
-		</form>
-	</div>
+        </form>
+    </div>
 </nav>
 <div class='row'>
-	<div class='col-md-12' ng-controller="ctrlUserAction">
-		<table class='table table-bordered'>
+    <div class='col-md-12' ng-controller="ctrlUserAction">
+        <table class='table table-bordered'>
             <thead>
                 <tr>
                     <th style='width:40px'></th>
@@ -49,7 +49,7 @@
             <span>总数：{{page.total}}</span>
             <ul uib-pagination style="margin:0;vertical-align:bottom;cursor:pointer" ng-show="page.total>page.size" boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="doSearch()"></ul>
         </div>
-	</div>
+    </div>
 </div>
 <script type="text/ng-template" id="assignUserApp.html">
     <div class="modal-header">
