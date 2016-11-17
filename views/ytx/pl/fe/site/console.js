@@ -164,7 +164,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
     };
     $scope.addEnrollByTemplate = function(assignedScenario) {
         $('body').trigger('click');
-        templateShop.choose('enroll', assignedScenario).then(function(choice) {
+        templateShop.choose($scope.siteId, 'enroll', assignedScenario).then(function(choice) {
             var url = '/rest/pl/fe/matter/enroll/',
                 title,
                 config = {
