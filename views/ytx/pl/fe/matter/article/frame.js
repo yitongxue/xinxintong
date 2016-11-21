@@ -31,6 +31,7 @@ define(['require'], function() {
 			var url;
 			$scope.editing = rsp.data;
 			if ($scope.editing) {
+				$scope.siteId = rsp.data.siteid;
 				!$scope.editing.attachments && ($scope.editing.attachments = []);
 				url = 'http://' + location.host + '/rest/site/fe/matter?site=' + $scope.editing.siteid + '&id=' + ls.id + '&type=article';
 				$scope.entry = {

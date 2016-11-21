@@ -21,6 +21,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             case 'enroll':
             case 'signin':
             case 'group':
+            case 'channel':
                 location.href = '/rest/pl/fe/matter/' + type + '?id=' + id + '&site=' + $scope.siteId;
                 break;
             case 'mission':
@@ -160,6 +161,11 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
         }
         http2.post(url, config, function(rsp) {
             location.href = '/rest/pl/fe/matter/article?site=' + $scope.siteId + '&id=' + rsp.data;
+        });
+    };
+    $scope.addChannel = function() {
+        http2.get('/rest/pl/fe/matter/channel/create?site=' + $scope.siteId, function(rsp) {
+            location.href = '/rest/pl/fe/matter/channel?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
     $scope.addEnrollByTemplate = function(assignedScenario) {

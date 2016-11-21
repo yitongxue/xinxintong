@@ -16,6 +16,7 @@
 				</ul>
 				<ul class='nav navbar-nav site'>
 					<li class='active'><a href='/rest/pl/fe/site/console?site={{siteId}}'>工作台</a></li>
+					<li><a href='/rest/pl/fe/template/site?site={{siteId}}' target='_self'>模板库</a></li>
 					<li><a href='/rest/pl/fe/file?site={{siteId}}' target='_self'>图片库</a></li>
 					<li><a href='/rest/pl/fe/site/setting?site={{siteId}}' target='_self'>站点设置</a></li>
 				</ul>
@@ -35,6 +36,7 @@
 								<option value='signin'>签到</option>
 								<option value='group'>分组</option>
 								<option value='enroll'>通用登记</option>
+								<option value='channel'>频道</option>
 							</select>
 							<button class='btn btn-default' ng-if="matterType!=='recent'" ng-click="chooseMatterType('recent')">最近</button>
 							<button class='btn btn-default' ng-if="matterType!=='mission'" ng-click="chooseMatterType('mission')">项目</button>
@@ -78,6 +80,9 @@
             		<button class='btn btn-default' ng-click="addEnrollByTemplate('voting')">评价</button>
             		<button class='btn btn-default' ng-click="addSignin()">签到</button>
             		<button class='btn btn-default' ng-click="addGroup()">分组</button>
+            	</div>
+            	<div class='form-group'>
+            		<button class='btn btn-default' ng-click="addChannel()">频道</button>
             	</div>
             <div>
         </script>

@@ -103,6 +103,12 @@
             </div>
         </div>
         <div class='tile'>
+            <div class='form-group' ng-controller='ctrlSetChannel' ng-init="matterType='article';matterObj='editing'">
+                <label>频道（可选）</label>
+                <combox evt-prefix='channel' readonly=true prop='title' existing='editing.channels' options='channels'></combox>
+            </div>
+        </div>
+        <div class='tile'>
             <div class='form-group'>
                 <div>阅读：{{editing.read_num}}</div>
                 <div>评论：{{editing.remark_num}}</div>

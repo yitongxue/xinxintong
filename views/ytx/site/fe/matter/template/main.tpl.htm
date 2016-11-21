@@ -3,12 +3,11 @@
     <head>
         <meta charset="utf-8">
         <meta content="width=device-width,user-scalable=no,initial-scale=1.0" name="viewport">
-        <base href="/" />
-        <title><?php TPL::pt('title');?>-首页</title>
+        <base href='/'>
         <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-        <style>body{margin-bottom:50px;}.ng-cloak{display:none;}</style>
+        <link href="/views/default/site/fe/matter/template/main.css?_=1" rel="stylesheet">
+        <title>模板</title>
     </head>
-    
     <body>
         <nav class='navbar navbar-default'>
             <div class='container'>
@@ -20,7 +19,6 @@
                     <li><a href='/rest/pl/fe/user/register' target='_self'>注册</a></li>
                 </ul>
                 <ul class='nav navbar-nav navbar-right ng-cloak' ng-if="isLogin==='Y'" ng-cloak>
-                    <li><a href="/rest/pl/fe" target='_self'>管理我的站点</a></li>
                     <li><a href='/rest/pl/fe/user/logout' target='_self'>退出</a></li>
                 </ul>
             </div>
@@ -28,20 +26,40 @@
         <div class='container'>
             <div class='row'>
                 <nav class='navbar navbar-default'>
-                    <div class='container'>
-                        <p class="navbar-text" ng-bind="site.name"></p>
-                        <form class="navbar-form navbar-right ng-cloak" ng-cloak>
-                            <button type="button" class="btn btn-success" ng-click="subscribeSite()" ng-if="site._subscribed!=='Y'">关注</button>
-                            <button type="button" class="btn btn-default" ng-click="subscribeSite()" ng-if="site._subscribed==='Y'">已关注</button>
-                        </form>
+                    <div class='container-fluid'>
+                        <ul class='navbar-form'>
+                            <button class='btn btn-default' ng-click="favorTemplate()">收藏</button>
+                            <button class='btn btn-default' ng-click="useTemplate()">使用</button>
+                        </ul>
                     </div>
                 </nav>
             </div>
-        </div>
-        <div id="content" dynamic-html='page.html' ng-cloak class='ng-cloak'></div>
-        <div class='container'>
             <div class='row'>
-                <div tms-discuss="platform" tms-discuss-ready="site?'Y':'N'" class="ds-thread" data-thread-key="site,{{site.id}}" data-title="{{site.name}}" data-url=""></div>
+                <div class='col-md-7 preview' ng-controller='ctrlPreview'>
+                    <div id='simulator'>
+                        <iframe ng-src="{{previewURL}}"></iframe>
+                        <div id='simulatorActions'>
+                            <button class='btn btn-default btn-block' ng-disabled="!params.hasPrev" ng-click="prevPage()"><i class='glyphicon glyphicon-arrow-up'>上一页</i></button>
+                            <button class='btn btn-default btn-block' ng-disabled="!params.hasNext" ng-click="nextPage()"><i class='glyphicon glyphicon-arrow-down'>下一页</i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-md-5 tms-box'>
+                    <div class='form-group'>
+                        <p class='form-control-static' ng-bind="template.title"></p>
+                    </div>
+                    <div class='form-group'>
+                        <p class='form-control-static'>发布站点：<span ng-bind="template.site_name"></span></p>
+                    </div>
+                    <div class='form-group'>
+                        <p class='form-control-static'>发布时间：<span ng-bind="template.put_at*1000|date:'yy-MM-dd'"></span></p>
+                    </div>
+                    <div class='form-group'>
+                        <p class='form-control-static'>说明：<span ng-bind="template.summary"></span></p>
+                    </div>
+                    <hr>
+                    <div tms-discuss="platform" tms-discuss-ready="template?'Y':'N'" class="ds-thread" data-thread-key="template,{{template.id}}" data-title="{{template.title}}" data-url=""></div>
+                </div>
             </div>
         </div>
         <script type="text/ng-template" id="favorTemplateSite.html">
@@ -75,22 +93,6 @@
                 <button class="btn btn-success" ng-click="ok() ">确定</button>
             </div>
         </script>
-        <script type="text/ng-template" id="subscribeSite.html">
-            <div class="modal-header">
-                <button class="close" type="button" ng-click="cancel()">×</button>
-                <h5 class="modal-title ">指定关注本站点的站点</h5>
-            </div>
-            <div class="modal-body ">
-                <div class="checkbox" ng-repeat="site in mySites">
-                    <label ng-if="site._subscribed!=='Y'"><input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='site._selected'>{{site.name}}</label>
-                    <label ng-if="site._subscribed==='Y'"><input type='checkbox' checked disabled><span>{{site.name}}</span>（已关注）</label></label>
-                </div>
-                <div class='alert alert-danger' ng-if="mySites.length===0">请创建用于关注本站点的站点</div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-success" ng-click="ok() ">确定</button>
-            </div>
-        </script>
-        <script src="/static/js/require.js" defer async data-main="/views/default/site/home-loader.js?_=3"></script>
+        <script src="/static/js/require.js" defer async data-main="/views/default/site/fe/matter/template/main-loader.js?_=4"></script>
     </body>
 </html>
