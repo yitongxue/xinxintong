@@ -22,7 +22,9 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$http', function($scope, $http
             $scope.articles = rsp.data.matters;
         });
     };
-
+    $scope.openMatter = function(matter) {
+        location.href = matter.url;
+    };
     listSites();
     listTemplates();
     listApps();
