@@ -381,5 +381,11 @@ define(['frame'], function(ngApp) {
 				$scope.modified = true;
 			}
 		});
+		$scope.applyToHome = function() {
+			var url = '/rest/pl/fe/matter/home/apply?site=' + $scope.editing.siteid + '&type=article&id=' + $scope.id;
+			http2.get(url, function(rsp) {
+				noticebox.success('完成申请！');
+			});
+		};
 	}]);
 });
