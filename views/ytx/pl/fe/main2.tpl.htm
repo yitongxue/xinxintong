@@ -116,6 +116,10 @@
                                     <div class='creater_name' ng-bind="site.creater_name"></div>
                                     <div class='create_at' ng-bind="site.create_at*1000|date:'yyyy-MM-dd'"></div>
                                 </div>
+                                <div class='actions'>
+                                    <a class='btn btn-sm btn-default' ng-click="openHome(site)">主页</a>
+                                    <a class='btn btn-sm btn-default' ng-click="openConsole(site)">工作台</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -128,6 +132,7 @@
         <script src="/static/js/angular-sanitize.min.js"></script>
         <script src="/static/js/ui-bootstrap-tpls.min.js"></script>
         <script src="/static/js/ui-tms.js"></script>
-        <script src="/views/default/pl/fe/main2.js?_=1"></script>
+        <script src="/static/js/xxt.ui.tmplshop.js?_=2"></script>
+        <script src="/views/default/pl/fe/main2.js"></script>
     </body>
 </html>
