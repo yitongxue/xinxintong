@@ -27,20 +27,28 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
             });
         },
         //研究项目-登记活动
-        addEnroll: function(site) {
+        addEnroll: function(site, scenario) {
             $('body').trigger('click');
-            templateShop.choose(site.id, 'enroll').then(function(choice) {
+            templateShop.choose(site.id, 'enroll', scenario).then(function(choice) {
+                var url = '/rest/pl/fe/matter/enroll/',
+                    title,
+                    config = {
+                        proto: {}
+                    };
+
+                if (scenario === 'registration') {
+                    title = '在线报名';
+                } else if (scenario === 'voting') {
+                    title = '评价';
+                } else {
+                    title = '登记活动';
+                }
                 if (choice) {
+                    var data = choice.data;
                     if (choice.source === 'share') {
-                        var url, data = choice.data;
-                        url = '/rest/pl/fe/matter/enroll/createByOther?site=' + site.id + '&template=' + data.id;
-                        http2.get(url, function(rsp) {
-                            location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
-                        });
+                        url += 'createByOther?site=' + site.id + '&template=' + data.id;
                     } else if (choice.source === 'platform') {
-                        var url, config, data = choice.data;
-                        url = '/rest/pl/fe/matter/enroll/create?site=' + site.id;
-                        config = {};
+                        url += 'create?site=' + site.id;
                         if (data) {
                             url += '&scenario=' + data.scenario.name;
                             url += '&template=' + data.template.name;
@@ -48,23 +56,20 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
                                 config.simpleSchema = data.simpleSchema;
                             }
                         }
-                        http2.post(url, config, function(rsp) {
-                            location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
-                        });
                     } else if (choice.source === 'file') {
-                        var url, data = choice.data;
-                        url = '/rest/pl/fe/matter/enroll/createByFile?site=' + site.id;
+                        url += 'createByFile?site=' + site.id;
                         http2.post(url, data, function(rsp) {
                             location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
                         });
+                        return;
                     }
                 } else {
-                    var url;
-                    url = '/rest/pl/fe/matter/enroll/create?site=' + site.id;
-                    http2.post(url, {}, function(rsp) {
-                        location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
-                    });
+                    url += 'create?site=' + site.id;
                 }
+                config.proto.title = title;
+                http2.post(url, config, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
+                });
             });
         },
         addSignin: function(site) {
@@ -84,9 +89,9 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
         },
     };
 
-    function addMatter(site, matterType) {
+    function addMatter(site, matterType, scenario) {
         var fnName = 'add' + matterType[0].toUpperCase() + matterType.substr(1);
-        _fns[fnName].call(_fns, site);
+        _fns[fnName].call(_fns, site, scenario);
     }
 
     var url, page;
@@ -120,15 +125,15 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
     $scope.open = function(matter) {
         location.href = location.href = '/rest/pl/fe/matter/' + matter.matter_type + '?id=' + matter.matter_id + '&site=' + matter.siteid;
     };
-    $scope.addMatter = function(matterType) {
+    $scope.addMatter = function(matterType, scenario) {
         var url = '/rest/pl/fe/site/list?_=' + (new Date() * 1);
         http2.get(url, function(rsp) {
             var sites = rsp.data;
             if (sites.length === 1) {
-                addMatter(sites[0], matterType);
+                addMatter(sites[0], matterType, scenario);
             } else if (sites.length === 0) {
                 createSite().then(function(site) {
-                    addMatter(site, matterType);
+                    addMatter(site, matterType, scenario);
                 });
             } else {
                 $uibModal.open({
@@ -150,7 +155,7 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
                         };
                     }]
                 }).result.then(function(site) {
-                    addMatter(site, matterType);
+                    addMatter(site, matterType, scenario);
                 });
             }
         });

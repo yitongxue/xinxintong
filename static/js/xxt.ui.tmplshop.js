@@ -34,6 +34,7 @@ service('templateShop', ['$uibModal', 'http2', '$q', function($uibModal, http2, 
                     };
                     switch ($scope.source) {
                         case 'platform':
+                            if (!$scope.result.template) return;
                             choice.data = $scope.result;
                             break;
                         case 'share':
