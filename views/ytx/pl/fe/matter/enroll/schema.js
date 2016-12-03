@@ -27,8 +27,9 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 			$scope.app.data_schemas.push(newSchema);
 			srvApp.update('data_schemas').then(function() {
 				$scope.app.pages.forEach(function(page) {
-					page.appendSchema(newSchema);
-					srvPage.update(page, ['data_schemas', 'html']);
+					if (page.appendSchema(newSchema)) {
+						srvPage.update(page, ['data_schemas', 'html']);
+					}
 				});
 			});
 		};
@@ -49,8 +50,9 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 			$scope.app.data_schemas.push(newSchema);
 			srvApp.update('data_schemas').then(function() {
 				$scope.app.pages.forEach(function(page) {
-					page.appendSchema(newSchema);
-					srvPage.update(page, ['data_schemas', 'html']);
+					if (page.appendSchema(newSchema)) {
+						srvPage.update(page, ['data_schemas', 'html']);
+					}
 				});
 			});
 		};
@@ -77,8 +79,9 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 			$scope.app.data_schemas.push(newSchema);
 			srvApp.update('data_schemas').then(function() {
 				$scope.app.pages.forEach(function(page) {
-					page.appendSchema(newSchema);
-					srvPage.update(page, ['data_schemas', 'html']);
+					if (page.appendSchema(newSchema)) {
+						srvPage.update(page, ['data_schemas', 'html']);
+					}
 				});
 			});
 		};
@@ -92,8 +95,9 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 
 			srvApp.update('data_schemas').then(function() {
 				$scope.app.pages.forEach(function(page) {
-					page.appendSchema(newSchema, schema);
-					srvPage.update(page, ['data_schemas', 'html']);
+					if (page.appendSchema(newSchema, schema)) {
+						srvPage.update(page, ['data_schemas', 'html']);
+					}
 				});
 			});
 		};
@@ -382,7 +386,7 @@ define(['frame', 'schema'], function(ngApp, schemaLib) {
 		};
 		$scope.makePagelet = function(schema) {
 			$uibModal.open({
-				templateUrl: '/views/default/pl/fe/matter/mission/pagelet.html',
+				templateUrl: '/views/default/pl/fe/matter/enroll/component/pagelet.html',
 				controller: ['$scope', '$uibModalInstance', 'mediagallery', function($scope2, $mi, mediagallery) {
 					var tinymceEditor;
 					$scope2.reset = function() {
