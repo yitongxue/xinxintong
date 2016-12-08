@@ -147,6 +147,12 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             location.href = '/rest/pl/fe/matter/' + type + '?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
+    $scope.restoreMatter = function(matter) {
+        var url = '/rest/pl/fe/matter/' + matter.matter_type + '/restore' + '?site=' + $scope.siteId + '&id=' + matter.matter_id;
+        http2.get(url, function(rsp) {
+            location.href = '/rest/pl/fe/matter/' + matter.matter_type + '?site=' + $scope.siteId + '&id=' + matter.matter_id;
+        });
+    };
     $scope.addArticle = function() {
         var url = '/rest/pl/fe/matter/article/create?site=' + $scope.siteId,
             config = {

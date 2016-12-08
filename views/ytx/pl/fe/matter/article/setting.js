@@ -50,7 +50,7 @@ define(['frame'], function(ngApp) {
 						id: $scope.id,
 						type: 'article'
 					};
-					http2.post('/rest/pl/fe/matter/mission/matter/add?site=' + $scope.editing.siteid + '&id=' + matters[0].mission_id, app, function(rsp) {
+					http2.post('/rest/pl/fe/matter/mission/matter/add?site=' + $scope.editing.siteid + '&id=' + matters[0].id, app, function(rsp) {
 						var mission = rsp.data,
 							editing = $scope.editing,
 							updatedFields = ['mission_id'];
