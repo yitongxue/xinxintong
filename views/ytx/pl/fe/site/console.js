@@ -97,6 +97,10 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             http2.get('/rest/pl/fe/site/console/recent?site=' + $scope.siteId + '&_=' + (new Date() * 1), function(rsp) {
                 $scope.matters = rsp.data.matters;
             });
+        } else if ($scope.matterType === 'recycle') {
+            http2.get('/rest/pl/fe/site/console/recycle?site=' + $scope.siteId + '&_=' + (new Date() * 1), function(rsp) {
+                $scope.matters = rsp.data.matters;
+            });
         } else {
             $scope.page.at = 1;
             $scope.page.total = 0;
