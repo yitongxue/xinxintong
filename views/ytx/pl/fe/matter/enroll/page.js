@@ -3,7 +3,7 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
     /**
      * app setting controller
      */
-    ngApp.provider.controller('ctrlPage', ['$scope', 'srvPage', function($scope, srvPage) {
+    ngApp.provider.controller('ctrlPage', ['$scope', '$location', 'srvPage', function($scope, $location, srvPage) {
         window.onbeforeunload = function(e) {
             var message;
             if ($scope.ep.$$modified) {
