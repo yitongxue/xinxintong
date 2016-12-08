@@ -43,6 +43,7 @@ define(['frame'], function(ngApp) {
 			});
 		};
 		$scope.addEnroll = function(assignedScenario) {
+			$('body').click();
 			templateShop.choose($scope.mission.siteid, 'enroll', assignedScenario).then(function(choice) {
 				var url, config = {
 					proto: {}
