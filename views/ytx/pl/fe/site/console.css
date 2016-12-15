@@ -1,0 +1,20 @@
+body{margin-bottom:50px;}
+.site.navbar-nav{position:absolute;left:50%;margin-left:-208px;float:none;}
+.site.navbar-nav .active:after{content:' ';position:absolute;left:0;right:0;bottom:-1px;height:3px;background:red;}
+
+/*matters*/
+.category{border-top-right-radius:0}
+.thumbnail{position:relative;height:180px;cursor:pointer;display:flex;flex-direction:column;padding:8px;}
+.recycle .thumbnail{cursor:auto;}
+.thumbnail .summary{flex:1;overflow:hidden;}
+.thumbnail .attr{display:flex;}
+.thumbnail .operator_name{flex:1;}
+.thumbnail .actions{position:absolute;top:8px;right:8px;}
+.mission:after{content:'项目';position:absolute;top:-8px;left:-8px;background:red;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}
+.article:after{content:'项目资料';position:absolute;top:-8px;left:-8px;background:green;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}
+.channel:after{content:'频道';position:absolute;top:-8px;left:-8px;background:green;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}
+.common:after{content:'通用登记';position:absolute;top:-8px;left:-8px;background:#0000ff;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}
+.registration:after{content:'报名';position:absolute;top:-8px;left:-8px;background:#0000ff;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}
+.voting:after{content:'评价';position:absolute;top:-8px;left:-8px;background:#0000ff;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}
+.signin:after{content:'签到';position:absolute;top:-8px;left:-8px;background:#0000cc;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}
+.split:after{content:'分组';position:absolute;top:-8px;left:-8px;background:#000099;padding:2px 4px;font-size:60%;color:#fff;border-radius:4px;}

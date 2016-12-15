@@ -72,6 +72,7 @@
             <ul class='nav navbar-nav navbar-right' ng-if="subView==='record'">
                 <li><a href="/rest/pl/fe/matter/enroll/publish?site={{siteId}}&id={{id}}" target='_self'>发布预览</a></li>
                 <li ng-if="app.scenario==='voting'"><a href="/rest/pl/fe/matter/enroll/stat?site={{siteId}}&id={{id}}">统计报告</a></li>
+                <li><a href="/rest/pl/fe/matter/enroll/recycle?site={{siteId}}&id={{id}}">回收站</a></li>
             </ul>
             <ul class='nav navbar-nav navbar-right' ng-if="subView==='schema'">
                 <li><a href="/rest/pl/fe/matter/enroll/publish?site={{siteId}}&id={{id}}" target='_self'>发布预览</a></li>
@@ -79,6 +80,9 @@
             </ul>
             <ul class='nav navbar-nav navbar-right' ng-if="subView==='page'">
                 <li><a href="/rest/pl/fe/matter/enroll/publish?site={{siteId}}&id={{id}}" target='_self'>发布预览</a></li>
+                <li><a href="/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}" target='_self'>详细数据</a></li>
+            </ul>
+            <ul class='nav navbar-nav navbar-right' ng-if="subView==='recycle'">
                 <li><a href="/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}" target='_self'>详细数据</a></li>
             </ul>
             <ul class='nav navbar-nav navbar-right' ng-if="subView==='stat'">
@@ -139,6 +143,6 @@
         <script src="/views/default/pl/fe/_module/matter.service.js?_=1"></script>
         <script src="/views/default/pl/fe/matter/enroll/lib/enroll.service.js?_=2"></script>
         <script src="/views/default/pl/fe/matter/enroll/lib/enroll.tinymce.js?_=2"></script>
-        <script src="/static/js/require.js" data-main="/views/ytx/pl/fe/matter/enroll/frame-loader.js?_=6"></script>
+        <script src="/static/js/require.js" data-main="/views/ytx/pl/fe/matter/enroll/frame-loader.js?_=7"></script>
     </body>
 </html>
