@@ -28,24 +28,14 @@
 		"otherwise": {
 			"entry": "enroll"
 		},
-		"member": {
-			"entry": "enroll",
-			"enroll": "Y",
-			"remark": "Y"
+		"scope": "sns",
+		"sns": {
+			"wx": {
+				"entry": "enroll"
+			}
 		},
-		"member_outacl": {
-			"entry": "enroll",
-			"enroll": "Y",
-			"remark": "Y"
-		},
-		"fan": {
-			"entry": "enroll",
-			"enroll": "Y",
-			"remark": "Y"
-		},
-		"nonfan": {
-			"entry": "$mp_follow",
-			"enroll": "$mp_follow"
+		"other": {
+			"entry": "$mpfollow"
 		}
 	},
 	"multi_rounds": "Y",

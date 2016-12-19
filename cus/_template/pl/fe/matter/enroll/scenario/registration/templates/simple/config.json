@@ -200,6 +200,15 @@
 	"entryRule": {
 		"otherwise": {
 			"entry": "enroll"
+		},
+		"scope": "sns",
+		"sns": {
+			"wx": {
+				"entry": "enroll"
+			}
+		},
+		"other": {
+			"entry": "$mpfollow"
 		}
 	},
 	"multi_rounds": "N",

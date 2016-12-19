@@ -1234,6 +1234,15 @@
 	"entryRule": {
 		"otherwise": {
 			"entry": "voting"
+		},
+		"scope": "sns",
+		"sns": {
+			"wx": {
+				"entry": "voting"
+			}
+		},
+		"other": {
+			"entry": "$mpfollow"
 		}
 	},
 	"multi_rounds": "N",

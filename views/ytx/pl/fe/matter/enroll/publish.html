@@ -144,7 +144,7 @@
                 <hr>
                 <!-- access rule -->
                 <div ng-controller="ctrlAccessRule">
-                    <div class='radio'>
+                    <div class='radio hide'>
                         <label><input type='radio' value='none' ng-model="rule.scope" ng-change="changeUserScope()">不限用户来源</label>
                     </div>
                     <div class='radio' ng-if="memberSchemas.length">
@@ -218,7 +218,6 @@
                     <div class='checkbox'>
                         <label><input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model="app.entry_rule.anonymous" ng-change="update('entry_rule')">隐藏用户昵称（匿名）</label>
                     </div>
-                    <button class='btn btn-block btn-success' ng-click="reset()">重置规则</button>
                     <!-- end access rule -->
                     <hr>
                     <table class='table table-bordered'>
