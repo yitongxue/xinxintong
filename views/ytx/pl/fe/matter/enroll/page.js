@@ -101,7 +101,19 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
         };
         $scope.$watch('app', function(app) {
             if (!app) return;
-            $scope.ep = app.pages[0];
+            if (!app) return;
+            if (!$scope.ep) {
+                var pageName;
+                if (pageName = $location.search().page) {
+                    for (var i = app.pages.length - 1; i >= 0; i--) {
+                        if (app.pages[i].name === pageName) {
+                            $scope.ep = app.pages[i];
+                            break;
+                        }
+                    }
+                }
+                if (!$scope.ep) $scope.ep = app.pages[0];
+            }
         });
     }]);
     /**
