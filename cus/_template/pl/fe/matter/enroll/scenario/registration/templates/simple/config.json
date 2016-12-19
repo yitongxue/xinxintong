@@ -78,7 +78,7 @@
 			"config": {
 				"id": "s1",
 				"pattern": "record",
-				"inline": "Y",
+				"inline": "N",
 				"splitLine": "Y"
 			},
 			"schema": {
@@ -90,7 +90,7 @@
 			"config": {
 				"id": "s2",
 				"pattern": "record",
-				"inline": "Y",
+				"inline": "N",
 				"splitLine": "Y"
 			},
 			"schema": {
@@ -102,7 +102,7 @@
 			"config": {
 				"id": "s3",
 				"pattern": "record",
-				"inline": "Y",
+				"inline": "N",
 				"splitLine": "Y"
 			},
 			"schema": {
@@ -121,7 +121,7 @@
 			"config": {
 				"id": "s4",
 				"pattern": "record",
-				"inline": "Y",
+				"inline": "N",
 				"splitLine": "Y"
 			},
 			"schema": {
@@ -133,7 +133,7 @@
 			"config": {
 				"id": "s5",
 				"pattern": "record",
-				"inline": "Y",
+				"inline": "N",
 				"splitLine": "Y"
 			},
 			"schema": {
@@ -145,7 +145,7 @@
 			"config": {
 				"id": "s6",
 				"pattern": "record",
-				"inline": "Y",
+				"inline": "N",
 				"splitLine": "Y"
 			},
 			"schema": {
