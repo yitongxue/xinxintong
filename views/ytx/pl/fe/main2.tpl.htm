@@ -164,6 +164,21 @@
                 </div>
             <div>
         </script>
+        <script type="text/ng-template" id="addMatterSite.html">
+            <div class="modal-header">
+                <button class="close" type="button" ng-click="cancel()">×</button>
+                <h5 class="modal-title ">指定创建素材的团队</h5>
+            </div>
+            <div class="modal-body ">
+                <div class="radio" ng-repeat="site in mySites">
+                    <label ng-if="site._favored!=='Y'"><input type='radio' name='site' value="{{$index}}" ng-model='data.index'>{{site.name}}</label>
+                </div>
+                <div class='alert alert-danger' ng-if="mySites.length===0">请创建添加素材的团队</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" ng-click="ok() ">确定</button>
+            </div>
+        </script>
         <script src="/static/js/jquery.min.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
         <script src="/static/js/angular.min.js"></script>
