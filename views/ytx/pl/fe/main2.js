@@ -70,6 +70,7 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
                     }
                 } else {
                     url += 'create?site=' + site.id;
+                    url += '&scenario=' + scenario;
                 }
                 config.proto.title = title;
                 http2.post(url, config, function(rsp) {
