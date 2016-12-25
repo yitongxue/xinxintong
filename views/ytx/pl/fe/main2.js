@@ -1,4 +1,9 @@
 angular.module('app', ['ui.tms', 'ui.bootstrap', 'tmplshop.ui.xxt']).
+config(['$uibTooltipProvider', function($uibTooltipProvider) {
+    $uibTooltipProvider.setTriggers({
+        'show': 'hide'
+    });
+}]).
 controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
     var url = '/rest/pl/fe/user/get?_=' + (new Date() * 1);
     http2.get(url, function(rsp) {
@@ -125,8 +130,17 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
     $scope.open = function(matter) {
         location.href = location.href = '/rest/pl/fe/matter/' + matter.matter_type + '?id=' + matter.matter_id + '&site=' + matter.siteid;
     };
+    $scope.popoverAddMatter = function(){
+        var target = $('#popoverAddMatter');
+        if (target.data('popover') === 'Y') {
+            target.trigger('hide').data('popover', 'N');
+        } else {
+            target.trigger('show').data('popover', 'Y');
+        }
+    };
     $scope.addMatter = function(matterType, scenario) {
         var url = '/rest/pl/fe/site/list?_=' + (new Date() * 1);
+        $('#popoverAddMatter').trigger('hide');
         http2.get(url, function(rsp) {
             var sites = rsp.data;
             if (sites.length === 1) {
