@@ -17,6 +17,9 @@ class console extends \pl\fe\base {
 	 * 列出站点最近操作的素材
 	 */
 	public function recent_action($site, $exclude = '', $page = 1, $size = 30) {
+		if (false === ($user = $this->accountUser())) {
+			return new \ResponseTimeout();
+		}
 		$modelLog = $this->model('matter\log');
 
 		/*分页参数*/
@@ -24,9 +27,9 @@ class console extends \pl\fe\base {
 		$p->at = $page;
 		$p->size = $size;
 
-		$options = array(
+		$options = [
 			'page' => $p,
-		);
+		];
 
 		if (!empty($exclude)) {
 			$exclude = explode(',', $exclude);
@@ -41,6 +44,9 @@ class console extends \pl\fe\base {
 	 * 最近删除的素材
 	 */
 	public function recycle_action($site, $page = 1, $size = 30) {
+		if (false === ($user = $this->accountUser())) {
+			return new \ResponseTimeout();
+		}
 		$modelLog = $this->model('matter\log');
 
 		/*分页参数*/
@@ -48,9 +54,9 @@ class console extends \pl\fe\base {
 		$p->at = $page;
 		$p->size = $size;
 
-		$options = array(
+		$options = [
 			'page' => $p,
-		);
+		];
 
 		$matters = $modelLog->recycleMatters($site, $options);
 
