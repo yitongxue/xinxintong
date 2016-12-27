@@ -39,6 +39,63 @@
             </div>
         </nav>
         <div class='container ng-cloak' ng-cloak>
+            <div class='row'>
+                <div class='col-md-12' ng-controller="ctrlSite">
+                    <nav class='navbar navbar-default tms-panel-heading'>
+                        <div class='container-fluid'>
+                            <div class="navbar-header">
+                                <span class="navbar-brand">我参与的团队</span>
+                            </div>
+                            <form class='navbar-form navbar-right'>
+                                <button class='btn btn-success' ng-click='create()'><span class='glyphicon glyphicon-plus'></span>新建团队</button>
+                            </form>
+                        </div>
+                    </nav>
+                    <div class='tms-panel-body'>
+                        <div  class='col-md-4' ng-repeat='site in sites'>
+                            <div class='thumbnail site' ng-click="open(site)">
+                                <h4 class='title' ng-bind="site.name"></h4>
+                                <p class='summary' ng-bind="site.summary"></p>
+                                <div class='attr'>
+                                    <div class='creater_name' ng-bind="site.creater_name"></div>
+                                    <div class='create_at' ng-bind="site.create_at*1000|date:'yyyy-MM-dd'"></div>
+                                </div>
+                                <div class='actions'>
+                                    <a class='btn btn-sm btn-default' ng-click="openHome(site)">主页</a>
+                                    <a class='btn btn-sm btn-default' ng-click="openConsole(site)">工作台</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='row' ng-controller="ctrlMission">
+                <div class='col-md-12'>
+                    <nav class='navbar navbar-default tms-panel-heading'>
+                        <div class='container-fluid'>
+                            <div class="navbar-header">
+                                <span class="navbar-brand">我参与的项目</span>
+                            </div>
+                        </div>
+                    </nav>
+                    <div class='tms-panel-body'>
+                        <div  class='col-md-4' ng-repeat='m in missions'>
+                            <div class='thumbnail mission' ng-click='open(m)'>
+                                <h4 class='title' ng-bind="m.title"></h4>
+                                <p class='summary' ng-bind="m.summary"></p>
+                                <div class='attr'>
+                                    <div class='creater_name' ng-bind="m.creater_name"></div>
+                                    <div class='create_at' ng-bind="m.create_at*1000|date:'yyyy-MM-dd'"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col-md-12'>
+                            <span style='height:34px;line-height:34px'>总数：{{page.total}}</span>
+                            <ul uib-pagination style="margin:0;vertical-align:bottom;cursor:pointer" class='pull-right' ng-show="page.total>page.size" boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="list()"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id='viewRecent' class='row' ng-controller="ctrlRecent">
                 <div class='col-md-12'>
                     <nav class='navbar navbar-default tms-panel-heading'>
@@ -86,63 +143,6 @@
                         <div class='col-md-12'>
                             <span style='height:34px;line-height:34px'>总数：{{page.total}}</span>
                             <ul uib-pagination style="margin:0;vertical-align:bottom;cursor:pointer" class='pull-right' ng-show="page.total>page.size" boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="list()"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class='row' ng-controller="ctrlMission">
-                <div class='col-md-12'>
-                    <nav class='navbar navbar-default tms-panel-heading'>
-                        <div class='container-fluid'>
-                            <div class="navbar-header">
-                                <span class="navbar-brand">我参与的项目</span>
-                            </div>
-                        </div>
-                    </nav>
-                    <div class='tms-panel-body'>
-                        <div  class='col-md-4' ng-repeat='m in missions'>
-                            <div class='thumbnail mission' ng-click='open(m)'>
-                                <h4 class='title' ng-bind="m.title"></h4>
-                                <p class='summary' ng-bind="m.summary"></p>
-                                <div class='attr'>
-                                    <div class='creater_name' ng-bind="m.creater_name"></div>
-                                    <div class='create_at' ng-bind="m.create_at*1000|date:'yyyy-MM-dd'"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class='col-md-12'>
-                            <span style='height:34px;line-height:34px'>总数：{{page.total}}</span>
-                            <ul uib-pagination style="margin:0;vertical-align:bottom;cursor:pointer" class='pull-right' ng-show="page.total>page.size" boundary-links="true" total-items="page.total" max-size="7" items-per-page="page.size" rotate="false" ng-model="page.at" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-change="list()"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class='row'>
-                <div class='col-md-12' ng-controller="ctrlSite">
-                    <nav class='navbar navbar-default tms-panel-heading'>
-                        <div class='container-fluid'>
-                            <div class="navbar-header">
-                                <span class="navbar-brand">我参与的团队</span>
-                            </div>
-                            <form class='navbar-form navbar-right'>
-                                <button class='btn btn-success' ng-click='create()'><span class='glyphicon glyphicon-plus'></span>新建团队</button>
-                            </form>
-                        </div>
-                    </nav>
-                    <div class='tms-panel-body'>
-                        <div  class='col-md-4' ng-repeat='site in sites'>
-                            <div class='thumbnail site' ng-click="open(site)">
-                                <h4 class='title' ng-bind="site.name"></h4>
-                                <p class='summary' ng-bind="site.summary"></p>
-                                <div class='attr'>
-                                    <div class='creater_name' ng-bind="site.creater_name"></div>
-                                    <div class='create_at' ng-bind="site.create_at*1000|date:'yyyy-MM-dd'"></div>
-                                </div>
-                                <div class='actions'>
-                                    <a class='btn btn-sm btn-default' ng-click="openHome(site)">主页</a>
-                                    <a class='btn btn-sm btn-default' ng-click="openConsole(site)">工作台</a>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
