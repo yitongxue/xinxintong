@@ -192,7 +192,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             } else if (assignedScenario === 'voting') {
                 title = '评价';
             } else {
-                title = '登记活动';
+                title = '通用登记';
             }
             if (choice) {
                 var data = choice.data;

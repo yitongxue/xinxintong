@@ -5,7 +5,7 @@
         <meta content="width=device-width,user-scalable=no,initial-scale=1.0" name="viewport">
         <link href="/static/css/bootstrap.min.css" rel="stylesheet">
         <link href="/static/css/tms.css" rel="stylesheet">
-        <link href="/views/default/pl/fe/main.css?_=1" rel="stylesheet">
+        <link href="/views/ytx/pl/fe/main.css?_=1" rel="stylesheet">
         <title><?php echo APP_TITLE;?></title>
     </head>
     <body ng-app='app' ng-controller='ctrlMain'>
@@ -131,7 +131,7 @@
                     </nav>
                     <div class='tms-panel-body'>
                         <div  class='col-md-4' ng-repeat='m in matters'>
-                            <div class='thumbnail matter' ng-class="m.matter_type" ng-click='open(m)'>
+                            <div class='thumbnail matter' ng-class="m.matter_scenario||m.matter_type||''" ng-click='open(m)'>
                                 <h4 class='title' ng-bind="m.matter_title"></h4>
                                 <p class='summary' ng-bind="m.matter_summary"></p>
                                 <div class='attr'>
@@ -161,7 +161,7 @@
                     <button class='btn btn-default' ng-click="addMatter('enroll','voting')">评价</button>
                     <button class='btn btn-default' ng-click="addMatter('signin')">签到</button>
                     <button class='btn btn-default' ng-click="addMatter('group')">分组</button>
-                    <button class='btn btn-default' ng-click="addMatter('enroll')">通用登记</button>
+                    <button class='btn btn-default' ng-click="addMatter('enroll','common')">通用登记</button>
                 </div>
                 <div class='form-group'>
                     <button class='btn btn-default' ng-click="addMatter('channel')">频道</button>

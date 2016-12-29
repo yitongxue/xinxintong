@@ -46,7 +46,7 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
                 } else if (scenario === 'voting') {
                     title = '评价';
                 } else {
-                    title = '登记活动';
+                    title = '通用登记';
                 }
                 if (choice) {
                     var data = choice.data;
@@ -70,7 +70,7 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
                     }
                 } else {
                     url += 'create?site=' + site.id;
-                    url += '&scenario=' + scenario;
+                    scenario && (url += '&scenario=' + scenario);
                 }
                 config.proto.title = title;
                 http2.post(url, config, function(rsp) {
@@ -131,7 +131,7 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
     $scope.open = function(matter) {
         location.href = location.href = '/rest/pl/fe/matter/' + matter.matter_type + '?id=' + matter.matter_id + '&site=' + matter.siteid;
     };
-    $scope.popoverAddMatter = function(){
+    $scope.popoverAddMatter = function() {
         var target = $('#popoverAddMatter');
         if (target.data('popover') === 'Y') {
             target.trigger('hide').data('popover', 'N');
