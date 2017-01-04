@@ -198,7 +198,7 @@ define(['frame'], function(ngApp) {
                 if ('enroll' === matterType) {
                     url += 'enroll';
                     scenario = '';
-                } else if (/registration|voting/.test(matterType)) {
+                } else if (/registration|voting|common/.test(matterType)) {
                     url += 'enroll'
                     scenario = $scope.matterType;
                 } else {
@@ -214,7 +214,7 @@ define(['frame'], function(ngApp) {
                         if (rsp.data.total == 0) {
                             indicators.article && $scope.indicators.push(indicators.article);
                         }
-                    } else if (/enroll|voting|registration|signin|group/.test(matterType)) {
+                    } else if (/common|voting|registration|signin|group/.test(matterType)) {
                         $scope.matters = rsp.data.apps;
                         if (rsp.data.total == 0) {
                             indicators[matterType] && $scope.indicators.push(indicators[matterType]);
