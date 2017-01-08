@@ -101,7 +101,6 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
         };
         $scope.$watch('app', function(app) {
             if (!app) return;
-            if (!app) return;
             if (!$scope.ep) {
                 var pageName;
                 if (pageName = $location.search().page) {

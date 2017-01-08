@@ -41,7 +41,7 @@
                             </span>
                         </div>
                     </div>
-                    <a class='btn btn-default btn-block' href="/rest/pl/fe/matter/signin/schema?site={{siteId}}&id={{id}}">修改登记项</a>
+                    <a class='btn btn-default btn-block' href="/rest/pl/fe/matter/signin/schema?site={{siteId}}&id={{id}}">修改题目</a>
                 </div>
                 <div class='list-group-item' ng-if="ep.type==='V'" ng-controller="ctrlAppSchemas4View">
                     <div class='help-block'>活动中所有登记项</div>
@@ -76,9 +76,6 @@
                     <button ng-if="ep.type==='I'" class='btn btn-default' title='复制' ng-click="copySchema(activeWrap.schema)" ng-disabled='!activeWrap'>
                     <span class='fa fa-copy fa-fw'></span>
                     </button>
-                    <button class='btn btn-default' title='编辑代码' ng-click="gotoCode()">
-                    <i class='fa fa-code fa-fw'></i>
-                    </button>
                 </div>
             </div>
             <!-- end tinymce editor -->
@@ -104,5 +101,7 @@
         <button class='btn btn-block btn-default' ng-click="delPage()">删除页面</button>
         <hr>
         <button class='btn btn-block btn-default' ng-click="addPage()">添加页面</button>
+        <hr>
+        <button class='btn btn-block btn-default' ng-click="gotoCode()">编辑代码</button>
     <div>
 </script>
