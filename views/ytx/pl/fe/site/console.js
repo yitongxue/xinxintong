@@ -12,7 +12,71 @@ ngApp.controller('ctrlSite', ['$scope', '$location', 'http2', function($scope, $
     });
 }]);
 ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop', function($scope, $uibModal, http2, templateShop) {
+    function searchMatters(append) {
+        var url;
+        if ($scope.matterType === 'addressbook') {
+            url = '/rest/pl/fe/matter/' + $scope.matterType + '/get?site=' + $scope.siteId + page.j();
+        } else if ('enroll' === $scope.matterType) {
+            url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + page.j();
+        } else if (/registration|voting/.test($scope.matterType)) {
+            url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + $scope.matterType + page.j();
+        } else {
+            url = '/rest/pl/fe/matter/' + $scope.matterType + '/list?site=' + $scope.siteId + page.j();
+        }
+        url += '&_=' + (new Date() * 1);
+        switch ($scope.matterType) {
+            case 'channel':
+                url += '&cascade=N';
+                break;
+        }
+        if (/mission/.test($scope.matterType)) {
+            http2.post(url, filter2, function(rsp) {
+                if (append) {
+                    $scope.matters = $scope.matters.concat(rsp.data.missions);
+                } else {
+                    $scope.matters = rsp.data.missions;
+                }
+                page.total = rsp.data.total;
+            });
+        } else {
+            http2.get(url, function(rsp) {
+                if (/article/.test($scope.matterType)) {
+                    if (append) {
+                        $scope.matters = $scope.matters.concat(rsp.data.articles);
+                    } else {
+                        $scope.matters = rsp.data.articles;
+                    }
+                    page.total = rsp.data.total;
+                } else if (/enroll|registration|voting|signin|group|contribute/.test($scope.matterType)) {
+                    if (append) {
+                        $scope.matters = $scope.matters.concat(rsp.data.apps);
+                    } else {
+                        $scope.matters = rsp.data.apps;
+                    }
+                    page.total = rsp.data.total;
+                } else if (/custom/.test($scope.matterType)) {
+                    if (append) {
+                        $scope.matters = $scope.matters.concat(rsp.data.customs);
+                    } else {
+                        $scope.matters = rsp.data.customs;
+                    }
+                    page.total = rsp.data.total;
+                } else {
+                    $scope.matters = rsp.data;
+                }
+            });
+        }
+    };
+    var filter2, page;
     $scope.matterType = 'recent';
+    $scope.filter2 = filter2 = {};
+    $scope.page = page = {
+        at: 1,
+        size: 21,
+        j: function() {
+            return '&page=' + this.at + '&size=' + this.size;
+        }
+    };
     $scope.open = function(matter) {
         var type = $scope.matterType === 'recent' ? matter.matter_type : (matter.type || $scope.matterType),
             id = (matter.matter_id || matter.id);
@@ -29,63 +93,18 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 break;
         }
     };
-    $scope.page = {
-        at: 1,
-        size: 21,
-        j: function() {
-            return '&page=' + this.at + '&size=' + this.size;
-        }
+    $scope.doFilter = function() {
+        page.at = 1;
+        page.total = 0;
+        searchMatters();
+        $('body').click();
     };
-    var searchMatters = function(append) {
-        var url;
-        if ($scope.matterType === 'addressbook') {
-            url = '/rest/pl/fe/matter/' + $scope.matterType + '/get?site=' + $scope.siteId + $scope.page.j();
-        } else if ('enroll' === $scope.matterType) {
-            url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + $scope.page.j();
-        } else if (/registration|voting/.test($scope.matterType)) {
-            url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + $scope.matterType + $scope.page.j();
-        } else {
-            url = '/rest/pl/fe/matter/' + $scope.matterType + '/list?site=' + $scope.siteId + $scope.page.j();
-        }
-        url += '&_=' + (new Date() * 1);
-        switch ($scope.matterType) {
-            case 'channel':
-                url += '&cascade=N';
-                break;
-        }
-        http2.get(url, function(rsp) {
-            if (/article/.test($scope.matterType)) {
-                if (append) {
-                    $scope.matters = $scope.matters.concat(rsp.data.articles);
-                } else {
-                    $scope.matters = rsp.data.articles;
-                }
-                $scope.page.total = rsp.data.total;
-            } else if (/enroll|registration|voting|signin|group|contribute/.test($scope.matterType)) {
-                if (append) {
-                    $scope.matters = $scope.matters.concat(rsp.data.apps);
-                } else {
-                    $scope.matters = rsp.data.apps;
-                }
-                $scope.page.total = rsp.data.total;
-            } else if (/mission/.test($scope.matterType)) {
-                if (append) {
-                    $scope.matters = $scope.matters.concat(rsp.data.missions);
-                } else {
-                    $scope.matters = rsp.data.missions;
-                }
-                $scope.page.total = rsp.data.total;
-            } else if (/custom/.test($scope.matterType)) {
-                if (append) {
-                    $scope.matters = $scope.matters.concat(rsp.data.customs);
-                } else {
-                    $scope.matters = rsp.data.customs;
-                }
-                $scope.page.total = rsp.data.total;
-            } else {
-                $scope.matters = rsp.data;
-            }
-        });
+    $scope.cleanFilter = function() {
+        filter2.byTitle = '';
+        page.at = 1;
+        page.total = 0;
+        searchMatters();
+        $('body').click();
     };
     $scope.moreMatters = function() {
         $scope.page.at++;
