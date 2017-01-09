@@ -1,6 +1,6 @@
 define(['frame'], function(ngApp) {
     'use strict';
-    ngApp.provider.controller('ctrlRecord', ['$scope', '$uibModal', 'srvApp', 'srvRecord', function($scope, $uibModal, srvApp, srvRecord) {
+    ngApp.provider.controller('ctrlRecord', ['$scope', '$uibModal', 'srvApp', 'srvRecord', 'http2', function($scope, $uibModal, srvApp, srvRecord, http2) {
         $scope.notifyMatterTypes = [{
             value: 'tmplmsg',
             title: '模板消息',
