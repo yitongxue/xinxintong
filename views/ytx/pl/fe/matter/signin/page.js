@@ -374,7 +374,7 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
                 editorProxy.load(tinymceEditor, newPage);
             }
             // page's buttons
-            var buttons = [],
+            var buttons = {},
                 button, btnName;
             for (btnName in schemaLib.buttons) {
                 if (btnName === 'addRecord') continue;
