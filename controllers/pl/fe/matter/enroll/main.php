@@ -66,6 +66,7 @@ class main extends \pl\fe\matter\base {
 			return new \ResponseTimeout();
 		}
 
+		$filter = $this->getPostJson();
 		$result = ['apps' => null, 'total' => 0];
 		$modelApp = $this->model('matter\enroll');
 		$q = [
@@ -84,6 +85,10 @@ class main extends \pl\fe\matter\base {
 		if ($onlySns === 'Y') {
 			$q[2] .= " and entry_rule like '%\"scope\":\"sns\"%'";
 		}
+		if (isset($filter->byTitle)) {
+			$q[2] .= " and title like '%" . $modelApp->escape($filter->byTitle) . "%'";
+		}
+
 		$q2['o'] = 'a.modify_at desc';
 		$q2['r']['o'] = ($page - 1) * $size;
 		$q2['r']['l'] = $size;
