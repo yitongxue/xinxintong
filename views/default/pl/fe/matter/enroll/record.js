@@ -7,11 +7,7 @@ define(['frame'], function(ngApp) {
             url: '/rest/pl/fe/matter'
         }, {
             value: 'article',
-            title: '单图文',
-            url: '/rest/pl/fe/matter'
-        }, {
-            value: 'news',
-            title: '多图文',
+            title: '项目资料',
             url: '/rest/pl/fe/matter'
         }, {
             value: 'channel',
@@ -59,7 +55,7 @@ define(['frame'], function(ngApp) {
         };
         $scope.editRecord = function(record) {
             $uibModal.open({
-                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordEditor.html?_=6',
+                templateUrl: '/views/default/pl/fe/matter/enroll/component/recordEditor.html?_=7',
                 controller: 'ctrlEdit',
                 backdrop: 'static',
                 resolve: {
