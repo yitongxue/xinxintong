@@ -22,6 +22,7 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
         };
         $scope.updPage = function(page, names) {
             if (names.indexOf('html') !== -1) {
+                /* 如果是当前编辑页面 */
                 if (page === $scope.ep) {
                     page.html = editorProxy.getEditor().getContent();
                 }
