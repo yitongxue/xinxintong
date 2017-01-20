@@ -125,6 +125,16 @@
                 <div>最后一次修改时间：{{editing.modify_at*1000|date:'yy-MM-dd HH:mm'}}</div>
             </div>
         </div>
+        <div class='tile'>
+            <div class='form-group'>
+                <label class='checkbox-inline'>
+                    <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.can_share' ng-change="update('can_share');">可以分享</label>
+                <label class='checkbox-inline'>
+                    <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.can_discuss' ng-change="update('can_discuss');">开放评论</label>
+                <label class='checkbox-inline'>
+                    <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='editing.can_siteuser' ng-change="update('can_siteuser');">用户主页</label>
+            </div>
+        </div>
     </div>
 </div>
 <!-- footer navbar -->
