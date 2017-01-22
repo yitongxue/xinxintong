@@ -260,4 +260,34 @@ define(['frame'], function(ngApp) {
             }
         });
     }]);
+    ngApp.provider.controller('ctrlOpUrl', ['$scope', 'http2', 'srvQuickEntry', function($scope, http2, srvQuickEntry) {
+        var targetUrl;
+        $scope.opEntry = {};
+        $scope.$watch('mission', function(mission) {
+            if (!mission) return;
+            targetUrl = mission.opUrl;
+            srvQuickEntry.get(targetUrl).then(function(entry) {
+                if (entry) {
+                    $scope.opEntry.url = 'http://' + location.host + '/q/' + entry.code;
+                    $scope.opEntry.password = entry.password;
+                }
+            });
+        });
+        $scope.makeOpUrl = function() {
+            srvQuickEntry.add(targetUrl).then(function(task) {
+                $scope.opEntry.url = 'http://' + location.host + '/q/' + task.code;
+            });
+        };
+        $scope.closeOpUrl = function() {
+            srvQuickEntry.remove(targetUrl).then(function(task) {
+                $scope.opEntry.url = '';
+            });
+        };
+        $scope.configOpUrl = function(event, prop) {
+            event.preventDefault();
+            srvQuickEntry.config(targetUrl, {
+                password: $scope.opEntry.password
+            });
+        };
+    }]);
 });
