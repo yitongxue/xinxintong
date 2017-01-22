@@ -51,7 +51,7 @@ define(['require'], function() {
         $scope.subView = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
-            $scope.subView = subView[1] === 'group' ? 'record' : subView[1];
+            $scope.subView = subView[1] === 'group' ? 'player' : subView[1];
 
         });
         http2.get('/rest/pl/fe/site/get?site=' + $scope.siteId, function(rsp) {

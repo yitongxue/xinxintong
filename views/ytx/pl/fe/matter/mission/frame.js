@@ -58,6 +58,7 @@ define([], function() {
             var mission = rsp.data;
             mission.type = 'mission';
             mission.extattrs = (mission.extattrs && mission.extattrs.length) ? JSON.parse(mission.extattrs) : {};
+            mission.opUrl = 'http://' + location.host + '/rest/site/op/matter/mission?site=' + mission.siteid + '&mission=' + $scope.id;
             $scope.mission = mission;
             if (location.href.indexOf('/matter?') === -1) {
                 http2.get('/rest/pl/fe/matter/mission/matter/count?id=' + $scope.id, function(rsp) {
