@@ -1,6 +1,6 @@
 define(['require'], function() {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'service.group']);
+    var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', , 'service.matter', 'service.group']);
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', 'srvAppProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, srvAppProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/group/';
