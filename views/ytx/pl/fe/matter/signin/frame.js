@@ -1,15 +1,15 @@
 define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'service.signin', 'tinymce.enroll', 'ui.xxt']);
-    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvAppProvider', 'srvRoundProvider', 'srvPageProvider', 'srvRecordProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvAppProvider, srvRoundProvider, srvPageProvider, srvRecordProvider) {
-        var RouteParam = function(name) {
+    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'service.matter', 'service.signin', 'tinymce.enroll', 'ui.xxt']);
+    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvQuickEntryProvider', 'srvAppProvider', 'srvRoundProvider', 'srvPageProvider', 'srvRecordProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvQuickEntryProvider, srvAppProvider, srvRoundProvider, srvPageProvider, srvRecordProvider) {
+        var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/ytx/pl/fe/matter/signin/';
-            this.templateUrl = baseURL + name + '.html?_=' + ((new Date()) * 1);
+            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + ((new Date()) * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
-                    require([baseURL + name + '.js'], function() {
+                    require([(jsBase || baseURL) + name + '.js'], function() {
                         defer.resolve();
                     });
                     return defer.promise;
@@ -21,12 +21,12 @@ define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
             directive: $compileProvider.directive
         };
         $routeProvider
-            .when('/rest/pl/fe/matter/signin/main', new RouteParam('main'))
+            .when('/rest/pl/fe/matter/signin/main', new RouteParam('main', null, '/views/default/pl/fe/matter/signin/'))
             .when('/rest/pl/fe/matter/signin/page', new RouteParam('page'))
             .when('/rest/pl/fe/matter/signin/schema', new RouteParam('schema'))
             .when('/rest/pl/fe/matter/signin/record', new RouteParam('record'))
-            .when('/rest/pl/fe/matter/signin/publish', new RouteParam('publish'))
-            .otherwise(new RouteParam('publish'));
+            .when('/rest/pl/fe/matter/signin/publish', new RouteParam('publish', null, '/views/default/pl/fe/matter/signin/'))
+            .otherwise(new RouteParam('publish', null, '/views/default/pl/fe/matter/signin/'));
 
         $locationProvider.html5Mode(true);
         $uibTooltipProvider.setTriggers({
@@ -51,6 +51,8 @@ define(['require', 'page', 'schema'], function(require, pageLib, schemaLib) {
             //
             srvRecordProvider.setSiteId(siteId);
             srvRecordProvider.setAppId(appId);
+            //
+            srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
     ngApp.controller('ctrlFrame', ['$scope', '$location', '$uibModal', '$q', 'http2', 'srvApp', function($scope, $location, $uibModal, $q, http2, srvApp) {

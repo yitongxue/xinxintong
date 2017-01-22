@@ -1,66 +1,26 @@
 <div class='row'>
-    <!-- attrs -->
-    <div class='col-md-12 app'>
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-form navbar-left" ng-if="!app.mission">
-                    <button class='btn btn-success' ng-click="assignMission()">指定项目</button>
-                </div>
-                <div class="navbar-form navbar-left">
-                    <div class='form-group'>
-                        <label>标题</label>
-                        <input type='text' class='form-control' ng-model='app.title' tms-auto-update tms-wait=1000 tms-update="update('title')">
-                    </div>
-                    <div class='form-group' ng-if="app.mission.multi_phase==='Y'">
-                        <label>课程期数</label>
-                        <select class='form-control' ng-model="app.mission_phase_id" ng-change="choosePhase()" ng-options="phase.phase_id as phase.title for phase in app.mission.phases">
-                            <option></option>
-                        </select>
-                    </div>
-                    <div class='form-group hide'>
-                        <label>分组类型</label>
-                        <select class='form-control' ng-model='app.scenario' ng-change="update('scenario');">
-                            <option value='split'>拆分</option>
-                            <option value='extract'>抽取</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </div>
-    <!-- end attrs -->
-    <!-- source app -->
-    <div class='col-md-12 source'>
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-form">
-                    <div class='form-group' ng-if="!app.sourceApp">
-                        <button class='btn btn-block btn-success' ng-click="importByApp()">导入用户</button>
-                    </div>
-                    <div class='form-group compact' ng-if="app.sourceApp">
-                        <label>分组用户来源</label>
-                        <div class="input-group">
-                            <div class='form-control' ng-bind="app.sourceApp.title"></div>
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button" ng-click="cancelSourceApp()">
-                                    <span class='glyphicon glyphicon-remove'></span>
-                                </button>
-                            </span>
-                        </div>
-                    </div>
-                    <div class='form-group' ng-if="app.sourceApp">
-                        <button class='btn btn-block btn-success' ng-click='syncByApp()'>同步用户</button>
-                    </div>
-                    <div class='form-group' ng-if="app.sourceApp">
-                        <button class='btn btn-block btn-primary' ng-click='export()'>导出结果</button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </div>
-    <!-- end source app -->
     <!-- left -->
     <div class='col-md-4'>
+        <div class='tile'>
+            <div class='form-group' ng-if="!app.sourceApp">
+                <button class='btn btn-block btn-success' ng-click="importByApp()">导入用户</button>
+            </div>
+            <div class='form-group compact' ng-if="app.sourceApp">
+                <label>分组用户来源</label>
+                <div class="input-group">
+                    <input class='form-control' value="{{app.sourceApp.title}}" disabled="">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="cancelSourceApp()">
+                            <span class='glyphicon glyphicon-remove'></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class='form-group' ng-if="app.sourceApp">
+                <button class='btn btn-success' ng-click='syncByApp()'>同步用户</button>
+                
+            </div>
+        </div>
         <!-- groups -->
         <div class='tile' ng-if="app.sourceApp">
             <div class='form-group'>
@@ -78,36 +38,14 @@
             </div>
         </div>
         <!-- end groups-->
-        <div class='tile hide'>
-            <div class='form-group'>
-                <div>创建人：{{app.creater_name}}</div>
-                <div>创建时间：{{app.create_at*1000|date:'yy-MM-dd HH:mm'}}</div>
-                <div>修改人：{{app.modifier_name}}</div>
-                <div>最后一次修改时间：{{app.modify_at*1000|date:'yy-MM-dd HH:mm'}}</div>
-            </div>
-        </div>
-        <div class='tile'>
-            <div class='form-group compact'>
-                <div class='help-block'>投影地址</div>
-                <div class='input-group'>
-                    <input class='form-control' readonly value="{{opUrl}}">
-                    <span class='input-group-btn'>
-                        <button class='btn btn-default text2Clipboard' data-clipboard-text="{{opUrl}}">复制</button>
-                    </span>
-                </div>
-            </div>
-            <div class='form-group'>
-                <a href="javascript:void(0)" ng-click="gotoCode()">编辑页面</a>
-                <a href="javascript:void(0)" ng-click="resetCode()">重置页面</a>
-            </div>
-        </div>
     </div>
     <!-- end left -->
     <!-- right -->
+    <!-- all rounds -->
     <div class='col-md-8' ng-if="!activeRound&&app.sourceApp">
         <!-- result -->
         <div class='tile' ng-controller='ctrlPlayers'>
-            <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=3'">
+            <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=4'">
             </div>
             <div class='form-group'>
                 <div class='form-inline'>
@@ -126,6 +64,8 @@
         </div>
         <!-- end result -->
     </div>
+    <!-- end all rounds -->
+    <!-- one round -->
     <div class='col-md-8' ng-if="activeRound&&app.sourceApp">
         <uib-tabset active="activeTabIndex">
             <uib-tab index="0" heading="分组说明">
@@ -134,16 +74,12 @@
                         <div class='help-block'>名称</div>
                         <input type='text' class='form-control' ng-model='activeRound.title' tms-auto-update tms-wait=1000 tms-update="updateRound('title')">
                     </div>
-                    <div class='form-group compact'>
-                        <div class='help-block'>积分</div>
-                        <input type="text" class="form-control" ng-model="activeRound.extattrs.attr1" tms-auto-update tms-wait=1000 tms-update="updateRound('extattrs')">
-                    </div>
                 </div>
             </uib-tab>
             <uib-tab index="1" heading="分组结果">
                 <!-- result -->
                 <div class='tile' ng-controller='ctrlPlayers'>
-                    <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=3'">
+                    <div class='form-group' tms-table-wrap ready='tableReady' ng-include="'/views/default/pl/fe/matter/group/component/players.html?_=4'">
                     </div>
                     <div class='form-group'>
                         <button class="btn btn-default" ng-disabled="selectedPlayers.length===0" ng-click='quitGroup(selectedPlayers)'>移出分组</button>
@@ -189,15 +125,14 @@
             </uib-tab>
         </uib-tabset>
     </div>
+    <!-- end one round -->
     <!-- end right -->
     <!-- bottom nav -->
     <nav class="navbar navbar-default navbar-fixed-bottom">
         <div class="container-fluid text-center">
             <form class="navbar-form" style='display:inline-block'>
                 <button class='btn btn-success' ng-disabled="!app.sourceApp||!rounds.length" ng-click="execute()">进行分组</button>
-            </form>
-            <form class="navbar-form navbar-right">
-                <button class='btn btn-default' ng-click="remove()">删除活动</button>
+                <button class='btn btn-primary' ng-click='export()'>导出结果</button>
             </form>
         </div>
     </nav>
@@ -216,13 +151,13 @@
                     <input type='text' class="form-control" ng-model="rule.count">
                 </div>
             </div>
-            <div class='form-group hide'>
+            <div class='form-group'>
                 <label class="col-md-3 control-label">每组人数</label>
                 <div class="col-md-9">
                     <input type='text' class="form-control" ng-model="rule.times">
                 </div>
             </div>
-            <div class='form-group hide'>
+            <div class='form-group'>
                 <label class="col-md-3 control-label">分组属性</label>
                 <div class="col-md-9">
                     <select class="form-control" ng-model="rule.schema" ng-options="schema.title for schema in schemas">
@@ -248,6 +183,10 @@
                 <div class="col-md-9">
                     <label class='radio-inline'><input type='radio' name='appType' value='registration' ng-model="data.appType">报名</label>
                     <label class='radio-inline'><input type='radio' name='appType' value='signin' ng-model="data.appType">签到</label>
+                    <label class='radio-inline'><input type='radio' name='appType' value='wall' ng-model="data.appType">信息墙</label>
+                </div>
+                <div class="col-md-9 col-md-offset-3" ng-if="data.appType==='wall'">
+                    <label class='checkbox-inline'><input type='checkbox' ng-model='data.onlySpeaker' ng-true-value="'Y'" ng-false-value="'N'">仅包含发言用户</label>
                 </div>
             </div>
             <div class='form-group'>
@@ -276,7 +215,7 @@
 <script type="text/ng-template" id="targetEditor.html">
     <div class="modal-header">
         <button class="close" type="button" ng-click="cancel()">×</button>
-        <h5 class="modal-title">分组条件</h5>
+        <h5 class="modal-title">抽取条件</h5>
     </div>
     <div class="modal-body">
         <form class="form-horizontal">
@@ -295,47 +234,5 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" ng-click="ok()">确定</button>
-    </div>
-</script>
-<script type="text/ng-template" id="editorPlayer.html">
-    <div class="modal-header">
-        <button class="close" type="button" ng-click="cancel()">×</button>
-        <h5 class="modal-title">登记记录</h5>
-    </div>
-    <div class="modal-body">
-        <form class="form-horizontal player-editor">
-            <div class="form-group" ng-repeat="c in app.data_schemas" ng-if="c.id.indexOf('member')!==0">
-                <label class="col-md-2 control-label">{{c.title}}</label>
-                <div class="col-md-10">
-                    <input type='text' class='form-control' ng-if="c.type!=='img'&&c.type!=='file'&&c.type!=='single'" ng-model="player.data[c.id]">
-                    <select class='form-control' ng-if="c.type==='single'" ng-model="player.data[c.id]" ng-options="op.v as op.l for op in c.ops">
-                        <option></option>
-                    </select>
-                    <span ng-if="c.type==='img'" ng-init="imgs=player.data[c.id].split(',')">
-                        <img ng-repeat="img in imgs" ng-src='{{img}}' style="width:100%"/>
-                    </span>
-                    <span ng-if="c.type==='file'">
-                        <span ng-repeat="file in player.data[c.id]">
-                            <span ng-bind="file.url"></span>
-                            <video ng-if="file.type.indexOf('video')===0" style="width:100%;" controls="controls">
-                                <source src="{{file.url}}" type="{{file.type}}"/>
-                            </video>
-                            <img ng-if="file.type.indexOf('image')===0" ng-src='{{file.url}}' style="width:100%"/>
-                        </span>
-                    </span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">所属分组</label>
-                <div class="col-md-10">
-                    <select class='form-control' ng-model="player.round_id" ng-options="r.round_id as r.title for r in rounds">
-                        <option></option>
-                    </select>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">保存</button>
     </div>
 </script>
