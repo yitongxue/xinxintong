@@ -157,7 +157,6 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
             title: '项目资料',
             url: '/rest/pl/fe/matter'
         }];
-        $scope.buttons = schemaLib.buttons;
         $scope.setActiveWrap = function(domWrap) {
             var activeWrap;
             $scope.activeWrap = editorProxy.setActiveWrap(domWrap);
@@ -410,6 +409,7 @@ define(['frame', 'schema', 'editor'], function(ngApp, schemaLib, editorProxy) {
             var buttons = {},
                 button, btnName;
             for (btnName in schemaLib.buttons) {
+                if (btnName === 'gotoPage') continue;
                 button = schemaLib.buttons[btnName];
                 if (button.scope && button.scope.indexOf(newPage.type) !== -1) {
                     buttons[btnName] = button;
