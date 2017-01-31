@@ -23,23 +23,19 @@
             </div>
             <div class='collapse navbar-collapse' id='navbar-collapse-1'>
                 <nav class='nav navbar-nav tms-breadcrumb'>
-                    <li>
-                        <a href='/rest/home' target='_self'>
-                            <?php echo APP_TITLE;?>
-                        </a>
-                    </li>
+                    <li><a href='/rest/home' target='_self'><?php echo APP_TITLE;?></a></li>
                     <li><a href="/rest/pl/fe" target='_self'>个人工作台</a></li>
                     <li ng-if="site.yourRole"><a href="/rest/pl/fe/site/console?site={{app.siteid}}" target='_self'>{{site.name}}</a></li>
                     <li ng-if="!site.yourRole"><a href="javascript:void(0)" style='color:#777;cursor:default;'>{{site.name}}</a></li>
                     <li ng-if="app.mission"><a href="/rest/pl/fe/matter/mission?site={{app.siteid}}&id={{app.mission.id}}" target='_self' title="{{app.mission.title}}">{{app.mission.title}}</a></li>
-                    <li><a href="/rest/pl/fe/matter/group/main?site={{app.siteid}}&id={{id}}" title='{{app.title}}'>{{app.title}}</a></li>
+                    <li><a href="/rest/pl/fe/matter/group/main?site={{app.siteid}}&id={{app.id}}" title='{{app.title}}'>{{app.title}}</a></li>
                 </nav>
                 <ul class='nav navbar-nav navbar-right'>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{viewNames[subView]}} <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="/rest/pl/fe/matter/group/main?site={{siteId}}&id={{id}}">活动定义</a></li>
-                            <li><a href="/rest/pl/fe/matter/group/player?site={{siteId}}&id={{id}}">分组数据</a></li>
+                            <li><a href="/rest/pl/fe/matter/group/main?site={{app.siteid}}&id={{app.id}}">活动定义</a></li>
+                            <li><a href="/rest/pl/fe/matter/group/player?site={{app.siteid}}&id={{app.id}}">分组数据</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -62,7 +58,7 @@
     <script src="/static/js/xxt.ui.js?_=1"></script>
     <script src="/views/default/pl/fe/_module/matter.service.js?_=1"></script>
     <script src="/views/default/pl/fe/matter/group/lib/group.service.js?_=3"></script>
-    <script src="/static/js/require.js" data-main="/views/ytx/pl/fe/matter/group/frame-loader.js?_=1"></script>
+    <script src="/static/js/require.js" data-main="/views/ytx/pl/fe/matter/group/frame-loader.js?_=2"></script>
 </body>
 
 </html>

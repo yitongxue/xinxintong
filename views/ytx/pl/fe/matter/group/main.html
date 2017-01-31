@@ -11,9 +11,9 @@
         <div class="input-group">
             <input class='form-control' title="{{app.mission.title}}" value="{{app.mission.title}}" readonly="">
             <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="quitMission()">
-                        <span class='glyphicon glyphicon-remove'></span>
-            </button>
+                <button class="btn btn-default" type="button" ng-click="quitMission()">
+                    <span class='glyphicon glyphicon-remove'></span>
+                </button>
             </span>
         </div>
     </div>
@@ -23,8 +23,8 @@
             <option>全部</option>
         </select>
     </div>
-    <div class='tile'>
-        <div class='form-group'>
+    <div class='form-group'>
+        <div class='list-group-item'>
             <div>创建人：{{app.creater_name}}</div>
             <div>创建时间：{{app.create_at*1000|date:'yy-MM-dd HH:mm'}}</div>
             <div>修改人：{{app.modifier_name}}</div>
