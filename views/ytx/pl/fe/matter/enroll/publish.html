@@ -106,7 +106,7 @@
                     <div class='list-group' style='max-height:290px;overflow-y:auto;'>
                         <li class='list-group-item' ng-repeat='r in app.rounds'>
                             <span>{{r.title}}</span>（<span>{{roundState[r.state]}}</span>）
-                            <button class="close " ng-click='open(r)'>
+                            <button class="close " ng-click='edit(r)'>
                                 <span class='glyphicon glyphicon-edit'></span>
                             </button>
                         </li>
