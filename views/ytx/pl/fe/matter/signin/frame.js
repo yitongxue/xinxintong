@@ -68,6 +68,8 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
             siteId = ls.match(/[\?&]site=([^&]*)/)[1];
             appId = ls.match(/[\?&]id=([^&]*)/)[1];
             //
+            srvSiteProvider.config(siteId);
+            //
             srvAppProvider.setSiteId(siteId);
             srvAppProvider.setAppId(appId);
             //
