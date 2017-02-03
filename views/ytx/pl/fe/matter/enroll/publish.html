@@ -4,7 +4,7 @@
         <div id='simulator'>
             <iframe ng-src={{previewURL}}></iframe>
             <div id='simulatorActions'>
-                <a class='btn btn-default btn-block' style='color:#337ab7' href="/rest/pl/fe/matter/enroll/schema?site={{siteId}}&id={{id}}">修改题目 <i class="glyphicon glyphicon-chevron-right"></i></a>
+                <a class='btn btn-default btn-block' style='color:#337ab7' href="/rest/pl/fe/matter/enroll/schema?site={{app.siteid}}&id={{app.id}}">修改题目 <i class="glyphicon glyphicon-chevron-right"></i></a>
                 <div class="btn-group btn-block" ng-repeat="page in app.pages">
                     <button type="button" class="btn btn-default" ng-class="params.page===page?'btn-primary':'btn-default'" style="width:125px" title="{{page.title}}" ng-click="showPage(page)">{{page.title}}</button>
                     <button type="button" class="btn dropdown-toggle" ng-class="params.page===page?'btn-primary':'btn-default'" data-toggle="dropdown">
@@ -26,7 +26,7 @@
         <div class='form-group hidden-xs'>
             <div class='list-group-item'>
                 <div ng-if="app.rounds.length">当前轮次：{{summary[0].title}}</div>
-                <div><span>打开次数：{{app.read_num}}</span>，<span ng-if="!app.rounds"><a href="/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}">填写数量：{{summary.total}}</a></span><span ng-if="app.rounds.length"><a href="/rest/pl/fe/matter/enroll/record?site={{siteId}}&id={{id}}">填写数量：{{summary[0].total}}</a></span></div>
+                <div><span>打开次数：{{app.read_num}}</span>，<span ng-if="!app.rounds"><a href="/rest/pl/fe/matter/enroll/record?site={{app.siteid}}&id={{app.id}}">填写数量：{{summary.total}}</a></span><span ng-if="app.rounds.length"><a href="/rest/pl/fe/matter/enroll/record?site={{app.siteid}}&id={{app.id}}">填写数量：{{summary[0].total}}</a></span></div>
                 <div><span>分享好友：{{app.share_friend_num}}</span>，<span>分享朋友圈：{{app.share_timeline_num}}</span></div>
             </div>
         </div>
