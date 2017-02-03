@@ -6,6 +6,7 @@ timestamp.setMinutes(minutes);
 timestamp.setMilliseconds(0);
 timestamp.setSeconds(0);
 require.config({
+    waitSeconds: 0,
     paths: {
         "domReady": '/static/js/domReady',
         "frame": '/views/ytx/pl/fe/matter/enroll/frame',
