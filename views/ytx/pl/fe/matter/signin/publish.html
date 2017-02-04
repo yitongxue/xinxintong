@@ -7,8 +7,8 @@
             <div class="btn-group btn-block" ng-repeat="page in app.pages">
                 <button type="button" class="btn btn-default" ng-class="params.page===page?'btn-primary':'btn-default'" style="width:125px" title="{{page.title}}" ng-click="showPage(page)">{{page.title}}</button>
                 <button type="button" class="btn dropdown-toggle" ng-class="params.page===page?'btn-primary':'btn-default'" data-toggle="dropdown">
-                <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="#" ng-click="gotoPage(page)">编辑页面</a></li>
@@ -39,7 +39,7 @@
             </tbody>
         </table>
     </div>
-    <uib-tabset active="0">
+    <uib-tabset active="0" justified="true">
         <uib-tab index="0">
             <uib-tab-heading><i class="glyphicon glyphicon-list"></i> 签到轮次</uib-tab-heading>
             <table class='table table-bordered rounds' ng-controller='ctrlRound'>
@@ -53,9 +53,15 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="round in rounds">
-                        <td style='padding:0'><input type='text' class="form-control" ng-model='round.title' tms-auto-update tms-wait=1000 tms-update="update(round,'title')"></td>
-                        <td style='padding:0'><tms-datepicker class='tms-datepicker' tms-title='开始时间' tms-obj="round" tms-date="round.start_at" tms-state='start_at'></tms-datepicker></td>
-                        <td style='padding:0'><tms-datepicker class='tms-datepicker' tms-title='迟到时间' tms-obj="round" tms-date='round.late_at' tms-state='late_at'></tms-datepicker></td>
+                        <td style='padding:0'>
+                            <input type='text' class="form-control" ng-model='round.title' tms-auto-update tms-wait=1000 tms-update="update(round,'title')">
+                        </td>
+                        <td style='padding:0'>
+                            <tms-datepicker class='tms-datepicker' tms-title='开始时间' tms-obj="round" tms-date="round.start_at" tms-state='start_at'></tms-datepicker>
+                        </td>
+                        <td style='padding:0'>
+                            <tms-datepicker class='tms-datepicker' tms-title='迟到时间' tms-obj="round" tms-date='round.late_at' tms-state='late_at'></tms-datepicker>
+                        </td>
                         <td style='padding:0'>
                             <button class="btn btn-default" ng-click="remove(round)"><span class="glyphicon glyphicon-remove"></span></button>
                             <button class="btn btn-default" ng-click="qrcode(round)"><span class="glyphicon glyphicon-qrcode"></span></button>
@@ -73,38 +79,6 @@
         <uib-tab index="1">
             <uib-tab-heading><i class="glyphicon glyphicon-ban-circle"></i> 进入规则</uib-tab-heading>
             <div ng-controller="ctrlAccessRule">
-                <table class='table table-bordered'>
-                    <tbody>
-                        <tr>
-                            <td>签到成功时进入</td>
-                            <td style='padding:0'>
-                                <div class='form-inline'>
-                                    <div class='form-group'>
-                                        <select style='border:0' class='form-control' ng-model="app.entry_rule.success.entry" ng-options='p.name as p.title for p in app.pages' ng-change="update()">
-                                            <option value=></option>
-                                        </select>
-                                    </div>
-                                    <button class="btn btn-default" type="button" ng-click="gotoPage(app.entry_rule.success.entry)">&gt;</button>
-                                    <button class="btn btn-default" type="button" ng-click="newPage('success.entry')">+</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>签到失败时进入</td>
-                            <td style='padding:0'>
-                                <div class='form-inline'>
-                                    <div class='form-group'>
-                                        <select style='border:0' class='form-control' ng-model="app.entry_rule.fail.entry" ng-options='p.name as p.title for p in app.pages' ng-change="update()" >
-                                            <option value=></option>
-                                        </select>
-                                    </div>
-                                    <button class="btn btn-default" type="button" ng-click="gotoPage(app.entry_rule.fail.entry)">&gt;</button>
-                                    <button class="btn btn-default" type="button" ng-click="newPage('fail.entry')">+</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
                 <div class="panel panel-default">
                     <div class="panel-heading">用户进入规则</div>
                     <div class="panel-body">
@@ -180,8 +154,57 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <button class='btn btn-block btn-success' ng-click="reset()">重置进入规则</button>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">用户签到后进入</div>
+                <div class="panel-body">
+                    <table class='table table-bordered'>
+                        <tbody>
+                            <tr ng-if="app.enrollApp">
+                                <td>签到成功时进入</td>
+                                <td style='padding:0'>
+                                    <div class='form-inline'>
+                                        <div class='form-group'>
+                                            <select style='border:0' class='form-control' ng-model="app.entry_rule.success.entry" ng-options='p.name as p.title for p in app.pages' ng-change="update()">
+                                                <option value=></option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-default" type="button" ng-click="newPage('success.entry')">+</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-if="app.enrollApp">
+                                <td>签到失败时进入</td>
+                                <td style='padding:0'>
+                                    <div class='form-inline'>
+                                        <div class='form-group'>
+                                            <select style='border:0' class='form-control' ng-model="app.entry_rule.fail.entry" ng-options='p.name as p.title for p in app.pages' ng-change="update()" >
+                                                <option value=></option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-default" type="button" ng-click="newPage('fail.entry')">+</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-if="!app.enrollApp">
+                                <td>签到后进入</td>
+                                <td style='padding:0'>
+                                    <div class='form-inline'>
+                                        <div class='form-group'>
+                                            <select style='border:0' class='form-control' ng-model="app.entry_rule.success.entry" ng-options='p.name as p.title for p in app.pages' ng-change="update()">
+                                                <option value=></option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-default" type="button" ng-click="newPage('success.entry')">+</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </uib-tab>
@@ -196,15 +219,15 @@
                             <div style="width:182px;border:1px solid #CCC">
                                 <div style="height:100px;text-align:center;padding-top:32px" ng-if="!app.pic">
                                     <button class='btn btn-default' ng-click='setPic();'>
-                                    <span class='glyphicon glyphicon-picture'></span>选择图片</button>
+                                        <span class='glyphicon glyphicon-picture'></span>选择图片</button>
                                 </div>
                                 <div style='position:relative' ng-if="app.pic!=''" ng-mouseenter='hover=true' ng-mouseleave='hover=false'>
                                     <img name='pic' ng-src="{{app.pic}}" width='180px' />
                                     <button class='btn btn-default btn-sm' style='position:absolute;top:2px;left:2px' ng-if='hover' ng-click='setPic();'>
-                                    <span class='glyphicon glyphicon-picture'></span>
+                                        <span class='glyphicon glyphicon-picture'></span>
                                     </button>
                                     <button class='btn btn-default btn-sm' style='position:absolute;top:2px;right:2px' ng-if='hover' ng-click='removePic();'>
-                                    <span class='glyphicon glyphicon-trash'></span>
+                                        <span class='glyphicon glyphicon-trash'></span>
                                     </button>
                                 </div>
                             </div>
@@ -214,7 +237,6 @@
                         <div class='help-block'>摘要（可选）：最多120个汉字，240个英文字符</div>
                         <textarea class='form-control' ng-model='app.summary' tms-auto-update tms-wait=1000 tms-update="update('summary')"></textarea>
                     </div>
-                    
                 </div>
             </div>
             <div class="panel panel-default" ng-controller="ctrlOpUrl">
@@ -279,14 +301,17 @@
             <div class="form-group">
                 <label class="col-md-3 control-label">每天签到次数</label>
                 <div class='col-md-9'>
-                    <label class='radio-inline'><input type='radio' value='1' name='type' ng-model="params.timesOfDay">1次</label>
-                    <label class='radio-inline'><input type='radio' value='2' name='type' ng-model="params.timesOfDay">2次</label>
+                    <label class='radio-inline'>
+                        <input type='radio' value='1' name='type' ng-model="params.timesOfDay">1次</label>
+                    <label class='radio-inline'>
+                        <input type='radio' value='2' name='type' ng-model="params.timesOfDay">2次</label>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-3 control-label">覆盖已有轮次</label>
                 <div class='col-md-9'>
-                    <label class='checkbox-inline'><input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model="params.overwrite">是</label>
+                    <label class='checkbox-inline'>
+                        <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model="params.overwrite">是</label>
                 </div>
             </div>
         </div>

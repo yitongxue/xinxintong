@@ -44,7 +44,7 @@
                     <a class='btn btn-default btn-block' href="/rest/pl/fe/matter/signin/schema?site={{app.siteid}}&id={{app.id}}">修改填写项</a>
                 </div>
                 <div class='list-group-item' ng-if="ep.type==='V'" ng-controller="ctrlAppSchemas4View">
-                    <div class='help-block'>活动中所有登记项</div>
+                    <div class='help-block'>活动中所有填写项</div>
                     <div class='list-group-item' ng-repeat="s in appSchemas">
                         <span ng-bind="s.title"></span>
                         <span class='schema-switch'>
@@ -65,16 +65,16 @@
                 <tinymce id='tinymce-page' height='660' toolbar="code"></tinymce>
                 <div class='sidebar'>
                     <button class='btn btn-default' ng-click="removeWrap()" title='删除' ng-disabled='!activeWrap'>
-                    <i class='fa fa-remove fa-fw'></i>
+                        <i class='fa fa-remove fa-fw'></i>
                     </button>
                     <button class='btn btn-default' ng-click="moveWrap('up')" ng-disabled='!activeWrap'>
-                    <span class='fa fa-arrow-up fa-fw'></span>
+                        <span class='fa fa-arrow-up fa-fw'></span>
                     </button>
                     <button class='btn btn-default' ng-click="moveWrap('down')" ng-disabled='!activeWrap'>
-                    <span class='fa fa-arrow-down fa-fw'></span>
+                        <span class='fa fa-arrow-down fa-fw'></span>
                     </button>
                     <button ng-if="ep.type==='I'" class='btn btn-default' title='复制' ng-click="copySchema(activeWrap.schema)" ng-disabled='!activeWrap'>
-                    <span class='fa fa-copy fa-fw'></span>
+                        <span class='fa fa-copy fa-fw'></span>
                     </button>
                 </div>
             </div>
@@ -105,5 +105,5 @@
         <button class='btn btn-block btn-default' ng-click="addPage()">添加页面</button>
         <hr>
         <button class='btn btn-block btn-default' ng-click="gotoCode()">编辑代码</button>
-    <div>
+        <div>
 </script>
