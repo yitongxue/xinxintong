@@ -49,7 +49,7 @@ define(['require', 'enrollService'], function(require) {
             .when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish', '/views/ytx/pl/fe/matter/enroll/'))
             .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema', '/views/ytx/pl/fe/matter/enroll/'))
             .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page', '/views/ytx/pl/fe/matter/enroll/'))
-            .when('/rest/pl/fe/matter/enroll/record', new RouteParam('record', '/views/ytx/pl/fe/matter/enroll/'))
+            .when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
             .when('/rest/pl/fe/matter/enroll/recycle', new RouteParam('recycle'))
             .when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
             .when('/rest/pl/fe/matter/enroll/log', new RouteParam('log'))

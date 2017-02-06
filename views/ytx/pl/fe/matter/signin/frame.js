@@ -52,7 +52,7 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
             .when('/rest/pl/fe/matter/signin/main', new RouteParam('main', '/views/ytx/pl/fe/matter/signin/'))
             .when('/rest/pl/fe/matter/signin/page', new RouteParam('page', '/views/ytx/pl/fe/matter/signin/'))
             .when('/rest/pl/fe/matter/signin/schema', new RouteParam('schema', '/views/ytx/pl/fe/matter/signin/'))
-            .when('/rest/pl/fe/matter/signin/record', new RouteParam('record', '/views/ytx/pl/fe/matter/signin/'))
+            .when('/rest/pl/fe/matter/signin/record', new RouteParam('record'))
             .when('/rest/pl/fe/matter/signin/publish', new RouteParam('publish', '/views/ytx/pl/fe/matter/signin/'))
             .otherwise(new RouteParam('publish'));
 
