@@ -55,7 +55,7 @@ define(['require', 'enrollService'], function(require) {
             .when('/rest/pl/fe/matter/enroll/log', new RouteParam('log'))
             .when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
             .when('/rest/pl/fe/matter/enroll/discuss', new RouteParam('discuss', '/views/default/pl/fe/_module/', '/views/default/pl/fe/_module/'))
-            .otherwise(new RouteParam('publish'));
+            .otherwise(new RouteParam('publish', '/views/ytx/pl/fe/matter/enroll/'));
 
         $locationProvider.html5Mode(true);
 
