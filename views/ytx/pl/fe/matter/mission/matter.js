@@ -166,8 +166,6 @@ define(['frame'], function(ngApp) {
             var url;
 
             matterType === undefined && (matterType = '');
-            $scope.matterType = matterType;
-
             if (matterType === '') {
                 url = '/rest/pl/fe/matter/mission/matter/list?id=' + $scope.id;
                 url += '&_=' + (new Date() * 1);
@@ -225,6 +223,9 @@ define(['frame'], function(ngApp) {
                 });
             }
         };
-        $scope.list();
+        $scope.$watch('matterType', function(matterType) {
+            $scope.list(matterType);
+        });
+        $scope.matterType = location.hash ? location.hash.substr(1) : '';
     }]);
 });

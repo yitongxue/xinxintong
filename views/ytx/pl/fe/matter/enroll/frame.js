@@ -78,6 +78,11 @@ define(['require', 'enrollService'], function(require) {
         })();
     }]);
     ngApp.controller('ctrlFrame', ['$scope', 'srvSite', 'srvApp', 'templateShop', function($scope, srvSite, srvApp, templateShop) {
+        $scope.scenarioNames = {
+            'common': '通用登记',
+            'registration': '报名',
+            'voting': '评价',
+        };
         $scope.viewNames = {
             'main': '活动定义',
             'publish': '发布预览',
