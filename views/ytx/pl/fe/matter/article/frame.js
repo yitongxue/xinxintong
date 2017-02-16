@@ -76,13 +76,11 @@ define(['require'], function() {
             $scope.site = oSite;
         });
         srvApp.get().then(function(editing) {
-            var url;
             $scope.editing = editing;
             !editing.attachments && (editing.attachments = []);
-            url = 'http://' + location.host + '/rest/site/fe/matter?site=' + $scope.editing.siteid + '&id=' + $scope.editing.id + '&type=article';
             $scope.entry = {
-                url: url,
-                qrcode: '/rest/site/fe/matter/article/qrcode?site=' + $scope.editing.siteid + '&url=' + encodeURIComponent(url),
+                url: editing.entryUrl,
+                qrcode: '/rest/site/fe/matter/article/qrcode?site=' + $scope.editing.siteid + '&url=' + encodeURIComponent(editing.entryUrl),
             };
             // 用户评论
             if (editing.can_discuss === 'Y') {
@@ -92,7 +90,7 @@ define(['require'], function() {
                     domain: editing.siteid
                 };
             }
-        })
+        });
     }]);
     /***/
     require(['domReady!'], function(document) {
