@@ -31,7 +31,7 @@ define(['frame'], function(ngApp) {
             indicator.handler();
         };
         $scope.addArticle = function() {
-            var url = '/rest/pl/fe/matter/article/create?mission=' + $scope.id,
+            var url = '/rest/pl/fe/matter/article/create?mission=' + $scope.mission.id,
                 config = {
                     proto: {
                         title: $scope.mission.title + '-资料'
@@ -57,9 +57,9 @@ define(['frame'], function(ngApp) {
                 if (choice) {
                     var data = choice.data;
                     if (choice.source === 'share') {
-                        url = '/rest/pl/fe/matter/enroll/createByOther?site=' + $scope.mission.siteid + '&mission=' + $scope.id + '&template=' + data.id;
+                        url = '/rest/pl/fe/matter/enroll/createByOther?site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id + '&template=' + data.id;
                     } else if (choice.source === 'platform') {
-                        url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.mission.siteid + '&mission=' + $scope.id;
+                        url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id;
                         url += '&scenario=' + data.scenario.name;
                         url += '&template=' + data.template.name;
                         if (data.simpleSchema && data.simpleSchema.length) {
@@ -67,7 +67,7 @@ define(['frame'], function(ngApp) {
                         }
                     }
                 } else {
-                    url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.mission.siteid + '&mission=' + $scope.id;
+                    url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id;
                     assignedScenario && (url += '&scenario=' + assignedScenario);
                 }
                 http2.post(url, config, function(rsp) {
@@ -76,7 +76,7 @@ define(['frame'], function(ngApp) {
             });
         };
         $scope.addSignin = function() {
-            var url = '/rest/pl/fe/matter/signin/create?site=' + $scope.mission.siteid + '&mission=' + $scope.id,
+            var url = '/rest/pl/fe/matter/signin/create?site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id,
                 config = {
                     proto: {
                         title: $scope.mission.title + '-签到'
@@ -87,7 +87,7 @@ define(['frame'], function(ngApp) {
             });
         };
         $scope.addGroup = function() {
-            var url = '/rest/pl/fe/matter/group/create?site=' + $scope.mission.siteid + '&mission=' + $scope.id + '&scenario=split',
+            var url = '/rest/pl/fe/matter/group/create?site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id + '&scenario=split',
                 config = {
                     proto: {
                         title: $scope.mission.title + '-分组'
@@ -149,12 +149,12 @@ define(['frame'], function(ngApp) {
             evt.stopPropagation();
             switch (type) {
                 case 'article':
-                    url += type + '/copy?id=' + id + '&site=' + $scope.mission.siteid + '&mission=' + $scope.id;
+                    url += type + '/copy?id=' + id + '&site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id;
                     break;
                 case 'enroll':
                 case 'signin':
                 case 'group':
-                    url += type + '/copy?app=' + id + '&site=' + $scope.mission.siteid + '&mission=' + $scope.id;
+                    url += type + '/copy?app=' + id + '&site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id;
                     break;
             }
             http2.get(url, function(rsp) {
@@ -167,7 +167,7 @@ define(['frame'], function(ngApp) {
 
             matterType === undefined && (matterType = '');
             if (matterType === '') {
-                url = '/rest/pl/fe/matter/mission/matter/list?id=' + $scope.id;
+                url = '/rest/pl/fe/matter/mission/matter/list?id=' + $scope.mission.id;
                 url += '&_=' + (new Date() * 1);
 
                 http2.get(url, function(rsp) {
@@ -202,7 +202,7 @@ define(['frame'], function(ngApp) {
                 } else {
                     url += matterType;
                 }
-                url += '/list?mission=' + $scope.id;
+                url += '/list?mission=' + $scope.mission.id;
                 scenario !== undefined && (url += '&scenario=' + scenario);
                 url += '&_=' + (new Date() * 1);
                 http2.get(url, function(rsp) {
