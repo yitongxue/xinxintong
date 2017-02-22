@@ -77,7 +77,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             return '&page=' + this.at + '&size=' + this.size;
         }
     };
-    $scope.open = function(matter) {
+    $scope.open = function(matter, subView) {
         var url = '/rest/pl/fe/matter/',
             type = $scope.matterType === 'recent' ? matter.matter_type : (matter.type || $scope.matterType),
             id = (matter.matter_id || matter.id);
