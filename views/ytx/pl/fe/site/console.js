@@ -78,18 +78,24 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
         }
     };
     $scope.open = function(matter) {
-        var type = $scope.matterType === 'recent' ? matter.matter_type : (matter.type || $scope.matterType),
+        var url = '/rest/pl/fe/matter/',
+            type = $scope.matterType === 'recent' ? matter.matter_type : (matter.type || $scope.matterType),
             id = (matter.matter_id || matter.id);
+
+        url += type;
+        if (subView) {
+            url += '/' + subView;
+        }
         switch (type) {
             case 'article':
             case 'enroll':
             case 'signin':
             case 'group':
             case 'channel':
-                location.href = '/rest/pl/fe/matter/' + type + '?id=' + id + '&site=' + $scope.siteId;
+                location.href = url + '?id=' + id + '&site=' + $scope.siteId;
                 break;
             case 'mission':
-                location.href = '/rest/pl/fe/matter/' + type + '?id=' + (matter.mission_id || id) + '&site=' + matter.siteid;
+                location.href = url + '?id=' + (matter.mission_id || id) + '&site=' + matter.siteid;
                 break;
         }
     };

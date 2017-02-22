@@ -16,11 +16,11 @@ body{margin-bottom:50px;}
 .phases .phase .action{position:absolute;top:-9px;right:9px;}
 
 /*matter*/
-#viewMatter .thumbnail{position:relative;cursor:pointer;height:180px;display:flex;flex-direction:column;padding:8px;}
+#viewMatter .thumbnail{position:relative;height:180px;display:flex;flex-direction:column;padding:.5em;}
 #viewMatter .thumbnail .summary{flex:1;overflow:hidden;}
-#viewMatter .thumbnail .attrs{display:flex;}
+#viewMatter .thumbnail .attrs{display:flex;padding:1em .5em;}
 #viewMatter .thumbnail .operator{flex:1;}
-#viewMatter .thumbnail .actions{position:absolute;top:8px;right:8px;}
+#viewMatter .thumbnail .actions-top{position:absolute;top:.5em;right:.5em;}
 
 /*indicator*/
 #viewMatter .thumbnail.indicator{flex-direction:row;align-items:center;background:#f8f8f8;}
