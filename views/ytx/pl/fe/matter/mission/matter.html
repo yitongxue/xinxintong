@@ -17,7 +17,7 @@
     </nav>
     <div class='tms-panel-body'>
         <div class='col-md-4' ng-repeat='m in matters'>
-            <div class='thumbnail' ng-click="open(m)" ng-class="m.scenario||m.type" ng-mouseenter="entered=true" ng-mouseleave="entered=false" ng-switch on="m.type">
+            <div class='thumbnail' ng-class="m.scenario||m.type" ng-mouseenter="entered=true" ng-mouseleave="entered=false" ng-switch on="m.type">
                 <h4 class='title' ng-bind='m.title'></h4>
                 <p class='summary' ng-bind='m.summary'></p>
                 <div class='attrs'>

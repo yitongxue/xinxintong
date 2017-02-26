@@ -167,7 +167,6 @@ define(['frame'], function(ngApp) {
                 location.href = '/rest/pl/fe/matter/' + type + '?site=' + $scope.mission.siteid + '&id=' + rsp.data.id;
             });
         };
-        $scope.matterType = '';
         $scope.list = function(matterType) {
             var url;
 
@@ -229,9 +228,13 @@ define(['frame'], function(ngApp) {
                 });
             }
         };
-        $scope.$watch('matterType', function(matterType) {
-            $scope.list(matterType);
+        $scope.$watch('mission', function(nv) {
+            $scope.$watch('matterType', function(matterType) {
+                if (matterType === undefined) return;
+                $scope.list(matterType);
+            });
+            if (!nv) return;
+            $scope.matterType = location.hash ? location.hash.substr(1) : '';
         });
-        $scope.matterType = location.hash ? location.hash.substr(1) : '';
     }]);
 });
