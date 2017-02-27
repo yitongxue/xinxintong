@@ -214,7 +214,9 @@ controller('ctrlMain', ['$scope', 'http2', function($scope, http2) {
     $scope.filter = filter = {};
     $scope.filter2 = filter2 = {};
     $scope.open = function(mission, subView) {
-        location.href = '/rest/pl/fe/matter/mission/' + subView + '?site=' + mission.siteid + '&id=' + mission.mission_id;
+        var url = '/rest/pl/fe/matter/mission/' + subView + '?site=' + mission.siteid + '&id=' + mission.mission_id;
+        console.log(url);
+        location.href = url;
     };
     $scope.listSite = function() {
         var url = '/rest/pl/fe/matter/mission/listSite?_=' + t;
