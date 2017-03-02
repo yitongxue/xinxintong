@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+		<meta content="width=device-width,user-scalable=no,initial-scale=1.0" name="viewport">
 		<base href='/'>
 		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/static/css/tms.css" rel="stylesheet">
@@ -16,19 +17,24 @@
                 </div>
 				<ul class='nav navbar-nav'>
 					<li><a href='/rest/pl/fe/site/console?site={{siteId}}' target='_self'>活动和资料</a></li>
+					<li><a href='/rest/pl/fe/site/user?site={{siteId}}' target='_self'>用户</a></li>
 					<li class='active'><a href='/rest/pl/fe/site/coworker?site={{siteId}}'>团队成员</a></li>
 				</ul>
 				<ul class='nav navbar-nav navbar-right'>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{site.name}} <span class="caret"></span></a>
-      					<ul class="dropdown-menu" role="menu">
-      						<li><a href='/rest/pl/fe/site/setting?site={{siteId}}' target='_self'>团队设置</a></li>
-      						<li class="divider"></li>
-      						<li><a href='/rest/pl/fe/site/file?site={{siteId}}' target='_self'>图片库</a></li>
-      						<li class="divider"></li>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href='/rest/pl/fe/site/setting?site={{siteId}}' target='_self'>团队设置</a></li>
+							<li class="divider"></li>
+							<li><a href='/rest/pl/fe/site/file?site={{siteId}}' target='_self'>图片库</a></li>
+							<li class="divider"></li>
 							<li><a href='/rest/pl/fe/template/site?site={{siteId}}' target='_self'>模板库</a></li>
-        				</ul>
-                    </li>
+							<li class="divider"></li>
+							<li><a href='/rest/pl/fe/site/analysis?site={{siteId}}' target='_self'>运行统计</a></li>
+							<li class="divider"></li>
+							<li><a href='/rest/pl/fe/site/message?site={{siteId}}' target='_self'>用户消息</a></li>
+	  				</ul>
+          </li>
 				</ul>
 			</div>
 		</nav>
@@ -40,7 +46,7 @@
 				            <input type="text" class="form-control" placeholder='请输入用户的账号' ng-model='ulabel'>
 				            <span class='input-group-btn'>
 				                <button class='btn btn-default' ng-click='add()' ng-disabled="!ulabel||!ulabel.length">
-				                	<i class='glyphicon glyphicon-plus'></i> 管理员 
+				                	<i class='glyphicon glyphicon-plus'></i> 管理员
 				                </button>
 				            </span>
 				        </div>
@@ -51,9 +57,22 @@
 				            <button class='close' ng-if="entered" ng-click='remove(a)'>&times;</button>
 				        </div>
 				    </div>
+					<div class='form-group'>
+						<label>或者发送邀请链接</label>
+						<button id='shareSite' uib-popover-template="'shareSite.html'" popover-trigger="show" popover-placement="bottom" popover-title="应用设置" class='btn btn-block btn-success' ng-click="makeInvite()">获取链接</button>
+					</div>
 			    </div>
 			</div>
 		</div>
+		<script type="text/ng-template" id="shareSite.html">
+			<div class='form-group'>
+				<div class='help-block'>链接有效期30分钟</div>
+				<div class='form-control' style='height:auto;word-break:break-all'>{{inviteURL}}</div>
+			</div>
+			<div class='form-group'>
+				<button class='btn btn-default' ng-click="closeInvite()">关闭</button>
+			</div>
+		</script>
 		<script src="/static/js/jquery.min.js"></script>
 		<script src="/static/js/bootstrap.min.js"></script>
 		<script src="/static/js/angular.min.js"></script>
