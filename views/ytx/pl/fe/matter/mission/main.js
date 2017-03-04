@@ -2,26 +2,6 @@ define(['frame'], function(ngApp) {
     'use strict';
     ngApp.provider.controller('ctrlMain', ['$scope', function($scope) {}]);
     ngApp.provider.controller('ctrlSetting', ['$scope', 'http2', '$uibModal', 'mediagallery', 'noticebox', function($scope, http2, $uibModal, mediagallery, noticebox) {
-        var modifiedData = {};
-        $scope.modified = false;
-        window.onbeforeunload = function(e) {
-            var message;
-            if ($scope.modified) {
-                message = '修改还没有保存，是否要离开当前页面？',
-                    e = e || window.event;
-                if (e) {
-                    e.returnValue = message;
-                }
-                return message;
-            }
-        };
-        $scope.submit = function() {
-            http2.post('/rest/pl/fe/matter/mission/setting/update?id=' + $scope.mission.id, modifiedData, function(rsp) {
-                $scope.modified = false;
-                modifiedData = {};
-                noticebox.success('完成保存');
-            });
-        };
         $scope.remove = function() {
             if (window.confirm('确定删除项目？')) {
                 http2.get('/rest/pl/fe/matter/mission/remove?id=' + $scope.mission.id, function(rsp) {
@@ -29,15 +9,10 @@ define(['frame'], function(ngApp) {
                 });
             }
         };
-        $scope.update = function(name) {
-            modifiedData[name] = $scope.mission[name];
-            $scope.modified = true;
-            $scope.submit();
-        };
         $scope.setPic = function() {
             var options = {
                 callback: function(url) {
-                    $scope.mission.pic = url + '?_=' + (new Date()) * 1;
+                    $scope.mission.pic = url + '?_=' + (new Date() * 1);
                     $scope.update('pic');
                 }
             };
@@ -259,47 +234,5 @@ define(['frame'], function(ngApp) {
                 });
             }
         });
-    }]);
-    ngApp.provider.controller('ctrlOpUrl', ['$scope', 'http2', 'srvQuickEntry', '$timeout', function($scope, http2, srvQuickEntry, $timeout) {
-        var targetUrl, opEntry;
-        $scope.opEntry = opEntry = {};
-        $timeout(function() {
-            new ZeroClipboard(document.querySelectorAll('.text2Clipboard'));
-        });
-        $scope.$watch('mission', function(mission) {
-            if (!mission) return;
-            targetUrl = mission.opUrl;
-            srvQuickEntry.get(targetUrl).then(function(entry) {
-                if (entry) {
-                    opEntry.url = 'http://' + location.host + '/q/' + entry.code;
-                    opEntry.password = entry.password;
-                    opEntry.code = entry.code;
-                    opEntry.can_favor = entry.can_favor;
-                }
-            });
-        });
-        $scope.makeOpUrl = function() {
-            srvQuickEntry.add(targetUrl, $scope.mission.title).then(function(task) {
-                opEntry.url = 'http://' + location.host + '/q/' + task.code;
-                opEntry.code = task.code;
-            });
-        };
-        $scope.closeOpUrl = function() {
-            srvQuickEntry.remove(targetUrl).then(function(task) {
-                opEntry.url = '';
-                opEntry.code = '';
-                opEntry.can_favor = 'N';
-                opEntry.password = '';
-            });
-        };
-        $scope.configOpUrl = function(event, prop) {
-            event.preventDefault();
-            srvQuickEntry.config(targetUrl, {
-                password: opEntry.password
-            });
-        };
-        $scope.updCanFavor = function() {
-            srvQuickEntry.update(opEntry.code, { can_favor: opEntry.can_favor });
-        };
     }]);
 });
