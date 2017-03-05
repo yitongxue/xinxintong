@@ -22,7 +22,7 @@ define(['require'], function() {
         };
         $routeProvider
             .when('/rest/pl/fe/matter/group/main', new RouteParam('main', '/views/ytx/pl/fe/matter/group/'))
-            .when('/rest/pl/fe/matter/group/player', new RouteParam('player', '/views/ytx/pl/fe/matter/group/'))
+            .when('/rest/pl/fe/matter/group/player', new RouteParam('player'))
             .otherwise(new RouteParam('player', '/views/ytx/pl/fe/matter/group/'));
 
         $locationProvider.html5Mode(true);
