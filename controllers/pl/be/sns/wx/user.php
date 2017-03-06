@@ -235,6 +235,7 @@ class user extends \pl\be\base {
 							'groupid' => $rfan->groupid,
 							'sync_at' => $current,
 						];
+						isset($rfan->subscribe_time) && $ins['subscribe_at'] = $rfan->subscribe_time;
 						isset($rfan->headimgurl) && $upd['headimgurl'] = $rfan->headimgurl;
 						isset($rfan->province) && $upd['province'] = $modelSnsUser->escape($rfan->province);
 						isset($rfan->country) && $upd['country'] = $modelSnsUser->escape($rfan->country);
@@ -352,7 +353,7 @@ class user extends \pl\be\base {
 		$model = $this->model();
 		$model->delete('xxt_site_wxfangroup', ["siteid" => $site]);
 		foreach ($groups as $g) {
-			$i = ['id' => $g->id, 'siteid' => $this->mpid, 'name' => $g->name];
+			$i = ['id' => $g->id, 'siteid' => $site, 'name' => $g->name];
 			$model->insert('xxt_site_wxfangroup', $i, false);
 		}
 
