@@ -54,6 +54,7 @@ define(['require', 'enrollService'], function(require) {
             .when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
             .when('/rest/pl/fe/matter/enroll/log', new RouteParam('log'))
             .when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
+            .when('/rest/pl/fe/matter/enroll/notice', new RouteParam('notice'))
             .when('/rest/pl/fe/matter/enroll/discuss', new RouteParam('discuss', '/views/default/pl/fe/_module/', '/views/default/pl/fe/_module/'))
             .otherwise(new RouteParam('publish', '/views/ytx/pl/fe/matter/enroll/'));
 
@@ -93,6 +94,7 @@ define(['require', 'enrollService'], function(require) {
             'discuss': '用户评论',
             'coin': '积分规则',
             'log': '运行日志',
+            'notice': '通知发送记录',
             'recycle': '回收站',
         };
         $scope.subView = '';
