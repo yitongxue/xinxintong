@@ -1,11 +1,11 @@
 <?php
-namespace pl\fe\matter\tmplmsg;
+namespace pl\fe\site;
 
 require_once dirname(dirname(__FILE__)) . '/base.php';
 /**
- * 模板消息
+ * 通知消息
  */
-class main extends \pl\fe\matter\base {
+class tmplmsg extends \pl\fe\base {
 	/**
 	 * @param int $id
 	 */
@@ -166,118 +166,118 @@ class main extends \pl\fe\matter\base {
 			return new \ResponseTimeout();
 		}
 
-		$wx = $this->model('sns\wx');
+		$wx=$this->model('sns\wx');
 		$config = $wx->bySite($site);
 		if (!$config || $config->joined === 'N') {
 			return new \ResponseError('未与微信公众号连接，无法同步微信模板消息!');
 		}
 
-		$proxy = $this->model('sns\wx\proxy', $config);
-		$rst = $proxy->templateList();
+		$proxy=$this->model('sns\wx\proxy',$config);
+		$rst=$proxy->templateList();
 
-		if ($rst[0] === false) {
+		if($rst[0]===false){
 			return new \ResponseError($rst[1]);
 		}
-
-		$templates = $rst[1]->template_list;
-		$d['siteid'] = $site;
-		$d['mpid'] = $site;
-		$d['creater'] = $user->id;
-		$d['create_at'] = time();
-		$p['siteid'] = $site;
+		
+		$templates=$rst[1]->template_list;
+		$d['siteid']=$site;
+		$d['mpid']=$site;
+		$d['creater']=$user->id;
+		$d['create_at']=time();
+		$p['siteid']=$site;
 
 		foreach ($templates as $k => $v) {
-			$d['templateid'] = $v->template_id;
-			$tmp[] = $v->template_id;
-			$d['title'] = $v->title;
-			$d['example'] = $v->example;
+			$d['templateid']=$v->template_id;
+			$tmp[]=$v->template_id;
+			$d['title']=$v->title;
+			$d['example']=$v->example;
 			//同步模板
-			if ($id = $wx->query_val_ss(['id', 'xxt_tmplmsg', ['siteid' => $site, 'templateid' => $v->template_id]])) {
-				$wx->update('xxt_tmplmsg', $d, "id='$id'");
-			} else {
-				$id = $wx->insert('xxt_tmplmsg', $d);
+			if($id=$wx->query_val_ss(['id','xxt_tmplmsg',['siteid'=>$site,'templateid'=>$v->template_id]])){
+				$wx->update('xxt_tmplmsg',$d,"id='$id'");
+			}else{
+				$id=$wx->insert('xxt_tmplmsg',$d);
 			}
 			//同步参数
-			$p['tmplmsg_id'] = $id;
-			$e = array();
-			$content = preg_replace(["/：{/", "/\s*/"], [":{"], trim($v->content));
+			$p['tmplmsg_id']=$id;
+			$e=array();
+			$content=preg_replace(["/：{/","/\s*/"], [":{"], trim($v->content));
 
-			if (!preg_match('/{{.+?}:{.+?}}/', $content, $m)) {
-				$r1 = explode("}}", $content);
+			if(!preg_match('/{{.+?}:{.+?}}/', $content,$m)){
+				$r1=explode("}}", $content);
 				//去掉空行的字符串
 				array_pop($r1);
-
+			
 				foreach ($r1 as $k1 => $v1) {
-					$arr = explode(':', $v1);
-					if (isset($arr[1])) {
-						$p['pname'] = substr(trim($arr[1]), 2, -5);
-						$p['plabel'] = $arr[0];
-					} else {
-						$p['pname'] = substr(trim($v1), 2, -5);
-						$p['plabel'] = '';
+					$arr=explode(':', $v1);
+					if(isset($arr[1])){
+						$p['pname']=substr(trim($arr[1]),2,-5);
+						$p['plabel']=$arr[0];
+					}else{
+						$p['pname']=substr(trim($v1),2,-5);
+						$p['plabel']='';
 					}
 
-					$pid = $wx->query_val_ss([
+					$pid=$wx->query_val_ss([
 						'id',
 						'xxt_tmplmsg_param',
-						['siteid' => $site, 'tmplmsg_id' => $p['tmplmsg_id'], 'pname' => $p['pname']],
-					]);
+						['siteid'=>$site,'tmplmsg_id'=>$p['tmplmsg_id'],'pname'=>$p['pname']]
+						]);
 
-					if ($pid) {
-						$wx->update('xxt_tmplmsg_param', $p, "id='$pid'");
-					} else {
-						$wx->insert('xxt_tmplmsg_param', $p);
+					if($pid){
+						$wx->update('xxt_tmplmsg_param',$p,"id='$pid'");
+					}else{
+						$wx->insert('xxt_tmplmsg_param',$p);
 					}
 				}
-			} else {
-				$word = $m[0];
-				$str = strstr($content, $word);
-				$param1 = explode(':', $word);
+			}else{
+				$word=$m[0];
+				$str=strstr($content,$word);
+				$param1=explode(':', $word);
 
-				$e[substr($param1[0], 2, -7)] = $l1 = substr($param1[1], 2, -7);
-				$e[$l1] = '';
+				$e[substr($param1[0], 2,-7)]=$l1=substr($param1[1], 2,-7);
+				$e[$l1]='';
 
-				$content = substr($str, strlen($word));
-				$arr2 = explode("}}", $content);
+				$content=substr($str, strlen($word));
+				$arr2=explode("}}", $content);
 				array_pop($arr2);
 
-				foreach ($arr2 as $k2 => $v2) {
-					$crr = explode(":", $v2);
-
-					if (isset($crr[1])) {
-						$e[substr($crr[1], 2, -5)] = $crr[0];
-					} else {
-						$e[substr($crr[0], 2, -5)] = '';
+				foreach ($arr2 as $k2 => $v2) {	
+					$crr=explode(":", $v2);
+			
+					if(isset($crr[1])){
+						$e[substr($crr[1],2,-5)]=$crr[0];
+					}else{
+						$e[substr($crr[0],2,-5)]='';
 					}
 				}
 
 				foreach ($e as $k3 => $v3) {
-					$p['pname'] = $k3;
-					$p['plabel'] = $v3;
+					$p['pname']=$k3;
+					$p['plabel']=$v3;
 
-					$pid = $wx->query_val_ss([
+					$pid=$wx->query_val_ss([
 						'id',
 						'xxt_tmplmsg_param',
-						['siteid' => $site, 'tmplmsg_id' => $p['tmplmsg_id'], 'pname' => $p['pname']],
-					]);
+						['siteid'=>$site,'tmplmsg_id'=>$p['tmplmsg_id'],'pname'=>$p['pname']]
+						]);
 
-					if ($pid) {
-						$wx->update('xxt_tmplmsg_param', $p, "id='$pid'");
-					} else {
-						$wx->insert('xxt_tmplmsg_param', $p);
-					}
-				}
+					if($pid){
+						$wx->update('xxt_tmplmsg_param',$p,"id='$pid'");
+					}else{
+						$wx->insert('xxt_tmplmsg_param',$p);
+					}	
+				}		
 			}
 		}
-		$one = $wx->query_objs_ss(['templateid', 'xxt_tmplmsg', "siteid='$site' and templateid!=''"]);
+		$one=$wx->query_objs_ss(['templateid','xxt_tmplmsg',"siteid='$site' and templateid!=''"]);
 
 		foreach ($one as $v0) {
-			$two[] = $v0->templateid;
+			$two[]=$v0->templateid;
 		}
 		//将本地原来有实际上微信管理端已经删除的模板ID 设置为‘’ 表示本地删除
-		if ($rest = array_diff($two, $tmp)) {
+		if($rest=array_diff($two,$tmp)){
 			foreach ($rest as $v4) {
-				$wx->update('xxt_tmplmsg', ['templateid' => ''], ['siteid' => $site, 'templateid' => $v4]);
+				$wx->update('xxt_tmplmsg',['templateid'=>''],['siteid'=>$site,'templateid'=>$v4]);
 			}
 		}
 
@@ -294,36 +294,36 @@ class main extends \pl\fe\matter\base {
 	 * $message
 	 */
 	protected function sendByOpenid($site, $openid, $message, $openid_src = null) {
-		$model = $this->model();
+		$model=$this->model();
 		if (empty($openid_src)) {
 			$openid_src = $model->query_val_ss([
 				'ufrom',
 				'xxt_site_account',
-				"siteid='$site' and (wx_openid='$openid' or qy_openid='$openid' or yx_openid='$openid')",
+				"siteid='$site' and (wx_openid='$openid' or qy_openid='$openid' or yx_openid='$openid')"
 			]);
 		}
 
 		switch ($openid_src) {
 		case 'yx':
-			$config = $this->model('sns\yx')->bySite($site);
+			$config=$this->model('sns\yx')->bySite($site);
 			if ($config->joined === 'Y' && $config->can_p2p === 'Y') {
-				$rst = $this->model('sns\yx\proxy', $config)->messageSend($message, array($openid));
+				$rst = $this->model('sns\yx\proxy',$config)->messageSend($message, array($openid));
 			} else {
-				$rst = $this->model('sns\yx\proxy', $config)->messageCustomSend($message, $openid);
+				$rst = $this->model('sns\yx\proxy',$config)->messageCustomSend($message, $openid);
 			}
 			break;
 		case 'wx':
-			$config = $this->model('sns\wx')->bySite($site);
-			$rst = $this->model('sns\wx\proxy', $config)->messageCustomSend($message, $openid);
+			$config=$this->model('sns\wx')->bySite($site);
+			$rst = $this->model('sns\wx\proxy',$config)->messageCustomSend($message, $openid);
 			break;
 		case 'qy':
-			$config = $this->model('sns\qy')->bySite($site);
+			$config=$this->model('sns\qy')->bySite($site);
 			$message['touser'] = $openid;
-			$message['agentid'] = $config->agentid;
-			$rst = $this->model('sns\qy\proxy', $config)->messageSend($message, $openid);
+			$message['agentid'] = $config->agentid;		
+			$rst = $this->model('sns\qy\proxy',$config)->messageSend($message, $openid);
 			break;
 		default:
-			$rst = array(false);
+			$rst=array(false);
 		}
 		return $rst;
 	}
@@ -334,7 +334,7 @@ class main extends \pl\fe\matter\base {
 	 * $tmplmsgId
 	 * $openid
 	 */
-	protected function tmplSendByOpenid($site, $tmplmsgId, $openid, $data, $url = null, $snsConfig = null) {
+	protected function tmplSendByOpenid($site,$tmplmsgId, $openid, $data, $url = null, $snsConfig = null) {
 		/*模板定义*/
 		is_object($data) && $data = (array) $data;
 		if (empty($url) && isset($data['url'])) {
@@ -347,10 +347,10 @@ class main extends \pl\fe\matter\base {
 		$ufrom = $modelTmpl->query_val_ss([
 			'ufrom',
 			'xxt_site_account',
-			"siteid='$site' and (wx_openid='$openid' or qy_openid='$openid' or yx_openid='$openid')",
+			"siteid='$site' and (wx_openid='$openid' or qy_openid='$openid' or yx_openid='$openid')"
 		]);
 		/*发送消息*/
-		if (!empty($tmpl->templateid) && $ufrom === 'wx') {
+		if (!empty($tmpl->templateid) && $ufrom==='wx') {
 			/*只有微信号才有模板消息ID*/
 			$msg = array(
 				'touser' => $openid,
@@ -396,8 +396,8 @@ class main extends \pl\fe\matter\base {
 					"content" => $txt,
 				),
 			);
-			$rst = $this->sendByOpenid($site, $openid, $msg, $ufrom);
-			if ($rst[0] === false) {
+			$rst =$this->sendByOpenid($site, $openid, $msg, $ufrom);
+			if ($rst[0]=== false) {
 				return $rst;
 			}
 			$msg['template_id'] = 0;
@@ -421,25 +421,25 @@ class main extends \pl\fe\matter\base {
 	 * 发送模板消息
 	 * @param $name string eg:site.matter.push、site.enroll.submit and so on
 	 */
-	public function send_action($site, $name, $openid) {
+	public function send_action($site,$name,$openid){
 		if (false === ($user = $this->accountUser())) {
 			return new \ResponseTimeout();
 		}
 
 		$modelNot = $this->model('site\notice');
 
-		if ($notice = $modelNot->byName($site, $name)) {
+		if($notice = $modelNot->byName($site, $name)){
 			$modelMap = $this->model('matter\tmplmsg\config');
 			$notice->tmplmsg_config_id && $notice->tmplmsgConfig = $modelMap->byId($notice->tmplmsg_config_id, ['cascaded' => 'Y']);
-		} else {
+		}else{
 			return new \ResponseError("没有设置模板消息或发送类型不支持。");
 		}
 
-		$rst = $this->tmplSendByOpenid($site, $notice->tmplmsgConfig->tmplmsg->id, $openid, $notice->tmplmsgConfig->mapping);
+		$rst=$this->tmplSendByOpenid($site,$notice->tmplmsgConfig->tmplmsg->id,$openid,$notice->tmplmsgConfig->mapping);
 
-		if ($rst[0] === true) {
+		if($rst[0]===true){
 			return new \ResponseData('ok');
-		} else {
+		}else{
 			return new \ResponseError($rst);
 		}
 	}
