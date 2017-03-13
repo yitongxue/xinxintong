@@ -1,10 +1,7 @@
 var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'ui.xxt', 'service.matter']);
 ngApp.config(['$routeProvider', '$locationProvider', 'srvSiteProvider', function($routeProvider, $locationProvider, srvSiteProvider) {
-    $routeProvider.when('/rest/pl/fe/matter/channel', {
-        templateUrl: '/views/default/pl/fe/matter/channel/setting.html?_=1',
-        controller: 'ctrlSetting',
-    }).otherwise({
-        templateUrl: '/views/default/pl/fe/matter/channel/setting.html?_=1',
+    $routeProvider.otherwise({
+        templateUrl: '/views/ytx/pl/fe/matter/channel/setting.html?_=1',
         controller: 'ctrlSetting'
     });
     var siteId = location.search.match(/[\?&]site=([^&]*)/)[1];
