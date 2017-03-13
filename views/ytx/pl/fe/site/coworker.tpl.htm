@@ -6,7 +6,7 @@
 		<base href='/'>
 		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/static/css/tms.css" rel="stylesheet">
-		<link href="/views/default/pl/fe/site/user.css" rel="stylesheet">
+		<link href="/views/default/pl/fe/site/coworker.css" rel="stylesheet">
 		<title>团队——成员</title>
 	</head>
 	<body ng-app='app' ng-controller='ctrlCoworker'>
@@ -17,7 +17,7 @@
                 </div>
 				<ul class='nav navbar-nav'>
 					<li><a href='/rest/pl/fe/site/console?site={{siteId}}' target='_self'>活动和资料</a></li>
-					<li><a href='/rest/pl/fe/site/user?site={{siteId}}' target='_self'>用户</a></li>
+					<li><a href='/rest/pl/fe/site/home?site={{siteId}}' target='_self'>团队门户</a></li>
 					<li class='active'><a href='/rest/pl/fe/site/coworker?site={{siteId}}'>团队成员</a></li>
 				</ul>
 				<ul class='nav navbar-nav navbar-right'>
@@ -29,12 +29,8 @@
 							<li><a href='/rest/pl/fe/site/file?site={{siteId}}' target='_self'>图片库</a></li>
 							<li class="divider"></li>
 							<li><a href='/rest/pl/fe/template/site?site={{siteId}}' target='_self'>模板库</a></li>
-							<li class="divider"></li>
-							<li><a href='/rest/pl/fe/site/analysis?site={{siteId}}' target='_self'>运行统计</a></li>
-							<li class="divider"></li>
-							<li><a href='/rest/pl/fe/site/message?site={{siteId}}' target='_self'>用户消息</a></li>
-	  				</ul>
-          </li>
+	  					</ul>
+         			</li>
 				</ul>
 			</div>
 		</nav>
