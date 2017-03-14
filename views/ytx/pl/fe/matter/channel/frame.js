@@ -83,6 +83,17 @@ ngApp.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', function($
         $scope.modified = true;
         modifiedData[name] = $scope.editing[name];
     };
+    $scope.addMatter = function() {
+        mattersgallery.open($scope.siteId, function(matters, type) {
+            var relations = { matter: matters };
+            http2.post('/rest/pl/fe/matter/channel/addMatter?site=' + $scope.siteId + '&channel=' + $scope.editing.id, relations, function(rsp) {
+                $scope.editing.matters = rsp.data;
+                arrangeMatters();
+            });
+        }, {
+            matterTypes: $scope.matterTypes,
+        });
+    };
     $scope.setFixed = function(pos, clean) {
         if (!clean) {
             mattersgallery.open($scope.siteId, function(matters, type) {
@@ -114,6 +125,9 @@ ngApp.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', function($
             $scope.editing.matters = rsp.data;
             arrangeMatters();
         });
+    };
+    $scope.gotoMatter = function(matter) {
+        location.href = '/rest/pl/fe/matter/' + matter.type + '?site=' + $scope.siteId + '&id=' + matter.id;
     };
     $scope.editPage = function(event, page) {
         event.preventDefault();

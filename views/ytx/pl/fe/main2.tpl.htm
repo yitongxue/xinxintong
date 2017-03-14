@@ -55,16 +55,15 @@
                             <div class="collapse navbar-collapse" id="navbar-collapse-4">
                                 <ul class="nav navbar-nav navbar-right">
                                     <li ng-class="{'active':siteType===1}"><a href="javaScript:void(0)" ng-click="siteType=1;sites=site1"><span class='glyphicon glyphicon-user'></span>&nbsp&nbsp我的团队</a></li>
-                                    <li><a href="javaScript:void(0)"  ng-click='create()'><span class='glyphicon glyphicon-plus'></span>&nbsp&nbsp新建团队</a></li>
+                                    <li><a href="javaScript:void(0)" ng-click='create()'><span class='glyphicon glyphicon-plus'></span>&nbsp&nbsp新建团队</a></li>
                                     <li ng-class="{'active':siteType===0}">
                                         <a href="javaScript:void(0)" ng-click="siteType=0;sites=sites0"><span class='glyphicon glyphicon-trash'></span>&nbsp&nbsp回收站
-                                       <span class="badge">
+                                        <span class="badge">
                                             <span ng-if="sites0.length>0" ng-bind="sites0.length"></span>
                                             <span ng-if="!sites0.length">空</span>
                                         </span>
                                         </a>
                                     </li>
-
                                 </ul>
                             </div>
                         </div>

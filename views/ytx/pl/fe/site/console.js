@@ -200,7 +200,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             config.proto.title = $scope.selectedMission.title + '-' + config.proto.title;
         }
         http2.post(url, config, function(rsp) {
-            location.href = '/rest/pl/fe/matter/article?site=' + $scope.siteId + '&id=' + rsp.data;
+            location.href = '/rest/pl/fe/matter/article?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
     $scope.addChannel = function() {
