@@ -30,6 +30,14 @@ ngApp.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', function($
         value: 'article',
         title: '项目资料',
         url: '/rest/pl/fe/matter'
+    }, {
+        value: 'enroll',
+        title: '登记活动',
+        url: '/rest/pl/fe/matter'
+    }, {
+        value: 'signin',
+        title: '签到活动',
+        url: '/rest/pl/fe/matter'
     }];
     $scope.acceptMatterTypes = [{
         name: '',
