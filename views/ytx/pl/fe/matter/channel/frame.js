@@ -1,8 +1,8 @@
 var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'ui.xxt', 'service.matter']);
 ngApp.config(['$routeProvider', '$locationProvider', 'srvSiteProvider', function($routeProvider, $locationProvider, srvSiteProvider) {
     $routeProvider.otherwise({
-        templateUrl: '/views/ytx/pl/fe/matter/channel/setting.html?_=1',
-        controller: 'ctrlSetting'
+        templateUrl: '/views/ytx/pl/fe/matter/channel/main.html?_=1',
+        controller: 'ctrlMain'
     });
     var siteId = location.search.match(/[\?&]site=([^&]*)/)[1];
     srvSiteProvider.config(siteId);
@@ -20,7 +20,7 @@ ngApp.controller('ctrlChannel', ['$scope', '$location', 'http2', 'srvSite', func
         $scope.entryUrl = 'http://' + location.host + '/rest/site/fe/matter?site=' + $scope.siteId + '&id=' + $scope.id + '&type=channel';
     });
 }]);
-ngApp.controller('ctrlSetting', ['$scope', 'http2', 'mattersgallery', function($scope, http2, mattersgallery) {
+ngApp.controller('ctrlMain', ['$scope', 'http2', 'mattersgallery', function($scope, http2, mattersgallery) {
     var modifiedData = {};
     $scope.modified = false;
     $scope.back = function() {
