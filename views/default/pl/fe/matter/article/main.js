@@ -1,5 +1,5 @@
 define(['frame'], function(ngApp) {
-    ngApp.provider.controller('ctrlMain', ['$scope', '$uibModal', 'http2', 'noticebox', 'mattersgallery', 'mediagallery', 'noticebox', 'srvApp', 'cstApp', function($scope, $uibModal, http2, noticebox, mattersgallery, mediagallery, noticebox, srvApp, cstApp) {
+    ngApp.provider.controller('ctrlMain', ['$scope', '$uibModal', 'http2', 'noticebox', 'mattersgallery', 'mediagallery', 'noticebox', 'srvApp', 'cstApp', 'tmsThumbnail', function($scope, $uibModal, http2, noticebox, mattersgallery, mediagallery, noticebox, srvApp, cstApp, tmsThumbnail) {
         (function() {
             new ZeroClipboard(document.querySelectorAll('.text2Clipboard'));
         })();
@@ -10,9 +10,6 @@ define(['frame'], function(ngApp) {
 
         $scope.modified = false;
         $scope.innerlinkTypes = cstApp.innerlink;
-        $scope.back = function() {
-            history.back();
-        };
         window.onbeforeunload = function(e) {
             var message;
             if ($scope.modified) {
@@ -22,6 +19,9 @@ define(['frame'], function(ngApp) {
                     e.returnValue = message;
                 }
                 return message;
+            }
+            if (!$scope.editing.pic && !$scope.editing.thumbnail) {
+                tmsThumbnail.thumbnail($scope.editing);
             }
         };
         $scope.submit = function() {
@@ -303,6 +303,11 @@ define(['frame'], function(ngApp) {
                     $scope.editing.attachments.push(rsp.data);
                 });
             });
+        });
+        $scope.$watch('editing.title', function(title, oldTitle) {
+            if (!$scope.editing.pic && title.slice(0, 1) != oldTitle.slice(0, 1)) {
+                tmsThumbnail.thumbnail($scope.editing);
+            }
         });
         $scope.$on('tinymce.instance.init', function(event, editor) {
             tinymceEditor = editor;
