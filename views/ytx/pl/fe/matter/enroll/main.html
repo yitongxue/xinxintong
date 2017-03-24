@@ -67,6 +67,9 @@
             <label class='checkbox-inline'>
                 <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model="app.notify_submit" ng-change="update('notify_submit')">用户提交填写内容时通知</label>
         </div>
+        <div class='form-group'>
+            <button class='btn btn-default' ng-click="addMe()">把我加入接收人</button>
+        </div>
         <div class='form-group' ng-if="sns.wx.joined==='Y'&&sns.wx.can_qrcode==='Y'">
             <button id='wxQrcode' uib-popover-template="'joinQrcode.html'" popover-trigger="show" popover-placement="bottom" class="btn btn-default" ng-click="qrcode('wx')">微信扫码作为接收人 <span class="caret"></span></button>
         </div>

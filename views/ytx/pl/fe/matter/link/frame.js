@@ -1,7 +1,7 @@
 ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'ui.xxt', 'service.matter', 'member.xxt', 'channel.fe.pl']);
 ngApp.config(['$routeProvider', '$locationProvider', 'srvSiteProvider', function($routeProvider, $locationProvider, srvSiteProvider) {
     $routeProvider.otherwise({
-        templateUrl: '/views/default/pl/fe/matter/link/main.html?_=2',
+        templateUrl: '/views/ytx/pl/fe/matter/link/main.html?_=2',
         controller: 'ctrlMain'
     });
     var siteId = location.search.match(/[\?&]site=([^&]*)/)[1];
