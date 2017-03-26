@@ -92,6 +92,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             case 'signin':
             case 'group':
             case 'channel':
+            case 'link':
                 location.href = url + '?id=' + id + '&site=' + $scope.siteId;
                 break;
             case 'mission':

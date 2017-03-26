@@ -315,34 +315,6 @@
         <label><input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='app.use_mission_footer' ng-change="update('use_mission_footer');">使用项目页脚</label>
     </div>
 </script>
-<script type="text/ng-template" id="roundEditor.html ">
-    <div class="modal-header">
-        <button class="close" type="button" ng-click="close()">×</button>
-        <h5 class="modal-title ">轮次</h5>
-    </div>
-    <div class="modal-body ">
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label class="col-md-2 control-label">名称</label>
-                <div class="col-md-10 ">
-                    <input type='text' class="form-control" ng-model='round.title'>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">状态</label>
-                <div class="col-md-10">
-                    <p class="form-control-static">{{roundState[round.state]}}</p>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-danger pull-left" ng-click="remove()" ng-if='round.rid&&round.state==0'>删除</button>
-        <button class="btn btn-success pull-left" ng-click="start()" ng-if='round.state==0'>启用</button>
-        <button class="btn btn-success pull-left" ng-click="stop()" ng-if='round.state==1'>停用</button>
-        <button class="btn btn-success" ng-click="ok() ">保存</button>
-    </div>
-</script>
 <script type="text/ng-template" id="opUrlPasswd.html">
     <div id="opUrlPasswd">
         <div class='form-group'>
