@@ -18,7 +18,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             url = '/rest/pl/fe/matter/' + $scope.matterType + '/get?site=' + $scope.siteId + page.j();
         } else if ('enroll' === $scope.matterType) {
             url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + page.j();
-        } else if (/registration|voting/.test($scope.matterType)) {
+        } else if (/registration|voting|common/.test($scope.matterType)) {
             url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + $scope.matterType + page.j();
         } else {
             url = '/rest/pl/fe/matter/' + $scope.matterType + '/list?site=' + $scope.siteId + page.j();
