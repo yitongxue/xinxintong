@@ -122,7 +122,7 @@ config(['$uibTooltipProvider', function($uibTooltipProvider) {
             page.at = pageAt;
         }
         if ($scope.matterType) {
-            if (['registration', 'voting']) {
+            if (['registration', 'voting', 'common']) {
                 url += '&matterType=enroll&scenario=' + $scope.matterType;
             } else if ($scope.matterType === 'enroll') {
                 url += '&matterType=enroll&scenario=';
