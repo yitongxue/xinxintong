@@ -47,7 +47,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                         $scope.matters = rsp.data.articles;
                     }
                     page.total = rsp.data.total;
-                } else if (/enroll|registration|voting|signin|group|contribute/.test($scope.matterType)) {
+                } else if (/enroll|registration|voting|common|signin|group|contribute/.test($scope.matterType)) {
                     if (append) {
                         $scope.matters = $scope.matters.concat(rsp.data.apps);
                     } else {
