@@ -151,6 +151,9 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 case 'group':
                     url += type + '/remove?app=' + id + '&site=' + $scope.siteId;
                     break;
+                case 'news':
+                case 'channel':
+                    url += type + '/delete?site=' + $scope.siteId + '&id=' + id;
             }
             http2.get(url, function(rsp) {
                 $scope.matters.splice($scope.matters.indexOf(matter), 1);
