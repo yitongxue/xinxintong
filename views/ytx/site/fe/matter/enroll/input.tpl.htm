@@ -32,6 +32,22 @@
     <div class="loading">
         <div class='loading-indicator'><i></i></div>
     </div>
+    <script type="text/ng-template" id="dataBySchema.html">
+        <div class="modal-header">
+            <button class="close" ng-click="cancel()">×</button>
+            <h5 class="modal-title">已填写过的内容</h5>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class='form-group'>
+                    <select class="form-control" ng-model="data.selected" ng-options="rec.value for rec in records" size='5'></select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">使用选择的内容填写</button>
+        </div>
+    </script>
     <script src="/static/js/require.js?_=1" defer async data-main="/views/default/site/fe/matter/enroll/input-loader.js?_=14"></script>
 </body>
 
