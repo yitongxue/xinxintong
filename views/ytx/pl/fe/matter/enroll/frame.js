@@ -91,6 +91,7 @@ define(['require', 'enrollService'], function(require) {
             'schema': '修改题目',
             'page': '修改页面',
             'record': '查看数据',
+            'editor': '编辑数据',
             'stat': '统计报告',
             'discuss': '用户评论',
             'coin': '积分规则',
