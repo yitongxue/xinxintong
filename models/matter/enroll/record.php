@@ -85,7 +85,7 @@ class record_model extends \TMS_MODEL {
 	 * @param object $oApp
 	 * @param array $data 用户提交的数据
 	 */
-	public function setData($user, &$oApp, $ek, $submitData, $submitkey = '', $firstSubmit = false) {
+	public function setData($user, &$oApp, $ek, $submitData, $submitkey = '', $firstSubmit = false, $score=null) {
 		if (empty($submitData)) {
 			return [true];
 		}
@@ -212,19 +212,62 @@ class record_model extends \TMS_MODEL {
 		 * 保存用户提交的数据
 		 */
 		$submitAt = time(); // 数据提交时间
-
+		$scoreData=array(); // 在xxt_enroll_record 存储分数
+		$scoreData['sum']=0; //记录总分
 		/* 按登记项记录数据 */
-		foreach ($dbData as $schemaId => $treatedValue) {
+		foreach ($dbData as $schemaId => $treatedValue) {			
 			if (is_object($treatedValue) || is_array($treatedValue)) {
 				$treatedValue = $this->toJson($treatedValue);
 			}
+
 			$lastSchemaValue = $this->query_obj_ss(
 				[
-					'submit_at,value,modify_log',
+					'submit_at,value,modify_log,score',
 					'xxt_enroll_record_data',
 					['aid' => $oApp->id, 'rid' => $oRecord->rid, 'enroll_key' => $ek, 'schema_id' => $schemaId, 'state' => 1],
 				]
 			);
+			/* 计算题目的分数。只支持对单选题和多选题自动打分 */
+			if ($oApp->scenario === 'quiz') {
+				$quizScore = null;
+				$schema = $schemasById[$schemaId];
+				if (!empty($schema->answer)) {
+					switch ($schema->type) {
+					case 'single':
+						$quizScore = $treatedValue === $schema->answer ? ($schema->score ? $schema->score : 0) : 0;
+						break;
+					case 'multiple':
+						$correct = 0;
+						$pendingValues = explode(',', $treatedValue);
+						is_string($schema->answer) && $schema->answer= explode(',', $schema->answer);
+						foreach ($pendingValues as $pending) {
+							if (in_array($pending, $schema->answer)) {
+								$correct++;
+							} else {
+								$correct = 0;
+								break;
+							}
+						}
+						$quizScore = ($schema->score ? $schema->score : 0) / count($schema->answer) * $correct;
+						break;
+					//主观题 	
+					default:
+						//有指定的优先使用指定的评分				
+						if(!empty($score) && isset($score->{$schemaId})){
+							$quizScore=$score->{$schemaId};
+						//有提交记录且没修改且已经评分	
+						}elseif(!empty($lastSchemaValue) && ($lastSchemaValue->value==$treatedValue) && !empty($lastSchemaValue->score)){
+							$quizScore=$lastSchemaValue->score;
+						}else{
+							$quizScore=0;
+						}
+						break;
+					}
+				}
+				//记录分数
+				isset($quizScore) && ($scoreData[$schemaId.'_score']=$quizScore) && ($scoreData['sum'] += $quizScore);
+			}
+			//记录结果
 			if (false === $lastSchemaValue) {
 				$schemaValue = [
 					'aid' => $oApp->id,
@@ -235,8 +278,11 @@ class record_model extends \TMS_MODEL {
 					'schema_id' => $schemaId,
 					'value' => $this->escape($treatedValue),
 				];
+				isset($quizScore) && $schemaValue['score'] = $quizScore;
 				$this->insert('xxt_enroll_record_data', $schemaValue, false);
 			} else {
+				isset($quizScore) && $schemaValue['score'] = $quizScore;
+
 				if ($treatedValue !== $lastSchemaValue->value) {
 					if (strlen($lastSchemaValue->modify_log)) {
 						$valueModifyLogs = json_decode($lastSchemaValue->modify_log);
@@ -253,18 +299,19 @@ class record_model extends \TMS_MODEL {
 						'value' => $this->escape($treatedValue),
 						'modify_log' => $this->toJson($valueModifyLogs),
 					];
-					$this->update(
-						'xxt_enroll_record_data',
-						$schemaValue,
-						['aid' => $oApp->id, 'rid' => $oRecord->rid, 'enroll_key' => $ek, 'schema_id' => $schemaId, 'state' => 1]
-					);
 				}
+
+				$this->update(
+					'xxt_enroll_record_data',
+					$schemaValue,
+					['aid' => $oApp->id, 'rid' => $oRecord->rid, 'enroll_key' => $ek, 'schema_id' => $schemaId, 'state' => 1]
+				);
 			}
 		}
-
 		/* 更新在登记记录上记录数据 */
 		$recordUpdated = [];
 		$recordUpdated['data'] = $this->escape($this->toJson($dbData));
+		isset($scoreData) && $recordUpdated['score']= $this->escape($this->toJson($scoreData));
 		/* 记录提交日志 */
 		if ($firstSubmit === false) {
 			if (empty($oRecord->submit_log)) {
@@ -288,17 +335,45 @@ class record_model extends \TMS_MODEL {
 	 */
 	public function &byId($ek, $options = []) {
 		$fields = isset($options['fields']) ? $options['fields'] : '*';
+		$verbose = isset($options['verbose']) ? $options['verbose'] : 'N';
 
 		$q = [
 			$fields,
 			'xxt_enroll_record',
-			"enroll_key='$ek'",
+			['enroll_key' => $ek],
 		];
-		if (($record = $this->query_obj_ss($q)) && ($fields === '*' || false !== strpos($fields, 'data'))) {
-			$record->data = json_decode($record->data);
+		if ($record = $this->query_obj_ss($q)) {
+			if ($fields === '*' || false !== strpos($fields, 'data')) {
+				$record->data = json_decode($record->data);
+			}
+			if ($verbose === 'Y') {
+				$record->verbose = $this->_dataByRecord($ek);
+			}
 		}
 
 		return $record;
+	}
+	/**
+	 *
+	 */
+	private function _dataByRecord($ek, $options = []) {
+		$result = new \stdClass;
+		$fields = isset($options['fields']) ? $options['fields'] : 'schema_id,value,remark_num,last_remark_at,score,modify_log';
+		$q = [
+			$fields,
+			'xxt_enroll_record_data',
+			['enroll_key' => $ek, 'state' => 1],
+		];
+		$data = $this->query_objs_ss($q);
+		if (count($data)) {
+			foreach ($data as $schemaData) {
+				$schemaId = $schemaData->schema_id;
+				unset($schemaData->schema_id);
+				$result->{$schemaId} = $schemaData;
+			}
+		}
+
+		return $result;
 	}
 	/**
 	 * 获得用户的登记清单
@@ -447,7 +522,7 @@ class record_model extends \TMS_MODEL {
 	/**
 	 * 计算记录的分数
 	 */
-	private function _calcScore(&$scoreSchemas, &$data) {
+	private function _calcVotingScore(&$scoreSchemas, &$data) {
 		$score = 0;
 		foreach ($scoreSchemas as $schemaId => $schema) {
 			if (!empty($data->{$schemaId})) {
@@ -570,6 +645,10 @@ class record_model extends \TMS_MODEL {
 			"xxt_enroll_record e",
 			$w,
 		];
+		//测验场景
+		if($oApp->scenario==='quiz'){
+			$q[0].=',e.score';
+		}
 
 		$q2 = [];
 		// 查询结果分页
@@ -584,6 +663,18 @@ class record_model extends \TMS_MODEL {
 			foreach ($records as &$rec) {
 				$data = str_replace("\n", ' ', $rec->data);
 				$data = json_decode($data);
+				//测验场景
+				if($oApp->scenario==='quiz' && !empty($rec->score)){
+					$score = str_replace("\n", ' ', $rec->score);
+					$score = json_decode($score);
+
+					if($score===null){
+						$rec->score = 'json error(' . json_last_error_msg() . '):' . $rec->score;
+					} else {
+						$rec->score = $score;
+					}
+				}
+
 				if ($data === null) {
 					$rec->data = 'json error(' . json_last_error_msg() . '):' . $rec->data;
 				} else {
@@ -610,7 +701,7 @@ class record_model extends \TMS_MODEL {
 						$scoreSchemas = $this->_mapOfScoreSchema($oApp);
 						$countScoreSchemas = count(array_keys((array) $scoreSchemas));
 					}
-					$rec->_score = $this->_calcScore($scoreSchemas, $data);
+					$rec->_score = $this->_calcVotingScore($scoreSchemas, $data);
 					$rec->_average = $countScoreSchemas === 0 ? 0 : $rec->_score / $countScoreSchemas;
 				}
 			}
@@ -796,7 +887,7 @@ class record_model extends \TMS_MODEL {
 						$scoreSchemas = $this->_mapOfScoreSchema($app);
 						$countScoreSchemas = count(array_keys((array) $scoreSchemas));
 					}
-					$r->_score = $this->_calcScore($scoreSchemas, $data);
+					$r->_score = $this->_calcVotingScore($scoreSchemas, $data);
 					$r->_average = $countScoreSchemas === 0 ? 0 : $r->_score / $countScoreSchemas;
 				}
 			}
@@ -973,7 +1064,7 @@ class record_model extends \TMS_MODEL {
 				$q = [
 					'sum(value)',
 					'xxt_enroll_record_data',
-					['aid' => $oApp->id, 'name' => $schema->id, 'state' => 1],
+					['aid' => $oApp->id, 'schema_id' => $schema->id, 'state' => 1],
 				];
 				$rid !== 'ALL' && !empty($rid) && $q[2]['rid'] = $rid;
 
