@@ -87,6 +87,8 @@ define(['frame'], function(ngApp) {
                         title = '在线报名';
                     } else if (scenario === 'voting') {
                         title = '评价';
+                    } else if (scenario === 'quiz') {
+                        title = '测验';
                     } else {
                         title = '通用登记';
                     }
@@ -188,7 +190,7 @@ define(['frame'], function(ngApp) {
                 page.at = pageAt;
             }
             if ($scope.matterType) {
-                if (-1 !== ['registration', 'voting', 'common'].indexOf($scope.matterType)) {
+                if (-1 !== ['registration', 'voting', 'quiz', 'common'].indexOf($scope.matterType)) {
                     url += '&matterType=enroll&scenario=' + $scope.matterType;
                 } else if ($scope.matterType === 'enroll') {
                     url += '&matterType=enroll&scenario=';

@@ -84,6 +84,7 @@ define(['require', 'enrollService'], function(require) {
             'common': '通用登记',
             'registration': '报名',
             'voting': '评价',
+            'quiz': '测验',
         };
         $scope.viewNames = {
             'main': '活动定义',
