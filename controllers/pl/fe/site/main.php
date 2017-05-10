@@ -9,6 +9,15 @@ class main extends \pl\fe\base {
 	/**
 	 *
 	 */
+	public function get_access_rule() {
+		$rule_action['rule_type'] = 'white';
+		$rule_action['actions'] = [];
+
+		return $rule_action;
+	}
+	/**
+	 *
+	 */
 	public function index_action() {
 		\TPL::output('/pl/fe/site/console');
 		exit;
@@ -28,6 +37,13 @@ class main extends \pl\fe\base {
 
 		$siteid = $this->model('site')->create($site);
 
+		/* 记录操作日志 */
+		$matter = new \stdClass;
+		$matter->id = $siteid;
+		$matter->type = 'site';
+		$matter->title = $site['name'];
+		$this->model('matter\log')->matterOp($siteid, $user, $matter, 'C');
+
 		/* 添加到团队的访问控制列表 */
 		$modelAdm = $this->model('site\admin');
 		$admin = new \stdClass;
@@ -36,7 +52,7 @@ class main extends \pl\fe\base {
 		$admin->urole = 'O';
 		$rst = $modelAdm->add($user, $siteid, $admin);
 
-		return new \ResponseData(['id' => $siteid]);
+		return new \ResponseData(['id' => $siteid, 'name' => $site['name']]);
 	}
 	/**
 	 * 删除团队
@@ -148,16 +164,20 @@ class main extends \pl\fe\base {
 			return new \ResponseTimeout();
 		}
 
-		$q = [
-			'id,creater_name,create_at,name',
-			'xxt_site s',
-			"state=1 and (creater='{$user->id}' or exists(select 1 from xxt_site_admin sa where sa.siteid=s.id and uid='{$user->id}'))",
-		];
-		$q2 = ['o' => 'create_at desc'];
+		$filter = $this->getPostJson();
+		$modelSite = $this->model('site');
 
-		$sites = $this->model()->query_objs_ss($q, $q2);
+		$options = array();
+		if (!empty($filter->bySite)) {
+			$options['bySite'] = $modelSite->escape($filter->bySite);
+		}
+		if (!empty($filter->byTitle)) {
+			$options['byTitle'] = $modelSite->escape($filter->byTitle);
+		}
+		
+		$mySites = $modelSite->byUser($user->id, $options);
 
-		return new \ResponseData($sites);
+		return new \ResponseData($mySites);
 	}
 	/**
 	 * 允许公开访问的团队
@@ -199,7 +219,7 @@ class main extends \pl\fe\base {
 		$friendSites = [];
 		$friends = $modelSite->byFriend($mySiteIds);
 		foreach ($friends as $friend) {
-			if($friendSite = $modelSite->byId($friend->siteid, ['fields' => 'id,name,summary,heading_pic'])) {
+			if ($friendSite = $modelSite->byId($friend->siteid, ['fields' => 'id,name,summary,heading_pic'])) {
 				$friendSite->friend = $friend;
 				$friendSites[] = $friendSite;
 			}
@@ -235,92 +255,25 @@ class main extends \pl\fe\base {
 	/**
 	 * 已经关注过的团队发布的消息
 	 */
-	public function matterList_action($page = 1, $size = 10) {
+	public function matterList_action($site = null, $page = 1, $size = 10) {
 		if (false === ($user = $this->accountUser())) {
 			return new \ResponseTimeout();
 		}
 		$result = new \stdClass;
 
 		$modelSite = $this->model('site');
-		$mySites = $modelSite->byUser($user->id);
 		$mySiteIds = [];
-		foreach ($mySites as $mySite) {
-			$mySiteIds[] = $mySite->id;
+		if (empty($site)) {
+			$mySites = $modelSite->byUser($user->id);
+			foreach ($mySites as $mySite) {
+				$mySiteIds[] = $mySite->id;
+			}
+		}else{
+			$mySiteIds[] = $site;
 		}
 		$result = $modelSite->matterByFriend($mySiteIds, ['page' => ['at' => $page, 'size' => $size]]);
 
 		return new \ResponseData($result);
-	}
-	/**
-	 * 关注指定团队
-	 */
-	public function subscribe_action($site, $subscriber) {
-		if (false === ($user = $this->accountUser())) {
-			return new \ResponseTimeout();
-		}
-
-		$modelSite = $this->model('site');
-
-		if (false === ($target = $modelSite->byId($site))) {
-			return new \ResponseError('数据不存在');
-		}
-
-		$siteIds = explode(',', $subscriber);
-		foreach ($siteIds as $siteId) {
-			$subscriber = $modelSite->byId($siteId);
-			$modelSite->subscribeBySite($user, $target, $subscriber);
-		}
-
-		return new \ResponseData('ok');
-	}
-	/**
-	 * 取消关注指定团队
-	 */
-	public function unsubscribe_action($site, $friend) {
-		if (false === ($user = $this->accountUser())) {
-			return new \ResponseTimeout();
-		}
-
-		$modelSite = $this->model('site');
-
-		if (false === ($target = $modelSite->byId($site))) {
-			return new \ObjectNotFoundError();
-		}
-		if (false === ($target = $modelSite->byId($friend))) {
-			return new \ObjectNotFoundError();
-		}
-
-		$rst = $modelSite->unsubscribeBySite($site, $friend);
-
-		return new \ResponseData($rst);
-	}
-	/**
-	 * 返回当前用户可以关注指定团队的团队
-	 *
-	 * @param string $site site'id
-	 */
-	public function canSubscribe_action($site) {
-		if (false === ($user = $this->accountUser())) {
-			return new \ResponseTimeout();
-		}
-
-		$modelSite = $this->model('site');
-		if (false === ($site = $modelSite->byId($site))) {
-			return new \ResponseError('数据不存在');
-		}
-		/* 当前用户管理的团队 */
-		$mySites = $modelSite->byUser($user->id);
-		$targets = []; // 符合条件的团队
-		foreach ($mySites as &$mySite) {
-			if ($mySite->id === $site->id) {
-				continue;
-			}
-			$rel = $modelSite->isFriend($site->id, $mySite->id);
-			$mySite->_subscribed = !empty($rel->subscribe_at) ? 'Y' : 'N';
-			$targets[] = $mySite;
-		}
-
-		return new \ResponseData($targets);
 	}
 	/**
 	 * 获得团队绑定的第三方公众号
@@ -362,17 +315,25 @@ class main extends \pl\fe\base {
 		if (false === ($user = $this->accountUser())) {
 			return new \ResponseTimeout();
 		}
+		
+		$modelSite = $this->model('site');
+		$modelSite->setOnlyWriteDbConn(true);
+		
 		$nv = $this->getPostJson();
 		foreach ($nv as $n => $v) {
 			if ($n === 'home_carousel') {
 				$nv->{$n} = json_encode($v);
 			}
 		}
-		$rst = $this->model()->update(
+		$rst = $modelSite->update(
 			'xxt_site',
 			$nv,
 			"id='$site'"
 		);
+		/*记录操作日志*/
+		$matter = $modelSite->byId($site, ['fields' => 'id,name as title']);
+		$matter->type = 'site';
+		$this->model('matter\log')->matterOp($site, $user, $matter, 'U');
 
 		return new \ResponseData($rst);
 	}

@@ -120,6 +120,7 @@ define(['frame'], function(ngApp) {
                 case 'enroll':
                 case 'group':
                 case 'signin':
+                case 'wall':
                     location.href = url + '?id=' + id + '&site=' + $scope.mission.siteid;
                     break;
             }
@@ -140,6 +141,7 @@ define(['frame'], function(ngApp) {
                     case 'enroll':
                     case 'signin':
                     case 'group':
+                    case 'wall':
                         url += type + '/remove?app=' + id + '&site=' + $scope.mission.siteid;
                         break;
                 }

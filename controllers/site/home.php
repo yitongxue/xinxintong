@@ -40,18 +40,35 @@ class home extends base {
 			if (!empty($oSite->home_carousel)) {
 				$oSite->home_carousel = json_decode($oSite->home_carousel);
 			}
+			/* 用户注册信息 */
 			$modelWay = $this->model('site\fe\way');
 			$siteUser = $modelWay->who($site);
+			$cookieRegUser = $modelWay->getCookieRegUser();
+			if ($cookieRegUser) {
+				if (isset($cookieRegUser->loginExpire)) {
+					$siteUser->unionid = $cookieRegUser->unionid;
+				}
+			}
 			/* 团队是否已经被当前用户关注 */
 			$oSite->_subscribed = 'N';
-			if (!empty($siteUser->loginExpire)) {
+			if (!empty($siteUser->unionid)) {
 				$modelSite = $this->model('site');
-				if ($rel = $modelSite->isSubscribed($siteUser->uid, $oSite->id)) {
+				if ($rel = $modelSite->isSubscribed($siteUser->unionid, $oSite->id)) {
 					if ($rel->subscribe_at > 0) {
 						$oSite->_subscribed = 'Y';
 					}
 				}
 			}
+			/*关注此团队的团队数*/
+			$q = [
+				'count(*)',
+				'xxt_site_friend',
+				"siteid='$site' and subscribe_at<>0",
+			];
+			$oSite->subFriend_num = $modelSite->query_val_ss($q);
+			/*关注此团队的个人数*/
+			$q[1] = 'xxt_site_subscriber';
+			$oSite->subUser_num = $modelSite->query_val_ss($q);
 		}
 
 		return new \ResponseData($oSite);
@@ -69,9 +86,10 @@ class home extends base {
 	/**
 	 *
 	 */
-	public function listChannel_action($site) {
+	public function listChannel_action($site, $homeGroup = null) {
 		$modelSp = $this->model('site\page');
-		$hcs = $modelSp->homeChannelBySite($site);
+		$options = ['home_group' => $homeGroup];
+		$hcs = $modelSp->homeChannelBySite($site, $options);
 
 		return new \ResponseData($hcs);
 	}

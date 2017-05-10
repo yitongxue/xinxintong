@@ -14,15 +14,14 @@ class wall_model extends app_base {
 	const APPROVE_REJECT = 2;
 	/**
 	 *
-	 * $wid string
-	 * $cascaded array []
 	 */
-	public function &byId($id, $fields = '*') {
-		$q = array(
+	public function &byId($id, $options = []) {
+		$fields = isset($options['fields']) ? $options['fields'] : '*';
+		$q = [
 			$fields,
 			'xxt_wall',
-			"id='$id'",
-		);
+			['id' => $id],
+		];
 		if ($w = $this->query_obj_ss($q)) {
 			$w->type = 'wall';
 		}
@@ -56,10 +55,9 @@ class wall_model extends app_base {
 		 */
 		$wall = $this->byId($wid, 'join_reply,active');
 		if ($wall->active === 'N') {
-			$reply = '信息墙已停用';
+			$reply = [false, '信息墙已停用'];
 			return $reply;
 		}
-
 		/**
 		 * 加入一个信息墙需要从其他的墙退出
 		 */
@@ -69,27 +67,29 @@ class wall_model extends app_base {
 			$where = " and yx_openid='{$user->yx_openid}'";
 		} else if (isset($user->qy_openid)) {
 			$where = " and qy_openid='{$user->qy_openid}'";
+		} else {
+			return [false, '不能获得公众号身份信息，无法加入信息墙'];
 		}
 		$this->update(
 			'xxt_wall_enroll',
-			array('close_at' => time()),
+			['close_at' => time()],
 			"siteid='$runningSiteId'" . $where
 		);
 		/**
 		 * 加入一个组
 		 */
-		$q = array(
+		$q = [
 			'count(*)',
 			'xxt_wall_enroll',
 			"siteid='$runningSiteId' and wid='$wid' " . $where,
-		);
+		];
 		if (1 === (int) $this->query_val_ss($q)) {
 			/**
 			 * 之前已经加入个这个组，重置状态
 			 */
 			$this->update(
 				'xxt_wall_enroll',
-				array('close_at' => 0),
+				['close_at' => 0],
 				$q[2]
 			);
 		} else {
@@ -116,15 +116,15 @@ class wall_model extends app_base {
 		 * 加入提示
 		 */
 		if (empty($wall->join_reply)) {
-			$reply = '欢迎进入，请输入您的发言。';
+			$reply = [true, '欢迎进入，请输入您的发言。'];
 		} else {
-			$reply = $wall->join_reply;
+			$reply = [true, $wall->join_reply];
 		}
 
 		return $reply;
 	}
 	/**
-	 * 判断当前用户是否已经参加了讨论组
+	 * 判断当前用户是否已经参加了信息墙
 	 *
 	 * 一个用户在一个公众号中只能加入一个信息墙
 	 *
@@ -140,7 +140,7 @@ class wall_model extends app_base {
 		return $wid;
 	}
 	/**
-	 * 判断当前用户是否已经参加了指定讨论组
+	 * 判断当前用户是否已经参加了指定信息墙
 	 */
 	public function joinedWall($runningSiteId, $wid, $openid) {
 		$q = array(
@@ -189,6 +189,23 @@ class wall_model extends app_base {
 			return $result;
 		}
 		return array();
+	}
+	/**
+	 * 获得所有消息列表
+	 * 没有分页，主要用于导出Excel
+	 *
+	 */
+	public function msgList($runningSiteId, $wid) {
+		$q = array(
+			'l.*,e.nickname,e.userid',
+			'xxt_wall_log l,xxt_wall_enroll e',
+			"l.siteid = '$runningSiteId' and l.wid = '$wid' and e.wid = l.wid and (e.wx_openid = l.openid or e.yx_openid = l.openid or e.qy_openid = l.openid)",
+		);
+		$q2['o'] = 'approve_at desc';
+
+		$rst = $this->query_objs_ss($q, $q2);
+
+		return $rst;
 	}
 	/**
 	 * 获得墙内的所有用户
@@ -293,7 +310,7 @@ class wall_model extends app_base {
 		$siteid = $msg['siteid'];
 		$openid = $msg['from_user'];
 
-		$wlog = array(); // 讨论组记录
+		$wlog = array(); // 信息墙记录
 		if ($msg['type'] === 'text') {
 			$wlog['data_type'] = 'text';
 			$wlog['data'] = $msg['data'];
@@ -349,7 +366,7 @@ class wall_model extends app_base {
 		return true;
 	}
 	/**
-	 * 将消息发送给讨论组中的用户
+	 * 将消息发送给信息墙中的用户
 	 *
 	 * $mpid
 	 * $openid
@@ -487,8 +504,8 @@ class wall_model extends app_base {
 
 		}
 		/**
-		 * 如果当前账号是企业号，且指定了参与的用户，那么发送给所有指定的用户；如果指定用户并未加入讨论组，应该提示他加入
-		 * 如果当前账号是服务号，那么发送给已经加入讨论组的所有用户
+		 * 如果当前账号是企业号，且指定了参与的用户，那么发送给所有指定的用户；如果指定用户并未加入信息墙，应该提示他加入
+		 * 如果当前账号是服务号，那么发送给已经加入信息墙的所有用户
 		 */
 		if (!empty($usersQy)) {
 
@@ -504,7 +521,7 @@ class wall_model extends app_base {
 				$pos = array_search($openid, $groupUsers);
 				unset($groupUsers[$pos]);
 				/**
-				 * 推送给已经加入讨论组的用户
+				 * 推送给已经加入信息墙的用户
 				 */
 				$joinedGroupUsers = array();
 				$ingroup = $this->joinedUsers($site, $wid);
@@ -516,7 +533,7 @@ class wall_model extends app_base {
 					$userid = $ig->openid;
 					$joinedGroupUsers[] = $userid;
 					/**
-					 * 从所有成员用户中删除已进入讨论组的用户
+					 * 从所有成员用户中删除已进入信息墙的用户
 					 */
 					$pos = array_search($userid, $groupUsers);
 					unset($groupUsers[$pos]);
@@ -526,7 +543,7 @@ class wall_model extends app_base {
 					$this->send2Qyuser($site, $message);
 				}
 				/**
-				 * 推送给未加入讨论组的用户
+				 * 推送给未加入信息墙的用户
 				 */
 				if (!empty($groupUsers)) {
 					$message['touser'] = implode('|', $groupUsers);

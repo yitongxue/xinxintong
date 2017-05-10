@@ -51,13 +51,20 @@ class site_model extends \TMS_MODEL {
 	/**
 	 * 指定用户参与管理的团队
 	 */
-	public function &byUser($userId) {
+	public function &byUser($userId, $options = array()) {
 		/* 当前用户管理的团队 */
 		$q = [
 			'id,creater_name,create_at,name',
 			'xxt_site s',
 			"(creater='{$userId}' or exists(select 1 from xxt_site_admin sa where sa.siteid=s.id and uid='{$userId}')) and state=1",
 		];
+		if(isset($options['byTitle'])){
+			$q[2] .= " and s.name like '%".$options['byTitle']."%'";
+		}
+		if(isset($options['bySite'])){
+			$q[2] .= " and s.id = '".$options['bySite']."'";
+		}
+		
 		$q2 = ['o' => 'create_at desc'];
 
 		$sites = $this->query_objs_ss($q, $q2);
@@ -67,11 +74,11 @@ class site_model extends \TMS_MODEL {
 	/**
 	 * 团队是否已经被指定用户关注
 	 */
-	public function isSubscribed($userid, $siteid) {
+	public function isSubscribed($unionid, $siteid) {
 		$q = [
 			'*',
 			'xxt_site_subscriber',
-			["siteid" => $siteid, "userid" => $userid],
+			['siteid' => $siteid, 'unionid' => $unionid],
 		];
 		$rel = $this->query_obj_ss($q);
 
@@ -81,11 +88,11 @@ class site_model extends \TMS_MODEL {
 	 * 访客用户关注团队
 	 */
 	public function subscribe(&$user, &$site) {
-		if (false === ($rel = $this->isSubscribed($user->uid, $site->id))) {
+		if (false === ($rel = $this->isSubscribed($user->unionid, $site->id))) {
 			$newRel = new \stdClass;
 			$newRel->siteid = $site->id;
 			$newRel->site_name = $site->name;
-			$newRel->userid = $user->uid;
+			$newRel->unionid = $user->unionid;
 			$newRel->nickname = $user->nickname;
 			$newRel->subscribe_at = time();
 			$newRel->unsubscribe_at = 0;
@@ -108,7 +115,7 @@ class site_model extends \TMS_MODEL {
 	 * 访客用户关注团队
 	 */
 	public function unsubscribe(&$user, &$site) {
-		if ($rel = $this->isSubscribed($user->uid, $site->id)) {
+		if ($rel = $this->isSubscribed($user->unionid, $site->id)) {
 			$rst = $this->update('xxt_site_subscriber', ['subscribe_at' => 0, 'unsubscribe_at' => time()], ['id' => $rel->id]);
 		}
 
@@ -259,7 +266,7 @@ class site_model extends \TMS_MODEL {
 			$q = [
 				'id',
 				'xxt_site_subscription',
-				['matter_id' => $oMatter->id, 'matter_type' => $oMatter->type, 'userid' => $subscriber->userid],
+				['matter_id' => $oMatter->id, 'matter_type' => $oMatter->type, 'unionid' => $subscriber->unionid],
 			];
 			if ($rel = $this->query_obj_ss($q)) {
 				$subscription = new \stdClass;
@@ -276,7 +283,7 @@ class site_model extends \TMS_MODEL {
 				$subscription->siteid = $oSite->id;
 				$subscription->site_name = $oSite->name;
 				$subscription->put_at = $current;
-				$subscription->userid = $subscriber->userid;
+				$subscription->unionid = $subscriber->unionid;
 				$subscription->nickname = $subscriber->nickname;
 				$subscription->matter_id = $oMatter->id;
 				$subscription->matter_type = $oMatter->type;

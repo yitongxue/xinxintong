@@ -1,5 +1,5 @@
 'use strict';
-require('!style-loader!css-loader!./remark.css');
+require('./remark.css');
 
 var ngApp = require('./main.js');
 ngApp.controller('ctrlRemark', ['$scope', '$q', '$http', function($scope, $q, $http) {
@@ -21,8 +21,9 @@ ngApp.controller('ctrlRemark', ['$scope', '$q', '$http', function($scope, $q, $h
         });
         return defer.promise;
     }
-    var oApp, ek, schemaRemarks, remarkableSchemas = [];
+    var oApp, ek, enterSchemaId, schemaRemarks, remarkableSchemas = [];
     ek = location.search.match(/[\?&]ek=([^&]*)/)[1];
+    enterSchemaId = location.search.match(/[\?&]schema=([^&]*)/)[1];
     $scope.newRemark = {};
     $scope.schemaRemarks = schemaRemarks = {};
     $scope.switchSchema = function(schema) {
@@ -49,6 +50,7 @@ ngApp.controller('ctrlRemark', ['$scope', '$q', '$http', function($scope, $q, $h
     };
     $scope.$on('xxt.app.enroll.ready', function(event, params) {
         oApp = params.app;
+        $scope.record = params.record;
         summary().then(function(result) {
             var summaryBySchema = {};
             result.forEach(function(schema) {
@@ -59,6 +61,9 @@ ngApp.controller('ctrlRemark', ['$scope', '$q', '$http', function($scope, $q, $h
                     summaryBySchema[schema.id] && (schema.summary = summaryBySchema[schema.id]);
                     schema._open = false;
                     remarkableSchemas.push(schema);
+                    if (enterSchemaId === schema.id) {
+                        $scope.switchSchema(schema);
+                    }
                 }
             });
             $scope.remarkableSchemas = remarkableSchemas;

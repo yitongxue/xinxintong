@@ -22,23 +22,28 @@ class main extends \site\fe\matter\base {
 	/**
 	 * 返回请求的素材
 	 *
-	 * $siteId
-	 * $id
+	 * @param strng $site
+	 * @param int $id
 	 */
 	public function get_action($site, $id) {
 		$model = $this->model();
-		$site = $model->escape($site);
-		$id = $model->escape($id);
 		$user = $this->who;
 
 		$modelArticle = $this->model('matter\article2');
 		$article = $modelArticle->byId($id);
 		if (false === $article) {
-			return new \ResponseError('not exist');
+			return new \ObjectNotFoundError();
 		}
 
 		if (isset($article->access_control) && $article->access_control === 'Y' && !empty($article->authapis)) {
 			$this->accessControl($site, $id, $article->authapis, $user->uid, $article, false);
+		}
+		/*如果此单图文属于引用那么需要返回被引用的单图文*/
+		if ($article->from_mode === 'C') {
+			$id2 = $article->from_id;
+			$article2 = $modelArticle->byId($id2, ['fields' => 'body,author,siteid,id']);
+			$article->body = $article2->body;
+			$article->author = $article2->author;
 		}
 		/* 单图文所属的频道 */
 		$article->channels = $this->model('matter\channel')->byMatter($id, 'article');
@@ -55,7 +60,7 @@ class main extends \site\fe\matter\base {
 				array(
 					'*',
 					'xxt_article_attachment',
-					"article_id='$id'",
+					['article_id' => $id],
 				)
 			);
 		}
@@ -289,6 +294,10 @@ class main extends \site\fe\matter\base {
 	 * 下载附件
 	 */
 	public function attachmentGet_action($site, $articleid, $attachmentid) {
+		if (empty($site) || empty($articleid) || empty($attachmentid)) {
+			die('没有指定有效的附件');
+		}
+
 		$user = $this->who;
 		/**
 		 * 访问控制
@@ -298,11 +307,27 @@ class main extends \site\fe\matter\base {
 		if (isset($article->access_control) && $article->access_control === 'Y') {
 			$this->accessControl($site, $articleid, $article->authapis, $user->uid, $article);
 		}
+
+		/**
+		 * 获取附件
+		 */
+		$q = [
+			'*',
+			'xxt_article_attachment',
+			['article_id' => $articleid, 'id' => $attachmentid],
+		];
+		if (false === ($att = $modelArticle->query_obj_ss($q))) {
+			die('指定的附件不存在');
+		}
+
 		/**
 		 * 记录日志
 		 */
-		$this->model()->update("update xxt_article set download_num=download_num+1 where id='$articleid'");
-		$log = array(
+		$site = $modelArticle->escape($site);
+		$articleid = $modelArticle->escape($articleid);
+		$attachmentid = $modelArticle->escape($attachmentid);
+		$modelArticle->update("update xxt_article set download_num=download_num+1 where id='$articleid'");
+		$log = [
 			'userid' => $user->uid,
 			'nickname' => $user->nickname,
 			'download_at' => time(),
@@ -311,17 +336,8 @@ class main extends \site\fe\matter\base {
 			'attachment_id' => $attachmentid,
 			'user_agent' => $_SERVER['HTTP_USER_AGENT'],
 			'client_ip' => $this->client_ip(),
-		);
-		$this->model()->insert('xxt_article_download_log', $log, false);
-		/**
-		 * 获取附件
-		 */
-		$q = array(
-			'*',
-			'xxt_article_attachment',
-			"article_id='$articleid' and id='$attachmentid'",
-		);
-		$att = $this->model()->query_obj_ss($q);
+		];
+		$modelArticle->insert('xxt_article_download_log', $log, false);
 
 		if (strpos($att->url, 'alioss') === 0) {
 			$downloadUrl = 'http://xxt-attachment.oss-cn-shanghai.aliyuncs.com/' . $site . '/article/' . $articleid . '/' . urlencode($att->name);

@@ -44,9 +44,13 @@ class home extends TMS_CONTROLLER {
 	 * @param string $userType 站点用户还是团队管理员用户
 	 *
 	 */
-	public function listSite_action() {
+	public function listSite_action($page = 1, $size = 8) {
 		$modelHome = $this->model('site\home');
-		$result = $modelHome->atHome();
+
+		$options = [];
+		$options['page']['at']=$page;
+		$options['page']['size']=$size;
+		$result = $modelHome->atHome($options);
 		if ($result->total) {
 			$modelWay = $this->model('site\fe\way');
 			$siteUser = $modelWay->who('platform');
@@ -75,10 +79,13 @@ class home extends TMS_CONTROLLER {
 	/**
 	 *
 	 */
-	public function listApp_action() {
+	public function listApp_action($page = 1, $size = 8) {
 		$modelHome = $this->model('matter\home');
 
-		$result = $modelHome->atHome();
+		$options = [];
+		$options['page']['at']=$page;
+		$options['page']['size']=$size;
+		$result = $modelHome->atHome($options);
 		if (count($result->matters)) {
 			foreach ($result->matters as &$matter) {
 				$matter->url = $this->model('matter\\' . $matter->matter_type)->getEntryUrl($matter->siteid, $matter->matter_id);
@@ -90,13 +97,52 @@ class home extends TMS_CONTROLLER {
 	/**
 	 *
 	 */
-	public function listArticle_action() {
+	public function listChannel_action($page = 1, $size = 8) {
 		$modelHome = $this->model('matter\home');
 
-		$result = $modelHome->atHomeArticle();
+		$options = [];
+		$options['page']['at']=$page;
+		$options['page']['size']=$size;
+		$result = $modelHome->atHomeChannel($options);
+		if (count($result->matters)) {
+			foreach ($result->matters as &$matter) {
+				$matter->url = $this->model('matter\channel')->getEntryUrl($matter->siteid, $matter->matter_id);
+			}
+		}
+
+		return new \ResponseData($result);
+	}
+	/**
+	 *
+	 */
+	public function listArticle_action($page = 1, $size = 8) {
+		$modelHome = $this->model('matter\home');
+
+		$options = [];
+		$options['page']['at']=$page;
+		$options['page']['size']=$size;
+		$result = $modelHome->atHomeArticle($options);
 		if (count($result->matters)) {
 			foreach ($result->matters as &$matter) {
 				$matter->url = $this->model('matter\article')->getEntryUrl($matter->siteid, $matter->matter_id);
+			}
+		}
+
+		return new \ResponseData($result);
+	}
+	/**
+	 *获取置顶活动
+	 */
+	public function listMatterTop_action($type = 'article', $page = 1, $size = 3) {
+		$modelHome = $this->model('matter\home');
+		$options = [];
+		$options['page']['at']=$page;
+		$options['page']['size']=$size;
+		$options['type']=$type;
+		$result = $modelHome->atHomeTop($options);
+		if (count($result->matters)) {
+			foreach ($result->matters as &$matter) {
+				$matter->url = $this->model('matter\\' . $matter->matter_type)->getEntryUrl($matter->siteid, $matter->matter_id);
 			}
 		}
 

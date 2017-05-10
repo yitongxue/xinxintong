@@ -43,7 +43,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                         $scope.matters = rsp.data.articles;
                     }
                     page.total = rsp.data.total;
-                } else if (/enroll|signin|group|contribute/.test($scope.matterType)) {
+                } else if (/enroll|signin|group|wall|contribute/.test($scope.matterType)) {
                     if (append) {
                         $scope.matters = $scope.matters.concat(rsp.data.apps);
                     } else {
@@ -183,7 +183,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 url += type + '/copy?app=' + id + '&site=' + $scope.siteId;
                 break;
             default:
-                alert('程序错误');
+                alert('指定素材不支持复制');
                 return;
         }
         http2.get(url, function(rsp) {
@@ -208,6 +208,53 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
     $scope.addArticle = function() {
         http2.get('/rest/pl/fe/matter/article/create?site=' + $scope.siteId, function(rsp) {
             location.href = '/rest/pl/fe/matter/article?site=' + $scope.siteId + '&id=' + rsp.data.id;
+        });
+    };
+    $scope.createArticleByPptx = function() {
+        var siteId = $scope.siteId;
+        $uibModal.open({
+            templateUrl: 'createArticleByPptx.html',
+            controller: ['$scope', '$uibModalInstance', '$timeout', function($scope, $mi) {
+                $scope.cancel = function() {
+                    $mi.dismiss();
+                };
+                $scope.ok = function() {
+                    var r = new Resumable({
+                        target: '/rest/pl/fe/matter/article/uploadAndCreate?site=' + siteId,
+                        testChunks: false,
+                    });
+                    r.on('fileAdded', function(file, event) {
+                        console.log('file Added and begin upload.');
+                        r.upload();
+                    });
+                    r.on('progress', function() {
+                        console.log('progress.');
+                    });
+                    r.on('complete', function() {
+                        console.log('complete.');
+                        var f, lastModified, posted;
+                        f = r.files[0].file;
+                        lastModified = f.lastModified ? f.lastModified : (f.lastModifiedDate ? f.lastModifiedDate.getTime() : 0);
+                        posted = {
+                            file: {
+                                uniqueIdentifier: r.files[0].uniqueIdentifier,
+                                name: f.name,
+                                size: f.size,
+                                type: f.type,
+                                lastModified: lastModified,
+                                uniqueIdentifier: f.uniqueIdentifier,
+                            }
+                        };
+                        http2.post('/rest/pl/fe/matter/article/uploadAndCreate?site=' + siteId + '&state=done', posted, function(rsp) {
+                            $mi.close(rsp.data);
+                        });
+                    });
+                    r.addFile(document.querySelector('#fileUpload').files[0]);
+                };
+            }],
+            backdrop: 'static',
+        }).result.then(function(data) {
+            location.href = '/rest/pl/fe/matter/article?site=' + siteId + '&id=' + data.id;
         });
     };
     $scope.addNews = function() {

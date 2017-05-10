@@ -65,6 +65,7 @@ class main extends \pl\fe\matter\base {
 		if (!empty($filter->byTitle)) {
 			$options['byTitle'] = $modelMis->escape($filter->byTitle);
 		}
+		$site = $modelMis->escape($site);
 		$result = $modelMis->bySite($site, $options);
 
 		return new \ResponseData($result);
@@ -91,6 +92,7 @@ class main extends \pl\fe\matter\base {
 		if (!empty($filter->byTitle)) {
 			$options['byTitle'] = $modelMis->escape($filter->byTitle);
 		}
+		
 		$result = $modelMis->byAcl($user, $options);
 
 		return new \ResponseData($result);
@@ -121,6 +123,7 @@ class main extends \pl\fe\matter\base {
 		$current = time();
 		$modelSite = $this->model('site');
 		$modelMis = $this->model('matter\mission');
+		$modelMis->setOnlyWriteDbConn(true);
 
 		$site = $modelSite->byId($site, ['fields' => 'id,heading_pic']);
 

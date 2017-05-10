@@ -42,7 +42,7 @@ class log_model extends \TMS_MODEL {
 		$q = [
 			'l.userid,l.nickname,l.read_at',
 			'xxt_log_matter_read l',
-			"l.matter_type='$type' and l.matter_id='$id'",
+			['l.matter_type' => $type, 'l.matter_id' => $id],
 		];
 		/**
 		 * 分页数据
@@ -234,6 +234,8 @@ class log_model extends \TMS_MODEL {
 	 * 用户操作素材日志
 	 */
 	public function addUserMatterOp($siteId, &$user, &$matter, &$operation, &$client, $referer = '') {
+		// 避免数据库双机同步延迟问题
+		$this->setOnlyWriteDbConn(true);
 		// 素材累积执行指定操作的次数
 		$q = [
 			'id,matter_op_num',
@@ -334,6 +336,9 @@ class log_model extends \TMS_MODEL {
 	 * @param object|string $data
 	 */
 	public function matterOp($siteId, &$user, &$matter, $op, $data = null) {
+		// 避免数据库双机同步延迟问题
+		$this->setOnlyWriteDbConn(true);
+
 		$q = [
 			'*',
 			'xxt_log_matter_op',
@@ -476,23 +481,72 @@ class log_model extends \TMS_MODEL {
 		} else {
 			$page = $options['page'];
 		}
-		$q = [
-			$fields,
-			'xxt_log_matter_op',
-			"operator='{$user->id}' and user_last_op='Y' and (operation<>'D' and operation<>'Recycle' and operation<>'Quit')",
-		];
-		if (isset($options['matterType'])) {
-			$q[2] .= " and matter_type='" . $options['matterType'] . "'";
+		
+		if (isset($options['bySite']) && isset($options['byType'])) {
+			$q = array();
+			$q[0] = "'".$options['byType']."' as matter_type,t.siteid,t.id matter_id,t.title matter_title,t.create_at operate_at,a.nickname operator_name";
+			$q[1] = 'xxt_' . $options['byType'] . ' t,account a';
+			$q[2] = "t.creater = a.uid and t.siteid = '" . $this->escape($options['bySite']) . "'";
+			switch ($options['byType']){
+				case 'wall':
+					$q[0] .= ',t.summary matter_summary,t.pic matter_pic';
+					break;
+				case 'custom':
+					$q[0] .= ',t.summary matter_summary,t.pic matter_pic';
+					$q[1] = 'xxt_article t,account a';
+					$q[2] .= " and t.custom_body='Y' and t.state<>0 and t.finished='Y'";
+					break;
+				case 'article':
+					$q[0] .= ',t.summary matter_summary,t.pic matter_pic';
+					$q[2] .= " and t.custom_body='N' and t.state<>0 and t.finished='Y'";
+					break;
+				case 'text':
+					$q[2] .= " and t.state<>0";
+					break;
+				case 'enroll':
+					$q[0] .= ',t.summary matter_summary,t.pic matter_pic,t.scenario matter_scenario';
+					$q[2] .= " and t.state<>0";
+					break;
+				default:
+					$q[0] .= ',t.summary matter_summary,t.pic matter_pic';
+					$q[2] .= " and t.state<>0";
+					break;
+			}
+			if (isset($options['byTitle'])) {
+				$q[2] .= " and t.title like '%" . $this->escape($options['byTitle']) . "%'";
+			}
+
+			$q2 = [
+				'r' => ['o' => ($page->at - 1) * $page->size, 'l' => $page->size],
+				'o' => ['t.create_at desc'],
+			];
+		}else{
+			$q = [
+				$fields,
+				'xxt_log_matter_op',
+				"operator='{$user->id}' and user_last_op='Y' and (operation<>'D' and operation<>'Recycle' and operation<>'Quit')",
+			];
+			if (isset($options['byType'])) {
+				$q[2] .= " and matter_type='" . $this->escape($options['byType']) . "'";
+			}
+			if (isset($options['scenario'])) {
+				$q[2] .= " and matter_scenario='" . $this->escape($options['scenario']) . "'";
+			}
+			if (isset($options['byTitle'])) {
+				$q[2] .= " and matter_title like '%" . $this->escape($options['byTitle']) . "%'";
+			}
+			if (isset($options['bySite'])) {
+				$q[2] .= " and siteid = '" . $this->escape($options['bySite']) . "'";
+			}
+
+			$q2 = [
+				'r' => ['o' => ($page->at - 1) * $page->size, 'l' => $page->size],
+				'o' => ['operate_at desc'],
+			];
 		}
-		if (isset($options['scenario'])) {
-			$q[2] .= " and matter_scenario='" . $options['scenario'] . "'";
-		}
-		$q2 = [
-			'r' => ['o' => ($page->at - 1) * $page->size, 'l' => $page->size],
-			'o' => ['operate_at desc'],
-		];
 
 		$matters = $this->query_objs_ss($q, $q2);
+
 		$result = ['matters' => $matters];
 		if (empty($matters)) {
 			$result['total'] = 0;
@@ -538,7 +592,7 @@ class log_model extends \TMS_MODEL {
 	}
 	/**
 	 * 汇总各类日志，形成用户完整的踪迹用于展示用户详情的发送消息列表记录
-	 * $total 用以分页的总数 
+	 * $total 用以分页的总数
 	 * $sum 实际上的总记录数
 	 */
 	public function track($site, $openid, $page = 1, $size = 30) {
@@ -554,8 +608,8 @@ class log_model extends \TMS_MODEL {
 
 		$sendlogs = $this->query_objs_ss($q, $q2);
 
-		$q[0]='count(*)';
-		$total_s=$this->query_val_ss($q);
+		$q[0] = 'count(*)';
+		$total_s = $this->query_val_ss($q);
 
 		$q = array(
 			'create_at,data content',
@@ -569,12 +623,12 @@ class log_model extends \TMS_MODEL {
 
 		$recelogs = $this->query_objs_ss($q, $q2);
 
-		$q[0]='count(*)';
-		$total_r=$this->query_val_ss($q);
+		$q[0] = 'count(*)';
+		$total_r = $this->query_val_ss($q);
 		//确定分页的总数以记录多的表的总数为准
-		$total=($total_s>=$total_r) ? $total_s : $total_r;
+		$total = ($total_s >= $total_r) ? $total_s : $total_r;
 		//实际的总数
-		$sum=$total_s+$total_r;
+		$sum = $total_s + $total_r;
 		$logs = array_merge($sendlogs, $recelogs);
 		/**
 		 * order by create_at
@@ -583,10 +637,10 @@ class log_model extends \TMS_MODEL {
 			return $b->create_at - $a->create_at;
 		});
 
-		$result=new \stdClass;
-		$result->total=$total;
-		$result->sum=$sum;
-		$result->data=$logs;
+		$result = new \stdClass;
+		$result->total = $total;
+		$result->sum = $sum;
+		$result->data = $logs;
 
 		return $result;
 	}

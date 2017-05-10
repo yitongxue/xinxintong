@@ -20,7 +20,7 @@ ngApp.controller('ctrlChannel', ['$scope', '$location', 'http2', 'srvSite', func
         $scope.entryUrl = 'http://' + location.host + '/rest/site/fe/matter?site=' + $scope.siteId + '&id=' + $scope.id + '&type=channel';
     });
 }]);
-ngApp.controller('ctrlMain', ['$scope', 'http2', 'mattersgallery', function($scope, http2, mattersgallery) {
+ngApp.controller('ctrlMain', ['$scope', 'http2', 'mattersgallery', 'noticebox', function($scope, http2, mattersgallery, noticebox) {
     var modifiedData = {};
     $scope.modified = false;
     $scope.matterTypes = [{
@@ -40,9 +40,17 @@ ngApp.controller('ctrlMain', ['$scope', 'http2', 'mattersgallery', function($sco
         title: '抽奖活动',
         url: '/rest/pl/fe/matter'
     }, {
+        value: 'wall',
+        title: '信息墙',
+        url: '/rest/pl/fe/matter'
+    }, {
         value: 'link',
         title: '链接',
-        url: '/rest/mp/matter'
+        url: '/rest/pl/fe/matter'
+    }, {
+        value: 'mission',
+        title: '项目',
+        url: '/rest/pl/fe/matter'
     }];
     $scope.acceptMatterTypes = [{
         name: '',
@@ -95,6 +103,12 @@ ngApp.controller('ctrlMain', ['$scope', 'http2', 'mattersgallery', function($sco
             }
         });
     };
+    $scope.applyToHome = function() {
+        var url = '/rest/pl/fe/matter/home/apply?site=' + $scope.siteId + '&type=channel&id=' + $scope.id;
+        http2.get(url, function(rsp) {
+            noticebox.success('完成申请！');
+        });
+    }
     $scope.update = function(name) {
         $scope.modified = true;
         modifiedData[name] = $scope.editing[name];
@@ -123,11 +137,17 @@ ngApp.controller('ctrlMain', ['$scope', 'http2', 'mattersgallery', function($sco
     };
     $scope.addMatter = function() {
         mattersgallery.open($scope.siteId, function(matters, type) {
-            var relations = { matter: matters };
-            http2.post('/rest/pl/fe/matter/channel/addMatter?site=' + $scope.siteId + '&channel=' + $scope.editing.id, relations, function(rsp) {
-                $scope.editing.matters = rsp.data;
-                arrangeMatters();
-            });
+            var relations;
+            if (matters && matters.length) {
+                matters.forEach(function(matter) {
+                    matter.type = type;
+                });
+                relations = { matter: matters };
+                http2.post('/rest/pl/fe/matter/channel/addMatter?site=' + $scope.siteId + '&channel=' + $scope.editing.id, relations, function(rsp) {
+                    $scope.editing.matters = rsp.data;
+                    arrangeMatters();
+                });
+            }
         }, {
             matterTypes: $scope.matterTypes,
         });
