@@ -8,6 +8,11 @@
                 "title": "简单",
                 "name": "simple",
                 "description": "简单快速"
+            },
+            "ask": {
+                "title": "问答库",
+                "name": "ask",
+                "description": "在线问答库"
             }
         }
     },
