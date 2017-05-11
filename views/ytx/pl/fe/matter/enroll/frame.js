@@ -83,34 +83,47 @@ define(['require', 'enrollService'], function(require) {
         $scope.scenarioNames = {
             'common': '通用登记',
             'registration': '报名',
-            'voting': '评价',
+            'voting': '投票',
             'quiz': '测验',
+            'group_week_report': '周报'
         };
-        $scope.viewNames = {
-            'main': '活动定义',
-            'publish': '发布预览',
-            'schema': '修改题目',
-            'page': '修改页面',
-            'record': '查看数据',
-            'editor': '编辑数据',
-            'stat': '统计报告',
-            'discuss': '用户评论',
-            'coin': '积分规则',
-            'log': '运行日志',
-            'notice': '通知发送记录',
-            'recycle': '回收站',
-        };
-        $scope.subView = '';
+        $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
             $scope.subView = subView[1] === 'enroll' ? 'publish' : subView[1];
+            switch ($scope.subView) {
+                case 'main':
+                case 'page':
+                case 'schema':
+                    $scope.opened = 'edit';
+                    break;
+                case 'record':
+                case 'stat':
+                    $scope.opened = 'data';
+                    break;
+                case 'recycle':
+                case 'log':
+                case 'coin':
+                case 'notice':
+                    $scope.opened = 'other';
+                    break;
+                default:
+                    $scope.opened = '';
+            }
         });
+        $scope.switchTo = function(subView) {
+            var url = '/rest/pl/fe/matter/enroll/' + subView;
+            $location.path(url);
+        };
         $scope.update = function(name) {
             srvEnrollApp.update(name);
         };
         $scope.shareAsTemplate = function() {
-            templateShop.share($scope.app.siteid, $scope.app);
+            templateShop.share($scope.app.siteid, $scope.app).then(function(template) {
+                location.href = '/rest/pl/fe/template/enroll?site=' + template.siteid + '&id=' + template.id;
+            });
         };
+
         srvSite.get().then(function(oSite) {
             $scope.site = oSite;
         });
@@ -123,14 +136,6 @@ define(['require', 'enrollService'], function(require) {
         srvEnrollApp.get().then(function(app) {
             $scope.app = app;
             app.__schemasOrderConsistent = 'Y'; //页面上登记项显示顺序与定义顺序一致
-            // 用户评论
-            if (app.can_discuss === 'Y') {
-                $scope.discussParams = {
-                    title: app.title,
-                    threadKey: 'enroll,' + app.id,
-                    domain: app.siteid
-                };
-            }
         });
     }]);
     /***/
