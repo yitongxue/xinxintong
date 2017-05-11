@@ -16,7 +16,6 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$http', 'tmsFavor', 'tmsForwar
             return '&page=' + this.at + '&size=' + this.size;
         }
     }
-
     function listTemplates() {
         $http.get('/rest/site/home/listTemplate?site=' + siteId).success(function(rsp) {
             $scope.templates = rsp.data;
@@ -27,31 +26,28 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$http', 'tmsFavor', 'tmsForwar
         $scope.cTotal[id].pageAt++;
         $scope.page.at = $scope.cTotal[id].pageAt;
         $http.get('/rest/site/fe/matter/channel/mattersGet?site=' + siteId + '&id=' + id + '&' + page.j()).success(function(rsp) {
-            var matterData = $scope.cTotal[id].data;
-            rsp.data.forEach(function(item) {
-                matterData.push(item);
-            });
-            $scope.cTotal[id].data = matterData;
-            $scope.cTotal[id].total = rsp.data.length;
+                var matterData = $scope.cTotal[id].data;
+                rsp.data.forEach(function(item) {
+                   matterData.push(item);
+                });
+                $scope.cTotal[id].data =  matterData;
+                $scope.cTotal[id].total = rsp.data.length;
         });
     }
-
     function c_listChannels() {
         $http.get('/rest/site/home/listChannel?site=' + siteId + '&homeGroup=C').success(function(rsp) {
             $scope.c_channels = rsp.data;
             $scope.c_channels.forEach(function(channel) {
                 $http.get('/rest/site/fe/matter/channel/mattersGet?site=' + siteId + '&id=' + channel.channel_id + '&' + page.j()).success(function(rsp) {
-                    var chid = channel.channel_id,
-                        data = [];
+                    var chid = channel.channel_id, data = [];
                     data.data = rsp.data;
                     data.total = rsp.data.length;
                     data.pageAt = $scope.page.at;
-                    $scope.cTotal[chid] = data;
+                    $scope.cTotal[chid]=data;
                 });
             });
         });
     };
-
     function r_listChannels() {
         $http.get('/rest/site/home/listChannel?site=' + siteId + '&homeGroup=R').success(function(rsp) {
             $scope.r_channels = rsp.data;
@@ -62,7 +58,7 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$http', 'tmsFavor', 'tmsForwar
             });
         });
     }
-    $scope.favor = function(user, article) {
+    $scope.favor = function(user,article) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -75,7 +71,7 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$http', 'tmsFavor', 'tmsForwar
             tmsFavor.open(article);
         }
     }
-    $scope.forward = function(user, article) {
+    $scope.forward = function(user,article) {
         event.preventDefault();
         event.stopPropagation();
 
