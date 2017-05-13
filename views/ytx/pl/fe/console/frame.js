@@ -2,14 +2,14 @@ define(['require'], function(require) {
     'use strict';
     var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter']);
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider) {
-        var RouteParam = function(name) {
-            var baseURL = '/views/ytx/pl/fe/console/';
-            this.templateUrl = baseURL + name + '.html?_=' + (new Date() * 1);
+        var RouteParam = function(name, htmlBase, jsBase) {
+            var baseURL = '/views/default/pl/fe/console/';
+            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
-                    require([baseURL + name + '.js'], function() {
+                    require([(jsBase || baseURL) + name + '.js'], function() {
                         defer.resolve();
                     });
                     return defer.promise;
@@ -21,12 +21,10 @@ define(['require'], function(require) {
             directive: $compileProvider.directive
         };
         $locationProvider.html5Mode(true);
-        $routeProvider
-            .when('/rest/pl/fe/friend', new RouteParam('friend'))
-            .otherwise(new RouteParam('main'));
+        $routeProvider.otherwise(new RouteParam('main', '/views/ytx/pl/fe/console/'));
     }]);
-    ngApp.controller('ctrlFrame', ['$scope', 'http2', 'srvUserNotice', function($scope, http2, srvUserNotice) {
-        var criteria;
+    ngApp.controller('ctrlFrame', ['$scope', 'http2', 'srvUserNotice', '$uibModal', 'templateShop', function($scope, http2, srvUserNotice, $uibModal, templateShop) {
+        var criteria, criteria2, criteria3;
         $scope.subView = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/[^\/]+$/)[0];
@@ -48,6 +46,184 @@ define(['require'], function(require) {
         });
         $scope.criteria = criteria = {
             sid: ''
+        };
+        $scope.criteria2 = criteria2 = {
+            scope: 'top'
+        };
+        $scope.criteria3 = criteria3 = {
+            scope: 'subscribeSite'
+        };
+        $scope.changeScope = function(criteria, scope) {
+            criteria.scope = scope;
+        };
+        $scope.load = function(id) {
+                location.href = '/rest/pl/fe/site/setting?site=' + id;
+            }
+            /*新建素材*/
+        var _fns = {
+            createSite: function() {
+                var defer = $q.defer(),
+                    url = '/rest/pl/fe/site/create?_=' + (new Date() * 1);
+
+                http2.get(url, function(rsp) {
+                    defer.resolve(rsp.data);
+                });
+                return defer.promise;
+            },
+            addLink: function(site) {
+                http2.get('/rest/pl/fe/matter/link/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/link?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addArticle: function(site) {
+                http2.get('/rest/pl/fe/matter/article/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/article?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addNews: function(site) {
+                http2.get('/rest/pl/fe/matter/news/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/news?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addChannel: function(site) {
+                http2.get('/rest/pl/fe/matter/channel/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/channel?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addEnroll: function(site, scenario) {
+                templateShop.choose(site.id, 'enroll', scenario).then(function(choice) {
+                    if (choice) {
+                        if (choice.source === 'share') {
+                            var url, data = choice.data;
+                            url = '/rest/pl/fe/matter/enroll/createByOther?site=' + site.id + '&template=' + data.id;
+                            http2.get(url, function(rsp) {
+                                location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
+                            });
+                        } else if (choice.source === 'platform') {
+                            var url, config, data = choice.data;
+                            url = '/rest/pl/fe/matter/enroll/create?site=' + site.id;
+                            config = {};
+                            if (data) {
+                                url += '&scenario=' + data.scenario.name;
+                                url += '&template=' + data.template.name;
+                                if (data.simpleSchema && data.simpleSchema.length) {
+                                    config.simpleSchema = data.simpleSchema;
+                                }
+                            }
+                            http2.post(url, config, function(rsp) {
+                                location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
+                            });
+                        } else if (choice.source === 'file') {
+                            var url, data = choice.data;
+                            url = '/rest/pl/fe/matter/enroll/createByFile?site=' + site.id;
+                            http2.post(url, data, function(rsp) {
+                                location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
+                            });
+                        }
+                    } else {
+                        var url;
+                        url = '/rest/pl/fe/matter/enroll/create?site=' + site.id;
+                        http2.post(url, {}, function(rsp) {
+                            location.href = '/rest/pl/fe/matter/enroll?site=' + site.id + '&id=' + rsp.data.id;
+                        });
+                    }
+                });
+            },
+            addSignin: function(site) {
+                http2.get('/rest/pl/fe/matter/signin/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/signin?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addGroup: function(site) {
+                http2.get('/rest/pl/fe/matter/group/create?site=' + site.id + '&scenario=split', function(rsp) {
+                    location.href = '/rest/pl/fe/matter/group/main?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addLottery: function(site) {
+                http2.get('/rest/pl/fe/matter/lottery/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/lottery?site=' + site.id + '&id=' + rsp.data;
+                });
+            },
+            addContribute: function(site) {
+                http2.get('/rest/pl/fe/matter/contribute/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/contribute?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addMission: function(site) {
+                http2.get('/rest/pl/fe/matter/mission/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/mission?site=' + site.id + '&id=' + rsp.data.id;
+                });
+            },
+            addCustom: function(site) {
+                http2.get('/rest/pl/fe/matter/custom/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/custom?site=' + site.id + '&id=' + rsp.data;
+                });
+            },
+            addMerchant: function(site) {
+                http2.get('/rest/pl/fe/matter/merchant/shop/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/merchant/shop?site=' + site.id + '&id=' + rsp.data;
+                });
+            },
+            addWall: function(site) {
+                http2.get('/rest/pl/fe/matter/wall/create?site=' + site.id, function(rsp) {
+                    location.href = '/rest/pl/fe/matter/wall?site=' + site.id + '&id=' + rsp.data;
+                });
+            },
+            addText: function(site) {
+                location.href = '/rest/pl/fe/matter/text?site=' + site.id;
+            }
+        };
+
+        function addMatter(site, matterType, scenario) {
+            var fnName = 'add' + matterType[0].toUpperCase() + matterType.substr(1);
+            _fns[fnName].call(_fns, site, scenario);
+        }
+        $scope.addMatter = function(matterType, scenario) {
+            $('body').trigger('click');
+            if (matterType == 'site') {
+                var url = '/rest/pl/fe/site/create?_=' + (new Date() * 1);
+                http2.get(url, function(rsp) {
+                    location.href = '/rest/pl/fe/site/setting?site=' + rsp.data.id;
+                });
+            }
+            if ($scope.criteria.sid != '') {
+                var site = { id: $scope.criteria.sid };
+                addMatter(site, matterType, scenario);
+            } else {
+                var url = '/rest/pl/fe/site/list?_=' + (new Date() * 1);
+                http2.get(url, function(rsp) {
+                    var sites = rsp.data;
+                    if (sites.length === 1) {
+                        addMatter(sites[0], matterType, scenario);
+                    } else if (sites.length === 0) {
+                        createSite().then(function(site) {
+                            addMatter(site, matterType, scenario);
+                        });
+                    } else {
+                        $uibModal.open({
+                            templateUrl: 'addMatterSite.html',
+                            dropback: 'static',
+                            controller: ['$scope', '$uibModalInstance', function($scope2, $mi) {
+                                var data;
+                                $scope2.mySites = sites;
+                                $scope2.data = data = {};
+                                $scope2.ok = function() {
+                                    if (data.index !== undefined) {
+                                        $mi.close(sites[data.index]);
+                                    } else {
+                                        $mi.dismiss();
+                                    }
+                                };
+                                $scope2.cancel = function() {
+                                    $mi.dismiss();
+                                };
+                            }]
+                        }).result.then(function(site) {
+                            addMatter(site, matterType, scenario);
+                        });
+                    }
+                });
+            }
         };
         $scope.list = function() {
             $scope.siteType = 1;
