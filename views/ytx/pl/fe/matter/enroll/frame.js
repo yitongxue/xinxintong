@@ -1,6 +1,6 @@
 define(['require', 'enrollService'], function(require) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'service.enroll', 'tinymce.enroll', 'ui.xxt', 'channel.fe.pl']);
+    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'service.enroll', 'tinymce.enroll', 'ui.xxt']);
     ngApp.constant('cstApp', {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -79,13 +79,12 @@ define(['require', 'enrollService'], function(require) {
             srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
-    ngApp.controller('ctrlFrame', ['$scope', 'srvSite', 'srvEnrollApp', 'templateShop', function($scope, srvSite, srvEnrollApp, templateShop) {
+    ngApp.controller('ctrlFrame', ['$scope', 'srvSite', 'srvEnrollApp', 'templateShop', '$location', function($scope, srvSite, srvEnrollApp, templateShop, $location) {
         $scope.scenarioNames = {
             'common': '通用登记',
             'registration': '报名',
             'voting': '评价',
             'quiz': '测验',
-            'group_week_report': '周报'
         };
         $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
