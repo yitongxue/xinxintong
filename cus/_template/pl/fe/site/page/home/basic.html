@@ -24,8 +24,8 @@
                     <div class="team-summary">{{site.summary}}</div>
                 </div>
                 <div class="team-handle pull-left">
-                    <button class="btn btn-warning btn-custom" ng-click="subscribeSite()">关注</button>
-                    <button class="btn btn-primary btn-custom" ng-click="contributeSite()">投稿</button>
+                    <button class="btn btn-warning btn-custom hide" ng-click="subscribeSite()">关注</button>
+                    <button class="btn btn-primary btn-custom hide" ng-click="contributeSite()">投稿</button>
                 </div>
                 <span ng-mouseenter="hover=true" ng-mouseleave="hover=false" class="site_fe_home site_fe_home_icon xxt_scan"></span>
             </div>
@@ -53,7 +53,7 @@
                                                 <div class="media-summary">{{m.summary}}</div>
                                                 <div class='attr clearfix'>
                                                     <div class='put_at pull-right' ng-bind="m.create_at*1000|date:'yyyy-MM-dd'"></div>
-                                                    <div class="forward pull-right">
+                                                    <div class="forward pull-right hide">
                                                         <a href="" ng-click="forward(user,m)">
                                                             <span class="site_fe_home site_fe_home_icon xxt_forward"></span>转发
                                                         </a>
@@ -63,7 +63,7 @@
                                                             <span class="site_fe_home site_fe_home_icon xxt_favor"></span>收藏
                                                         </a>
                                                     </div>
-                                                    <div class='creater_name pull-right'>
+                                                    <div class='creater_name pull-right hide'>
                                                         <a ng-href='/rest/site/home?site={{m.siteid}}'>
                                                             <span class="site_fe_home site_fe_home_icon xxt_team"></span> {{m.site_name}}
                                                         </a>
@@ -103,10 +103,10 @@
     <div id='gototop' class='tms-switch tms-top'>
         <span class="site_fe_home site_fe_home_icon xxt_backTop"></span>
     </div>
-    <div class="tms-switch tms-qrcode">
+    <div class="tms-switch tms-qrcode" ng-if="site.home_qrcode_group">
         <span class="site_fe_home site_fe_home_icon xxt_talk_qrcode" ng-mouseenter="active=true" ng-mouseleave="active=false"></span>
     </div>
-    <div id='gototalk'>
+    <div id='gototalk' ng-if="site.home_qrcode_group">
         <div class="talk-qrcodes">
             <div class="talk-qrcode" ng-repeat="q in site.home_qrcode_group">
                 <span ng-bind="{{q.tip}}"></span>
