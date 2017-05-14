@@ -1,6 +1,30 @@
 define(['require'], function(require) {
     'use strict';
     var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter']);
+    ngApp.constant('cstApp', {
+        matterNames: {
+            'article': '项目资料',
+            'news': '多图文',
+            'channel': '频道',
+            'link': '链接',
+            'contribute': '投稿',
+            'text': '文本',
+            'custom': '定制页',
+            'enroll': '登记',
+            'signin': '签到',
+            'group': '分组',
+            'lottery': '抽奖',
+            'wall': '信息墙',
+            'mission': '项目',
+            'site': '团队'
+        },
+        scenarioNames: {
+            'common': '通用登记',
+            'registration': '报名',
+            'voting': '评价',
+            'quiz': '测验'
+        }
+    });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/console/';

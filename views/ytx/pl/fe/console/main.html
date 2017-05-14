@@ -119,10 +119,24 @@
     </div>
     <div ng-controller="ctrlSite" ng-switch-when="site">
         <div class='col-md-12'>
-            <div ng-if="criteria.sid==''" class='pull-right'>
-                <button class="btn btn-default" ng-click='create()'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
-                <button uib-popover-template="'filter.html'" popover-placement="bottom-right" popover-append-to-body='true' popover-trigger="outsideClick" class='btn btn-default pull-right'><i class='glyphicon glyphicon-filter'></i> <span>筛选</span></button>
-            </div>
+            <nav class='navbar navbar-default' ng-if="criteria.sid==''">
+                <div class='container-fluid'>
+                    <form class='nav navbar-form pull-left'>
+                        <div class='form-group'>
+                            <div class='input-group'>
+                                <input type='input' class='form-control' placeholder='按名称筛选' ng-model='filter2.byTitle'>
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default' ng-click="doFilter()"><span class='glyphicon glyphicon-search'></button>
+                                    <button class='btn btn-default' ng-click="cleanFilter()"><span class='glyphicon glyphicon-remove'></button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    <form class='nav navbar-form pull-right'>
+                        <button class="btn btn-default" ng-click='create()'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
+                    </form>
+                </div>
+            </nav>
             <table class='table table-bordered'>
                 <thead>
                     <tr>
@@ -154,11 +168,25 @@
     </div>
     <div ng-controller="ctrlMission" ng-switch-when="mission">
         <div class='col-md-12'>
-            <div class='pull-right'>
-                <button ng-if="criteria.sid!=''" class="btn btn-default" ng-click='create()'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
-                <button ng-if="criteria.sid==''" class="btn btn-default" ng-click="addMatter('mission')"><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
-                <button uib-popover-template="'filter.html'" popover-placement="bottom-right" popover-append-to-body='true' popover-trigger="outsideClick" class='btn btn-default pull-right'><i class='glyphicon glyphicon-filter'></i> <span>筛选</span></button>
-            </div>
+            <nav class='navbar navbar-default' ng-if="criteria.sid==''">
+                <div class='container-fluid'>
+                    <form class='nav navbar-form pull-left'>
+                        <div class='form-group'>
+                            <div class='input-group'>
+                                <input type='input' class='form-control' placeholder='按名称筛选' ng-model='filter2.byTitle'>
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default' ng-click="doFilter()"><span class='glyphicon glyphicon-search'></button>
+                                    <button class='btn btn-default' ng-click="cleanFilter()"><span class='glyphicon glyphicon-remove'></button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    <form class='nav navbar-form pull-right'>
+                        <button ng-if="criteria.sid!=''" class="btn btn-default" ng-click='create()'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
+                        <button ng-if="criteria.sid==''" class="btn btn-default" ng-click="addMatter('mission')"><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
+                    </form>
+                </div>
+            </nav>
             <table class='table table-bordered'>
                 <thead>
                     <tr>
@@ -202,9 +230,28 @@
                         <li ng-class="{'active':criteria3.matterType==='signin'}"><a href='' ng-click="changeMatter('signin')">签到活动</a></li>
                         <li ng-class="{'active':criteria3.matterType==='group'}"><a href='' ng-click="changeMatter('group')">分组活动</a></li>
                     </ul>
+                    <form class='nav navbar-form pull-left'>
+                        <div class="form-group" ng-if="criteria3.matterType==='enroll'">
+                            <select class='form-control' ng-model="filter.scenario">
+                                <option value=''>全部场景</option>
+                                <option value='common'>通用登记</option>
+                                <option value='registration'>报名</option>
+                                <option value='voting'>评价</option>
+                                <option value='quiz'>测验</option>
+                            </select>
+                        </div>
+                        <div class='form-group'>
+                            <div class='input-group'>
+                                <input type='input' class='form-control' placeholder='按名称筛选' ng-model='filter2.byTitle'>
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default' ng-click="doFilter()"><span class='glyphicon glyphicon-search'></button>
+                                    <button class='btn btn-default' ng-click="cleanFilter()"><span class='glyphicon glyphicon-remove'></button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
                     <form class='nav navbar-form pull-right'>
                         <button uib-popover-template="'addActivity.html'" popover-placement="bottom-right" popover-append-to-body='true' popover-trigger="outsideClick" popover-title="新建" class='btn btn-default'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
-                        <button uib-popover-template="'filter.html'" popover-placement="bottom-right" popover-append-to-body='true' popover-trigger="outsideClick" class='btn btn-default pull-right'><i class='glyphicon glyphicon-filter'></i> <span>筛选</span></button>
                     </form>
                 </div>
             </nav>
@@ -266,9 +313,19 @@
                         <li ng-class="{'active':criteria4.matterType==='article'}"><a href='' ng-click="changeMatter('article')">项目资料</a></li>
                         <li ng-class="{'active':criteria4.matterType==='channel'}"><a href='' ng-click="changeMatter('channel')">频道</a></li>
                     </ul>
+                    <form class='nav navbar-form pull-left'>
+                        <div class='form-group'>
+                            <div class='input-group'>
+                                <input type='input' class='form-control' placeholder='按名称筛选' ng-model='filter2.byTitle'>
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default' ng-click="doFilter()"><span class='glyphicon glyphicon-search'></button>
+                                    <button class='btn btn-default' ng-click="cleanFilter()"><span class='glyphicon glyphicon-remove'></button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
                     <form class='nav navbar-form pull-right'>
                         <button uib-popover-template="'addInfo.html'" popover-placement="bottom-right" popover-append-to-body='true' popover-trigger="outsideClick" popover-title="新建" class='btn btn-default'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
-                        <button uib-popover-template="'filter.html'" popover-placement="bottom-right" popover-append-to-body='true' popover-trigger="outsideClick" class='btn btn-default pull-right'><i class='glyphicon glyphicon-filter'></i> <span>筛选</span></button>
                     </form>
                 </div>
             </nav>

@@ -83,7 +83,7 @@ define(['require', 'enrollService'], function(require) {
         $scope.scenarioNames = {
             'common': '通用登记',
             'registration': '报名',
-            'voting': '投票',
+            'voting': '评价',
             'quiz': '测验',
             'group_week_report': '周报'
         };
