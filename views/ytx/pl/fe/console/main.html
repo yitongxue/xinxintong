@@ -1,4 +1,4 @@
-<div ng-switch on="criteria2.scope">
+<div ng-switch on="frameState.scope">
     <div ng-controller="ctrlTop" ng-switch-when="top">
         <div class="col-md-12">
             <table class='table table-bordered'>
@@ -119,7 +119,7 @@
     </div>
     <div ng-controller="ctrlSite" ng-switch-when="site">
         <div class='col-md-12'>
-            <nav class='navbar navbar-default' ng-if="criteria.sid==''">
+            <nav class='navbar navbar-default' ng-if="frameState.sid===''">
                 <div class='container-fluid'>
                     <form class='nav navbar-form pull-left'>
                         <div class='form-group'>
@@ -182,8 +182,8 @@
                         </div>
                     </form>
                     <form class='nav navbar-form pull-right'>
-                        <button ng-if="criteria.sid!=''" class="btn btn-default" ng-click='create()'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
-                        <button ng-if="criteria.sid==''" class="btn btn-default" ng-click="addMatter('mission')"><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
+                        <button ng-if="frameState.sid!=''" class="btn btn-default" ng-click='create()'><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
+                        <button ng-if="frameState.sid==''" class="btn btn-default" ng-click="addMatter('mission')"><i class='glyphicon glyphicon-plus'></i> <span>新建</span></button>
                     </form>
                 </div>
             </nav>
@@ -226,17 +226,17 @@
             <nav class='navbar navbar-default'>
                 <div class='container-fluid'>
                     <ul class='nav navbar-nav'>
-                        <li ng-class="{'active':criteria3.matterType==='enroll'}"><a href='' ng-click="changeMatter('enroll')">登记活动</a></li>
-                        <li ng-class="{'active':criteria3.matterType==='signin'}"><a href='' ng-click="changeMatter('signin')">签到活动</a></li>
-                        <li ng-class="{'active':criteria3.matterType==='group'}"><a href='' ng-click="changeMatter('group')">分组活动</a></li>
+                        <li ng-class="{'active':filter.byType==='enroll'}"><a href='' ng-click="changeMatter('enroll')">登记活动</a></li>
+                        <li ng-class="{'active':filter.byType==='signin'}"><a href='' ng-click="changeMatter('signin')">签到活动</a></li>
+                        <li ng-class="{'active':filter.byType==='group'}"><a href='' ng-click="changeMatter('group')">分组活动</a></li>
                     </ul>
                     <form class='nav navbar-form pull-left'>
-                        <div class="form-group" ng-if="criteria3.matterType==='enroll'">
+                        <div class="form-group" ng-if="filter.byType==='enroll'">
                             <select class='form-control' ng-model="filter.scenario">
                                 <option value=''>全部场景</option>
                                 <option value='common'>通用登记</option>
                                 <option value='registration'>报名</option>
-                                <option value='voting'>评价</option>
+                                <option value='voting'>投票</option>
                                 <option value='quiz'>测验</option>
                             </select>
                         </div>
@@ -259,7 +259,7 @@
                 <thead>
                     <tr>
                         <th style='width:48px'>序号</th>
-                        <th ng-if="criteria3.matterType =='enroll'" style='width:90px'>场景</th>
+                        <th ng-if="filter.byType =='enroll'" style='width:90px'>场景</th>
                         <th>名称</th>
                         <th style='width:140px'>创建人</th>
                         <th style='width:120px'>创建时间</th>
@@ -270,7 +270,7 @@
                 <tbody>
                     <tr ng-repeat='m in matters'>
                         <td>{{$index+1}}</td>
-                        <td ng-if="criteria3.matterType=='enroll'">{{scenarioNames[m.matter_scenario]}}</td>
+                        <td ng-if="filter.byType=='enroll'">{{scenarioNames[m.matter_scenario]}}</td>
                         <td>{{m.matter_title}}</td>
                         <td>{{m.operator_name}}</td>
                         <td>{{m.operate_at*1000|date:'yy-MM-dd HH:mm'}}</td>
@@ -310,8 +310,8 @@
             <nav class='navbar navbar-default'>
                 <div class='container-fluid'>
                     <ul class='nav navbar-nav'>
-                        <li ng-class="{'active':criteria4.matterType==='article'}"><a href='' ng-click="changeMatter('article')">项目资料</a></li>
-                        <li ng-class="{'active':criteria4.matterType==='channel'}"><a href='' ng-click="changeMatter('channel')">频道</a></li>
+                        <li ng-class="{'active':filter.byType==='article'}"><a href='' ng-click="changeMatter('article')">项目资料</a></li>
+                        <li ng-class="{'active':filter.byType==='channel'}"><a href='' ng-click="changeMatter('channel')">频道</a></li>
                     </ul>
                     <form class='nav navbar-form pull-left'>
                         <div class='form-group'>
@@ -362,13 +362,13 @@
         </div>
     </div>
     <div ng-controller="ctrlSiteUser" ng-switch-when="siteuser">
-        <div class='col-md-3' ng-if="!criteria.sid">
+        <div class='col-md-3' ng-if="!frameState.sid">
             <div class='form-group'>
                 <label>选择团队</label>
-                <select class='form-control' ng-model="criteria.sid" ng-options="site.id as site.name for site in sites"></select>
+                <select class='form-control' ng-model="frameState.sid" ng-options="site.id as site.name for site in sites"></select>
             </div>
         </div>
-        <div class="col-md-12" ng-if="criteria.sid" ng-switch on="catelog">
+        <div class="col-md-12" ng-if="frameState.sid" ng-switch on="catelog">
             <nav class='navbar navbar-default'>
                 <div class='container-fluid'>
                     <ul class='nav navbar-nav' ng-init="catelog='member'">
