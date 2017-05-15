@@ -26,14 +26,14 @@ define(['require'], function() {
         }
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', 'srvQuickEntryProvider', 'srvSiteProvider', 'srvGroupAppProvider', 'srvGroupRoundProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, srvQuickEntryProvider, srvSiteProvider, srvGroupAppProvider, srvGroupRoundProvider) {
-        var RouteParam = function(name) {
+        var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/group/';
-            this.templateUrl = baseURL + name + '.html?_=' + (new Date() * 1);
+            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
-                    require([baseURL + name + '.js'], function() {
+                    require([(jsBase || baseURL) + name + '.js'], function() {
                         defer.resolve();
                     });
                     return defer.promise;
@@ -45,7 +45,7 @@ define(['require'], function() {
             directive: $compileProvider.directive
         };
         $routeProvider
-            .when('/rest/pl/fe/matter/group/main', new RouteParam('main'))
+            .when('/rest/pl/fe/matter/group/main', new RouteParam('main', '/views/ytx/pl/fe/matter/group/'))
             .when('/rest/pl/fe/matter/group/player', new RouteParam('player'))
             .when('/rest/pl/fe/matter/group/notice', new RouteParam('notice'))
             .otherwise(new RouteParam('player'));
@@ -64,18 +64,15 @@ define(['require'], function() {
             srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
-    ngApp.controller('ctrlApp', ['$scope', 'srvSite', 'srvGroupApp', function($scope, srvSite, srvGroupApp) {
-        $scope.viewNames = {
-            'main': '活动定义',
-            'player': '分组数据',
-            'notice': '通知发送记录',
-        };
-        $scope.subView = '';
+    ngApp.controller('ctrlApp', ['$scope', 'srvSite', 'srvGroupApp', '$location', function($scope, srvSite, srvGroupApp, $location) {
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
             $scope.subView = subView[1] === 'group' ? 'player' : subView[1];
-
         });
+        $scope.switchTo = function(subView) {
+            var url = '/rest/pl/fe/matter/group/' + subView;
+            $location.path(url);
+        };
         srvSite.get().then(function(oSite) {
             $scope.site = oSite;
         });

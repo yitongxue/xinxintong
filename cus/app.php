@@ -5,3 +5,5 @@ define('APP_TITLE', '易同学');
 define('TMS_APP_VIEW_NAME', 'ytx');
 /* 应用程序模版起始目录 */
 define('TMS_APP_TEMPLATE', dirname(__FILE__) . '/_template');
+/* 缺省页 */
+!defined('TMS_APP_HOME') && define('TMS_APP_HOME', '/rest/pl/fe');
