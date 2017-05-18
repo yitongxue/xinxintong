@@ -4,7 +4,16 @@ define(['missionService', 'enrollService', 'signinService'], function() {
     ngApp.constant('cstApp', {
         notifyMatter: [],
         innerlink: [],
-        alertMsg: {}
+        alertMsg: {},
+        scenarioNames: {
+            'article': '项目资料',
+            'common': '通用登记',
+            'registration': '报名',
+            'voting': '投票',
+            'quiz': '测验',
+            'signin': '签到',
+            'split': '分组'
+        }
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvMissionProvider', 'srvQuickEntryProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvMissionProvider, srvQuickEntryProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
@@ -48,11 +57,6 @@ define(['missionService', 'enrollService', 'signinService'], function() {
         })();
     }]);
     ngApp.controller('ctrlFrame', ['$scope', '$location', 'srvSite', 'srvMission', function($scope, $location, srvSite, srvMission) {
-        $scope.viewNames = {
-            'main': '项目定义',
-            'matter': '资料和活动',
-            'user': '汇总展示页',
-        };
         $scope.subView = '';
         $scope.update = function(name) {
             var modifiedData = {};
@@ -74,6 +78,10 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             var subView = currentRoute.match(/([^\/]+?)\?/);
             $scope.subView = subView[1] === 'mission' ? 'main' : subView[1];
         });
+        $scope.switchTo = function(subView) {
+            var url = '/rest/pl/fe/matter/mission/' + subView;
+            $location.path(url);
+        }
         srvSite.get().then(function(oSite) {
             $scope.site = oSite;
         });
