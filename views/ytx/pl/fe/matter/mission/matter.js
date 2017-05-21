@@ -1,6 +1,20 @@
 define(['frame'], function(ngApp) {
     'use strict';
-    ngApp.provider.controller('ctrlMatter', ['$scope', 'http2', 'templateShop', function($scope, http2, templateShop) {
+    ngApp.provider.controller('ctrlMatter', ['$scope', 'http2', 'templateShop', 'cstApp', function($scope, http2, templateShop, cstApp) {
+        $scope.scenarioNames = cstApp.scenarioNames;
+        $scope.filter2 = {};
+        $scope.addWall = function() {
+            var url = '/rest/pl/fe/matter/wall/create?mission=' + $scope.mission.id,
+                config = {
+                    proto: {
+                        title: $scope.mission.title + '-信息墙'
+                    }
+                };
+            http2.post(url, config, function(rsp) {
+                location.href = '/rest/pl/fe/matter/wall?site=' + $scope.mission.siteid + '&id=' + rsp.data;
+            })
+
+        };
         var indicators = {
             registration: {
                 title: '在线报名',
@@ -21,7 +35,7 @@ define(['frame'], function(ngApp) {
                 }
             },
             voting: {
-                title: '评价',
+                title: '投票',
                 handler: function() {
                     $scope.addEnroll('voting');
                 }
@@ -42,7 +56,6 @@ define(['frame'], function(ngApp) {
             });
         };
         $scope.addEnroll = function(assignedScenario) {
-            $('body').click();
             templateShop.choose($scope.mission.siteid, 'enroll', assignedScenario).then(function(choice) {
                 var url, config = {
                     proto: {}
@@ -51,10 +64,12 @@ define(['frame'], function(ngApp) {
                     config.proto.title = $scope.mission.title + '-报名';
                 } else if (assignedScenario === 'voting') {
                     config.proto.title = $scope.mission.title + '-评价';
+                } else if (assignedScenario === 'group_week_report') {
+                    config.proto.title = $scope.mission.title + '-周报';
                 } else if (assignedScenario === 'quiz') {
                     config.proto.title = $scope.mission.title + '-测验';
                 } else if (assignedScenario === 'common') {
-                    config.proto.title = $scope.mission.title + '-通用登记';
+                    config.proto.title = $scope.mission.title + '-登记';
                 }
                 if (choice) {
                     var data = choice.data;
@@ -70,7 +85,6 @@ define(['frame'], function(ngApp) {
                     }
                 } else {
                     url = '/rest/pl/fe/matter/enroll/create?site=' + $scope.mission.siteid + '&mission=' + $scope.mission.id;
-                    assignedScenario && (url += '&scenario=' + assignedScenario);
                 }
                 http2.post(url, config, function(rsp) {
                     location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.mission.siteid + '&id=' + rsp.data.id;
@@ -101,17 +115,16 @@ define(['frame'], function(ngApp) {
         };
         $scope.addMatter = function(matterType) {
             $('body').click();
-            if (/voting|registration|quiz/.test(matterType)) {
+            if (/quiz|voting|registration|group_week_report|common/.test(matterType)) {
                 $scope.addEnroll(matterType);
             } else {
                 $scope['add' + matterType[0].toUpperCase() + matterType.substr(1)]();
             }
         };
-        $scope.open = function(matter, subView) {
+        $scope.openMatter = function(matter, subView) {
             var url = '/rest/pl/fe/matter/',
                 type = matter.type || $scope.matterType,
                 id = matter.id;
-
             url += type;
             if (subView) {
                 url += '/' + subView;
@@ -121,6 +134,7 @@ define(['frame'], function(ngApp) {
                 case 'enroll':
                 case 'group':
                 case 'signin':
+                case 'wall':
                     location.href = url + '?id=' + id + '&site=' + $scope.mission.siteid;
                     break;
             }
@@ -141,6 +155,7 @@ define(['frame'], function(ngApp) {
                     case 'enroll':
                     case 'signin':
                     case 'group':
+                    case 'wall':
                         url += type + '/remove?app=' + id + '&site=' + $scope.mission.siteid;
                         break;
                 }
@@ -169,10 +184,20 @@ define(['frame'], function(ngApp) {
                 location.href = '/rest/pl/fe/matter/' + type + '?site=' + $scope.mission.siteid + '&id=' + rsp.data.id;
             });
         };
+        $scope.doChange = function(ms) {
+            location.hash = ms;
+        }
+        $scope.doFilter = function() {
+            $scope.list($scope.matterType);
+        }
+        $scope.cleanFilter = function() {
+            $scope.filter2.byTitle = '';
+        }
         $scope.list = function(matterType) {
             var url;
 
             matterType === undefined && (matterType = '');
+
             if (matterType === '') {
                 url = '/rest/pl/fe/matter/mission/matter/list?id=' + $scope.mission.id;
                 url += '&_=' + (new Date() * 1);
@@ -203,7 +228,7 @@ define(['frame'], function(ngApp) {
                 if ('enroll' === matterType) {
                     url += 'enroll';
                     scenario = '';
-                } else if (/registration|voting|quiz|common/.test(matterType)) {
+                } else if (/registration|voting|group_week_report|quiz|common/.test(matterType)) {
                     url += 'enroll'
                     scenario = $scope.matterType;
                 } else {
@@ -212,14 +237,14 @@ define(['frame'], function(ngApp) {
                 url += '/list?mission=' + $scope.mission.id;
                 scenario !== undefined && (url += '&scenario=' + scenario);
                 url += '&_=' + (new Date() * 1);
-                http2.get(url, function(rsp) {
+                http2.post(url, { byTitle: $scope.filter2.byTitle }, function(rsp) {
                     $scope.indicators = [];
                     if (/article/.test(matterType)) {
                         $scope.matters = rsp.data.articles;
                         if (rsp.data.total == 0) {
                             indicators.article && $scope.indicators.push(indicators.article);
                         }
-                    } else if (/common|voting|registration|quiz|signin|group/.test(matterType)) {
+                    } else if (/enroll|voting|registration|group_week_report|quiz|common|signin|group/.test(matterType)) {
                         $scope.matters = rsp.data.apps;
                         if (rsp.data.total == 0) {
                             indicators[matterType] && $scope.indicators.push(indicators[matterType]);
@@ -243,7 +268,7 @@ define(['frame'], function(ngApp) {
                 if ('enroll' === $scope.matterType) {
                     url += 'enroll';
                     scenario = '';
-                } else if (/registration|voting|quiz|common/.test($scope.matterType)) {
+                } else if (/registration|voting|group_week_report|quiz|common/.test($scope.matterType)) {
                     url += 'enroll'
                     scenario = $scope.matterType;
                 } else {
@@ -260,7 +285,7 @@ define(['frame'], function(ngApp) {
                     if (rsp.data.total == 0) {
                         indicators.article && $scope.indicators.push(indicators.article);
                     }
-                } else if (/enroll|voting|registration|quiz|common|signin|group/.test($scope.matterType)) {
+                } else if (/enroll|voting|registration|group_week_report|quiz|common|signin|group/.test($scope.matterType)) {
                     $scope.matters = rsp.data.apps;
                     if (rsp.data.total == 0) {
                         indicators[$scope.matterType] && $scope.indicators.push(indicators[$scope.matterType]);
@@ -277,6 +302,10 @@ define(['frame'], function(ngApp) {
             });
             if (!nv) return;
             $scope.matterType = location.hash ? location.hash.substr(1) : '';
+            if (/enroll|registration|voting|group_week_report|quiz|common/.test($scope.matterType)) {
+                $scope.matter_scenario = $scope.matterType;
+            }
+            $scope.mission = nv;
             http2.get('/rest/pl/fe/matter/mission/phase/list?mission=' + $scope.mission.id, function(rsp) {
                 $scope.phases = rsp.data;
             });

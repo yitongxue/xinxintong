@@ -1,6 +1,6 @@
 define(['require'], function(require) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter']);
+    var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'page.ui.xxt', 'modal.ui.xxt']);
     ngApp.constant('cstApp', {
         matterNames: {
             'article': '项目资料',
@@ -25,7 +25,7 @@ define(['require'], function(require) {
             'quiz': '测验'
         }
     });
-    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider) {
+    ngApp.config(['$controllerProvider', '$provide', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', function($controllerProvider, $provide, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/console/';
             this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
@@ -46,6 +46,9 @@ define(['require'], function(require) {
         };
         $locationProvider.html5Mode(true);
         $routeProvider.otherwise(new RouteParam('main', '/views/ytx/pl/fe/console/'));
+        $uibTooltipProvider.setTriggers({
+            'show': 'hide'
+        });
     }]);
     ngApp.controller('ctrlFrame', ['$scope', 'http2', 'srvUserNotice', '$uibModal', 'templateShop', function($scope, http2, srvUserNotice, $uibModal, templateShop) {
         var frameState;
