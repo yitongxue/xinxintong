@@ -194,7 +194,7 @@
                                 <tr>
                                     <td>默认进入页面</td>
                                     <td style='padding:0'>
-                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.otherwise.entry' ng-options="p.name as p.title for p in app.pages"></select>
+                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.otherwise.entry' ng-options="p.name as p.title for p in entry.pages"></select>
                                     </td>
                                 </tr>
                             </tbody>
@@ -204,7 +204,7 @@
                                 <tr ng-repeat="ms in memberSchemas">
                                     <td>{{ms.title}}</td>
                                     <td style='padding:0'>
-                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model="app.entry_rule.member[ms.id].entry" ng-options="p.name as p.title for p in app.pages">
+                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model="app.entry_rule.member[ms.id].entry" ng-options="p.name as p.title for p in entry.pages">
                                             <option value=''></option>
                                         </select>
                                     </td>
@@ -222,7 +222,7 @@
                                 <tr ng-if="sns.wx">
                                     <td>微信公众号关注用户</td>
                                     <td style='padding:0'>
-                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.sns.wx.entry' ng-options='p.name as p.title for p in app.pages'>
+                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.sns.wx.entry' ng-options='p.name as p.title for p in entry.pages'>
                                             <option value=''></option>
                                         </select>
                                     </td>
@@ -230,7 +230,7 @@
                                 <tr ng-if="sns.qy">
                                     <td>微信企业号关注用户</td>
                                     <td style='padding:0'>
-                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.sns.qy.entry' ng-options='p.name as p.title for p in app.pages'>
+                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.sns.qy.entry' ng-options='p.name as p.title for p in entry.pages'>
                                             <option value=''></option>
                                         </select>
                                     </td>
@@ -238,7 +238,7 @@
                                 <tr ng-if="sns.yx">
                                     <td>易信公众号关注用户</td>
                                     <td style='padding:0'>
-                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.sns.yx.entry' ng-options='p.name as p.title for p in app.pages'>
+                                        <select style='border:0' class='form-control' ng-change="update('entry_rule')" ng-model='app.entry_rule.sns.yx.entry' ng-options='p.name as p.title for p in entry.pages'>
                                             <option value=''></option>
                                         </select>
                                     </td>
@@ -262,7 +262,7 @@
                                 <tr>
                                     <td rowspan="2">已填写时进入</td>
                                     <td style='padding:0'>
-                                        <select style='border:0' class='form-control' ng-model='app.enrolled_entry_page' ng-options='page.name as page.title for page in app.pages' ng-change="update('enrolled_entry_page')">
+                                        <select style='border:0' class='form-control' ng-model='app.enrolled_entry_page' ng-options='page.name as page.title for page in entry.pages' ng-change="update('enrolled_entry_page')">
                                             <option value=''></option>
                                         </select>
                                     </td>
