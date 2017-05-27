@@ -46,7 +46,10 @@ define(['require', 'enrollService'], function(require) {
         };
         $routeProvider
             .when('/rest/pl/fe/matter/enroll/main', new RouteParam('main', '/views/ytx/pl/fe/matter/enroll/'))
-            .when('/rest/pl/fe/matter/enroll/publish', new RouteParam('publish', '/views/ytx/pl/fe/matter/enroll/'))
+            .when('/rest/pl/fe/matter/enroll/access', new RouteParam('access'))
+            .when('/rest/pl/fe/matter/enroll/time', new RouteParam('time'))
+            .when('/rest/pl/fe/matter/enroll/preview', new RouteParam('preview'))
+            .when('/rest/pl/fe/matter/enroll/entry', new RouteParam('entry'))
             .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema', '/views/ytx/pl/fe/matter/enroll/'))
             .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page', '/views/ytx/pl/fe/matter/enroll/'))
             .when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
@@ -56,8 +59,7 @@ define(['require', 'enrollService'], function(require) {
             .when('/rest/pl/fe/matter/enroll/log', new RouteParam('log'))
             .when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
             .when('/rest/pl/fe/matter/enroll/notice', new RouteParam('notice'))
-            .when('/rest/pl/fe/matter/enroll/discuss', new RouteParam('discuss', '/views/default/pl/fe/_module/', '/views/default/pl/fe/_module/'))
-            .otherwise(new RouteParam('publish', '/views/ytx/pl/fe/matter/enroll/'));
+            .otherwise(new RouteParam('entry'));
 
         $locationProvider.html5Mode(true);
 
@@ -89,12 +91,18 @@ define(['require', 'enrollService'], function(require) {
         $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
-            $scope.subView = subView[1] === 'enroll' ? 'publish' : subView[1];
+            $scope.subView = subView[1] === 'enroll' ? 'entry' : subView[1];
             switch ($scope.subView) {
                 case 'main':
                 case 'page':
                 case 'schema':
                     $scope.opened = 'edit';
+                    break;
+                case 'access':
+                case 'time':
+                case 'preview':
+                case 'entry':
+                    $scope.opened = 'publish';
                     break;
                 case 'record':
                 case 'stat':
