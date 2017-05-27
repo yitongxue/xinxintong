@@ -268,7 +268,7 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                         if (name === 'tags') {
                             modifiedData.tags = _oApp.tags.join(',');
                         } else {
-                            modifiedData[name] = _oApp[name];
+                            modifiedData[name] = _oApp[name];//_oApp  登记活动包  哪里传过来的？
                         }
                     });
 
@@ -291,27 +291,30 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                     return defer.promise;
                 },
                 jumpPages: function() {
-                    var defaultInput, pages = _oApp.pages,
+                    var defaultInput, inapp = [],
                         pages4NonMember = [{
                             name: '$memberschema',
-                            title: '填写自定义用户信息'
+                            title: '提示填写联系人信息'
                         }],
                         pages4Nonfan = [{
                             name: '$mpfollow',
                             title: '提示关注'
                         }];
 
-                    pages.forEach(function(page) {
+                    _oApp.pages.forEach(function(page) {
                         var newPage = {
                             name: page.name,
                             title: page.title
                         };
+                        inapp.push(newPage);
                         pages4NonMember.push(newPage);
                         pages4Nonfan.push(newPage);
                         page.type === 'I' && (defaultInput = newPage);
                     });
+                    inapp.push({ name: 'repos', 'title': '所有数据页' });
 
                     return {
+                        inapp: inapp,
                         nonMember: pages4NonMember,
                         nonfan: pages4Nonfan,
                         defaultInput: defaultInput
