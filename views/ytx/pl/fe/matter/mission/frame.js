@@ -9,7 +9,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             'article': '项目资料',
             'common': '通用登记',
             'registration': '报名',
-            'voting': '投票',
+            'voting': '评价',
             'quiz': '测验',
             'signin': '签到',
             'split': '分组'
