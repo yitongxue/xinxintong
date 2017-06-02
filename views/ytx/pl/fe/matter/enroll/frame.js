@@ -53,6 +53,7 @@ define(['require', 'enrollService'], function(require) {
             .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema', '/views/ytx/pl/fe/matter/enroll/'))
             .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page', '/views/ytx/pl/fe/matter/enroll/'))
             .when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
+            .when('/rest/pl/fe/matter/enroll/remark', new RouteParam('remark'))
             .when('/rest/pl/fe/matter/enroll/editor', new RouteParam('editor'))
             .when('/rest/pl/fe/matter/enroll/recycle', new RouteParam('recycle'))
             .when('/rest/pl/fe/matter/enroll/stat', new RouteParam('stat'))
@@ -105,6 +106,7 @@ define(['require', 'enrollService'], function(require) {
                     $scope.opened = 'publish';
                     break;
                 case 'record':
+                case 'remark':
                 case 'stat':
                     $scope.opened = 'data';
                     break;
