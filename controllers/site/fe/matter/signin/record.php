@@ -144,7 +144,7 @@ class record extends base {
 		}
 
 		/* 记录操作日志 */
-		$this->_logSubmit($site, $signinApp, $signState->ek);
+		$this->_logSubmit($signinApp, $signState->ek);
 		/**
 		 * 通知登记活动事件接收人
 		 */
@@ -157,11 +157,10 @@ class record extends base {
 	/**
 	 * 记录用户提交日志
 	 *
-	 * @param string $siteId
-	 * @param object $app
+	 * @param object $oApp
 	 *
 	 */
-	private function _logSubmit($siteId, $app, $ek) {
+	private function _logSubmit($oApp, $ek) {
 		$modelLog = $this->model('matter\log');
 
 		$logUser = new \stdClass;
@@ -178,7 +177,7 @@ class record extends base {
 
 		$referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
 
-		$logid = $modelLog->addUserMatterOp($siteId, $logUser, $app, $operation, $client, $referer);
+		$logid = $modelLog->addUserMatterOp($oApp->siteid, $logUser, $oApp, $operation, $client, $referer);
 
 		return $logid;
 	}
