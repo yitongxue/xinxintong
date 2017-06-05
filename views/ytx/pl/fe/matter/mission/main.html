@@ -117,6 +117,14 @@
         <nav class='navbar navbar-default tms-panel-heading'>
             <div class='container-fluid'>
                 <p class="navbar-text">项目合作人</p>
+                <form class='navbar-form navbar-right' ng-show="mission.yourRole==='O'">
+                    <div class='input-group' ng-hide="status">
+                        <input type="text" class="form-control" ng-model='newOwner' placeholder="输入新项目管理员的账号">
+                        <span class='input-group-btn'>
+                            <button class='btn btn-default' ng-click="transfer()">移交</button>
+                        </span>
+                    </div>
+                </form>
             </div>
         </nav>
         <div class='tms-panel-body'>
