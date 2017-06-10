@@ -29,9 +29,9 @@
         }
     },
     "voting": {
-        "title": "投票",
+        "title": "评价",
         "name": "voting",
-        "description": "投票信息收集",
+        "description": "评价信息收集",
         "templates": {
             "simple": {
                 "title": "简单",
