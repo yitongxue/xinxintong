@@ -15,8 +15,8 @@ foreach ($tables as $table) {
 		while ($row = $result->fetch_object()) {
 			if (!empty($row->data_schemas)) {
 				$newDataSchemas = str_replace(
-					['style="', 'style=\"', ';"', ';\"', "\n", '\n'],
-					['style=\\\\"', 'style=\\\\"', ';\\\\"', ';\\\\"', "\\\\n", "\\\\n"],
+					['style="', 'style=\"', ';"', ';\"', "\n", '\n', "\r", '\r'],
+					['style=\\\\"', 'style=\\\\"', ';\\\\"', ';\\\\"', "\\\\n", "\\\\n", "\\\\r", "\\\\r"],
 					$row->data_schemas);
 				if ($newDataSchemas !== $row->data_schemas) {
 					$mysqli->query("update $table set data_schemas='" . $newDataSchemas . "' where id='$row->id'");
