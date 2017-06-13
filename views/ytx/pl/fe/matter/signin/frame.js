@@ -43,11 +43,13 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
         $routeProvider
             .when('/rest/pl/fe/matter/signin/main', new RouteParam('main', '/views/ytx/pl/fe/matter/signin/'))
             .when('/rest/pl/fe/matter/signin/page', new RouteParam('page', '/views/ytx/pl/fe/matter/signin/'))
-            .when('/rest/pl/fe/matter/signin/schema', new RouteParam('schema', '/views/ytx/pl/fe/matter/signin/'))
+            .when('/rest/pl/fe/matter/signin/schema', new RouteParam('schema'))
             .when('/rest/pl/fe/matter/signin/record', new RouteParam('record'))
-            .when('/rest/pl/fe/matter/signin/publish', new RouteParam('publish', '/views/ytx/pl/fe/matter/signin/'))
+            .when('/rest/pl/fe/matter/signin/access', new RouteParam('access'))
+            .when('/rest/pl/fe/matter/signin/preview', new RouteParam('preview'))
+            .when('/rest/pl/fe/matter/signin/entry', new RouteParam('entry'))
             .when('/rest/pl/fe/matter/signin/notice', new RouteParam('notice'))
-            .otherwise(new RouteParam('publish'));
+            .otherwise(new RouteParam('entry'));
 
         $locationProvider.html5Mode(true);
         $uibTooltipProvider.setTriggers({
@@ -85,6 +87,11 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
                 case 'page':
                 case 'schema':
                     $scope.opened = 'edit';
+                    break;
+                case 'access':
+                case 'preview':
+                case 'entry':
+                    $scope.opened = 'publish';
                     break;
                 default:
                     $scope.opened = '';
