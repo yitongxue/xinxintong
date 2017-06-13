@@ -36,6 +36,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
         };
         $routeProvider
             .when('/rest/pl/fe/matter/mission/main', new RouteParam('main'))
+            .when('/rest/pl/fe/matter/mission/access', new RouteParam('access', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
             .when('/rest/pl/fe/matter/mission/matter', new RouteParam('matter'))
             .when('/rest/pl/fe/matter/mission/user', new RouteParam('user', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
             .otherwise(new RouteParam('main'));
