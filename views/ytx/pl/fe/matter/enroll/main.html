@@ -55,33 +55,3 @@
     <hr>
     <button class='btn btn-default btn-block' ng-click="remove()">删除活动</button>
 </div>
-<div class='col-md-6'>
-    <div ng-controller="ctrlReceiver">
-        <div class='form-group'>
-            <p class=''><i class="glyphicon glyphicon-bell"></i> 事件提醒</p>
-        </div>
-        <div class='checkbox'>
-            <label class='checkbox-inline'>
-                <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model="app.notify_submit" ng-change="update('notify_submit')">用户提交填写内容时通知</label>
-        </div>
-        <div class='form-group hide'>
-            <button class='btn btn-default' ng-click="addMe()">把我加入接收人</button>
-        </div>
-        <div class='form-group' ng-if="sns.wx.joined==='Y'&&sns.wx.can_qrcode==='Y'">
-            <button id='wxQrcode' uib-popover-template="'joinQrcode.html'" popover-trigger="show" popover-placement="bottom" class="btn btn-default" ng-click="qrcode('wx')">微信公众号用户扫码作为接收人 <span class="caret"></span></button>
-        </div>
-        <div class='list-group'>
-            <div class='list-group-item' ng-repeat="r in receivers" ng-mouseenter="entered=true" ng-mouseleave="entered=false">
-                <span>{{r.nickname}}</span>
-                <button class='btn btn-default btn-xs pull-right' ng-show="entered" ng-click="remove(r)">
-                    <span class='glyphicon glyphicon-remove'></span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<script type="text/ng-template" id="joinQrcode.html">
-    <div style="width:200px">
-        <img ng-src="{{qrcodeURL}}" style="width:100%">
-    </div>
-</script>
