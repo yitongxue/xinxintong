@@ -40,6 +40,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             .when('/rest/pl/fe/matter/mission/access', new RouteParam('access', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
             .when('/rest/pl/fe/matter/mission/matter', new RouteParam('matter'))
             .when('/rest/pl/fe/matter/mission/user', new RouteParam('user', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
+            .when('/rest/pl/fe/matter/mission/report', new RouteParam('report', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
             .otherwise(new RouteParam('main'));
 
         $locationProvider.html5Mode(true);
