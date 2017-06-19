@@ -1,7 +1,7 @@
 <div id='page-view'>
     <!-- pages -->
     <nav class='navbar navbar-default'>
-        <div class='container'>
+        <div class='container-fluid'>
             <ul class="nav navbar-nav" ng-show="app.pages.length<=3">
                 <li ng-class="{'active':p===ep}" ng-repeat="p in app.pages">
                     <a href="" ng-click="choosePage(p)"><span><i class='fa fa-file-o'></i> {{p.title}}</span></a>
@@ -110,5 +110,5 @@
         <button class='btn btn-block btn-default' ng-click="addPage()">添加页面</button>
         <hr>
         <button class='btn btn-block btn-default' ng-click="gotoCode()">编辑代码</button>
-        <div>
+    </div>
 </script>
