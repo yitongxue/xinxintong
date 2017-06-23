@@ -431,9 +431,7 @@ class record_model extends \TMS_MODEL {
 
 		$oRecord = count($records) === 1 ? $records[0] : false;
 		if ($oRecord) {
-			if ($oRecord = $this->query_obj_ss($q)) {
-				$this->_processRecord($oRecord, $fields, $verbose);
-			}
+			$this->_processRecord($oRecord, $fields, $verbose);
 		}
 
 		return $oRecord;
