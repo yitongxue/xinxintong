@@ -387,7 +387,7 @@ class record extends base {
 
 		$modelRec = $this->model('matter\signin\record');
 
-		$rst = $modelRec->find($app, $options);
+		$rst = $modelRec->byApp($app, $options);
 
 		return new \ResponseData($rst);
 	}
