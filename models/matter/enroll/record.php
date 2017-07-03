@@ -314,6 +314,40 @@ class record_model extends \TMS_MODEL {
 	 * @param object $oUser [uid]
 	 * @param object $oApp
 	 * @param string $ek
+	 * @param array $submitTag 用户提交的填写项标签
+	 */
+	public function setTag($oUser, &$oApp, $ek, $submitTag) {
+		$wholeTags = new \stdClass;
+		/*record data*/
+		foreach ($submitTag as $schemaId => $tags) {
+			/* 保证以字符串的格式存储标签id，便于以后检索 */
+			$jsonTags = [];
+			foreach ($tags as $oTag) {
+				$jsonTags[] = (string) $oTag->id;
+			}
+			$wholeTags->{$schemaId} = $jsonTags;
+			$jsonTags = json_encode($jsonTags);
+			$rst = $this->update(
+				'xxt_enroll_record_data',
+				['tag' => $this->escape($jsonTags)],
+				['enroll_key' => $ek, 'schema_id' => $schemaId, 'state' => 1]
+			);
+		}
+
+		$rst = $this->update(
+			'xxt_enroll_record',
+			['data_tag' => $this->escape(json_encode($wholeTags))],
+			['enroll_key' => $ek, 'state' => 1]
+		);
+
+		return $rst;
+	}
+	/**
+	 * 保存登记的数据
+	 *
+	 * @param object $oUser [uid]
+	 * @param object $oApp
+	 * @param string $ek
 	 * @param array $submitSupp 用户提交的补充说明
 	 */
 	public function setSupplement($oUser, &$oApp, $ek, $submitSupp) {
@@ -341,6 +375,9 @@ class record_model extends \TMS_MODEL {
 	private function _processRecord(&$oRecord, $fields, $verbose = 'Y') {
 		if ($fields === '*' || false !== strpos($fields, 'data')) {
 			$oRecord->data = empty($oRecord->data) ? new \stdClass : json_decode($oRecord->data);
+		}
+		if ($fields === '*' || false !== strpos($fields, 'data_tag')) {
+			$oRecord->data_tag = empty($oRecord->data_tag) ? new \stdClass : json_decode($oRecord->data_tag);
 		}
 		if ($fields === '*' || false !== strpos($fields, 'supplement')) {
 			$oRecord->supplement = empty($oRecord->supplement) ? new \stdClass : json_decode($oRecord->supplement);
@@ -438,8 +475,11 @@ class record_model extends \TMS_MODEL {
 	}
 	/**
 	 * 获得用户的登记清单
+	 * @param object $oApp
+	 * @param object $oUser
+	 * @param array $options
 	 */
-	public function &byUser($appId, &$oUser, $options = []) {
+	public function &byUser(&$oApp, &$oUser, $options = []) {
 		$fields = isset($options['fields']) ? $options['fields'] : '*';
 		$verbose = isset($options['verbose']) ? $options['verbose'] : 'N';
 
@@ -451,8 +491,13 @@ class record_model extends \TMS_MODEL {
 		$q = [
 			$fields,
 			'xxt_enroll_record',
-			["state" => 1, "aid" => $appId, "userid" => $userid],
+			["state" => 1, "aid" => $oApp->id, "userid" => $userid],
 		];
+		if (!empty($options['rid'])) {
+			if (strcasecmp('all', $options['rid']) !== 0) {
+				$q[2]['rid'] = $options['rid'];
+			}
+		}
 		$q2 = ['o' => 'enroll_at desc'];
 
 		$records = $this->query_objs_ss($q, $q2);
@@ -801,7 +846,7 @@ class record_model extends \TMS_MODEL {
 	 *
 	 * return
 	 */
-	public function enrollerByApp($oApp, $options = null, $criteria = null) {
+	public function enrolleeByApp($oApp, $options = null, $criteria = null) {
 		if ($options) {
 			is_array($options) && $options = (object) $options;
 			$rid = null;
@@ -862,9 +907,9 @@ class record_model extends \TMS_MODEL {
 			"xxt_enroll_record e",
 			$w,
 		];
-		$enrollers = $this->query_objs_ss($q);
+		$enrollees = $this->query_objs_ss($q);
 
-		return $enrollers;
+		return $enrollees;
 	}
 	/**
 	 * 已删除的登记清单

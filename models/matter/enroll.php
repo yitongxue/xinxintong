@@ -54,9 +54,19 @@ class enroll_model extends app_base {
 		return $url;
 	}
 	/**
+	 * 登记活动的统计报告链接
+	 */
+	public function getRpUrl($siteId, $id) {
+		$url = 'http://' . APP_HTTP_HOST;
+		$url .= '/rest/site/op/matter/enroll/report';
+		$url .= "?site={$siteId}&app=" . $id;
+
+		return $url;
+	}
+	/**
 	 *
-	 * $aid string
-	 * $cascaded array []
+	 * @param string $aid
+	 * @param array $options
 	 */
 	public function &byId($aid, $options = []) {
 		$fields = isset($options['fields']) ? $options['fields'] : '*';
@@ -72,52 +82,55 @@ class enroll_model extends app_base {
 			}
 		}
 
-		if ($app = $this->query_obj_ss($q)) {
-			$app->type = 'enroll';
-			if (isset($app->siteid) && isset($app->id)) {
-				$app->entryUrl = $this->getEntryUrl($app->siteid, $app->id);
-				$app->opUrl = $this->getOpUrl($app->siteid, $app->id);
+		if ($oApp = $this->query_obj_ss($q)) {
+			$oApp->type = 'enroll';
+			if (isset($oApp->siteid) && isset($oApp->id)) {
+				$oApp->entryUrl = $this->getEntryUrl($oApp->siteid, $oApp->id);
+				$oApp->opUrl = $this->getOpUrl($oApp->siteid, $oApp->id);
+				$oApp->rpUrl = $this->getRpUrl($oApp->siteid, $oApp->id);
 			}
-			if (isset($app->entry_rule)) {
-				$app->entry_rule = json_decode($app->entry_rule);
+			if (isset($oApp->entry_rule)) {
+				$oApp->entry_rule = json_decode($oApp->entry_rule);
 			}
 			if ($fields === '*' || false !== strpos($fields, 'data_schemas')) {
-				if (!empty($app->data_schemas)) {
-					$app->dataSchemas = json_decode($app->data_schemas);
+				if (!empty($oApp->data_schemas)) {
+					$oApp->dataSchemas = json_decode($oApp->data_schemas);
 				} else {
-					$app->dataSchemas = [];
+					$oApp->dataSchemas = [];
 				}
 			}
 			if ($fields === '*' || false !== strpos($fields, 'scenario_config')) {
-				if (!empty($app->scenario_config)) {
-					$app->scenarioConfig = json_decode($app->scenario_config);
+				if (!empty($oApp->scenario_config)) {
+					$oApp->scenarioConfig = json_decode($oApp->scenario_config);
 				} else {
-					$app->scenarioConfig = new \stdClass;
+					$oApp->scenarioConfig = new \stdClass;
 				}
 			}
 			if ($fields === '*' || false !== strpos($fields, 'round_cron')) {
-				if (!empty($app->round_cron)) {
-					$app->roundCron = json_decode($app->round_cron);
+				if (!empty($oApp->round_cron)) {
+					$oApp->roundCron = json_decode($oApp->round_cron);
 				} else {
-					$app->roundCron = [];
+					$oApp->roundCron = [];
 				}
 			}
 			if ($fields === '*' || false !== strpos($fields, 'rp_config')) {
-				if (!empty($app->rp_config)) {
-					$app->rpConfig = json_decode($app->rp_config);
+				if (!empty($oApp->rp_config)) {
+					$oApp->rpConfig = json_decode($oApp->rp_config);
 				} else {
-					$app->rpConfig = new \stdClass;
+					$oApp->rpConfig = new \stdClass;
 				}
 			}
+			$oApp->dataTags = $this->model('matter\enroll\tag')->byApp($oApp);
+
 			$modelPage = $this->model('matter\enroll\page');
 			if ($cascaded === 'Y') {
-				$app->pages = $modelPage->byApp($aid);
+				$oApp->pages = $modelPage->byApp($aid);
 			} else {
-				$app->pages = $modelPage->byApp($aid, ['cascaded' => 'N', 'fields' => 'id,name,type,title']);
+				$oApp->pages = $modelPage->byApp($aid, ['cascaded' => 'N', 'fields' => 'id,name,type,title']);
 			}
 		}
 
-		return $app;
+		return $oApp;
 	}
 	/**
 	 * 返回登记活动列表
@@ -189,11 +202,11 @@ class enroll_model extends app_base {
 		}
 
 		$options = array('fields' => 'tags', 'cascaded' => 'N');
-		$app = $this->byId($aid, $options);
-		if (empty($app->tags)) {
+		$oApp = $this->byId($aid, $options);
+		if (empty($oApp->tags)) {
 			$this->update('xxt_enroll', ['tags' => $tags], ["id" => $aid]);
 		} else {
-			$existent = explode(',', $app->tags);
+			$existent = explode(',', $oApp->tags);
 			$checked = explode(',', $tags);
 			$updated = array();
 			foreach ($checked as $c) {
@@ -232,16 +245,26 @@ class enroll_model extends app_base {
 	/**
 	 * 登记活动运行情况摘要
 	 *
-	 * @param string $siteId
-	 * @param string $appId
+	 * @param object $oApp
 	 *
 	 * @return
 	 */
 	public function &opData(&$oApp) {
 		$modelRnd = $this->model('matter\enroll\round');
-		$page = (object) ['num' => 1, 'size' => 5];
+		$modelRec = $this->model('matter\enroll\record');
+		$page = (object) ['num' => 1, 'size' => 3];
 		$result = $modelRnd->byApp($oApp, ['fields' => 'rid,title', 'page' => $page]);
 		$rounds = $result->rounds;
+		$mschemaIds = [];
+		if (!empty($oApp->entry_rule) && is_object($oApp->entry_rule)) {
+			if (!empty($oApp->entry_rule->member) && is_object($oApp->entry_rule->member)) {
+				foreach ($oApp->entry_rule->member as $mschemaId => $rule) {
+					if (!empty($rule->entry)) {
+						$mschemaIds[] = $mschemaId;
+					}
+				}
+			}
+		}
 		if (empty($rounds)) {
 			$summary = new \stdClass;
 			/* total */
@@ -251,43 +274,75 @@ class enroll_model extends app_base {
 				['aid' => $oApp->id, 'state' => 1],
 			];
 			$summary->total = $this->query_val_ss($q);
+			/* remark */
+			$q = [
+				'count(*)',
+				'xxt_enroll_record_remark',
+				['aid' => $oApp->id],
+			];
+			$summary->remark_total = $this->query_val_ss($q);
+			/* enrollee */
+			$enrollees = $modelRec->enrolleeByApp($oApp);
+			$summary->enrollee_num = count($enrollees);
+			/* member */
+			if (!empty($mschemaIds)) {
+				$summary->mschema = new \stdClass;
+				foreach ($mschemaIds as $mschemaId) {
+					$summary->mschema->{$mschemaId} = $this->_opByMschema($oApp->id, $mschemaId);
+				}
+			}
 		} else {
 			$summary = [];
-			$activeRound = $modelRnd->getActive($oApp);
-			foreach ($rounds as $round) {
+			$oActiveRound = $modelRnd->getActive($oApp);
+			foreach ($rounds as $oRound) {
+				if ($oActiveRound && $oRound->rid === $oActiveRound->rid) {
+					$oRound->active = 'Y';
+				}
 				/* total */
 				$q = [
 					'count(*)',
 					'xxt_enroll_record',
-					['aid' => $oApp->id, 'state' => 1, 'rid' => $round->rid],
+					['aid' => $oApp->id, 'state' => 1, 'rid' => $oRound->rid],
 				];
-				$round->total = $this->query_val_ss($q);
-				if ($activeRound && $round->rid === $activeRound->rid) {
-					$round->active = 'Y';
-				}
+				$oRound->total = $this->query_val_ss($q);
+				/* remark */
+				$q = [
+					'count(*)',
+					'xxt_enroll_record_remark',
+					['aid' => $oApp->id, 'rid' => $oRound->rid],
+				];
+				$oRound->remark_total = $this->query_val_ss($q);
+				/* enrollee */
+				$enrollees = $modelRec->enrolleeByApp($oApp, ['rid' => $oRound->rid]);
+				$oRound->enrollee_num = count($enrollees);
 
-				$summary[] = $round;
+				/* member */
+				if (!empty($mschemaIds)) {
+					$oRound->mschema = new \stdClass;
+					foreach ($mschemaIds as $mschemaId) {
+						$oRound->mschema->{$mschemaId} = $this->_opByMschema($oApp->id, $mschemaId, $oRound->rid);
+					}
+				}
+				$summary[] = $oRound;
 			}
 		}
 
 		return $summary;
 	}
 	/**
-	 * 指定用户的行为报告
+	 * 通讯录联系人登记情况
 	 */
-	public function reportByUser($oApp, $oUser) {
-
+	private function _opByMschema($appId, $mschemaId, $rid = null) {
 		$result = new \stdClass;
+		$q = [
+			'count(*)',
+			'xxt_site_member m',
+			"verified='Y' and forbidden='N' and schema_id=$mschemaId and exists(select 1 from xxt_enroll_record r where r.aid='{$appId}' and r.state=1 and r.userid=m.userid",
+		];
+		!empty($rid) && $q[2] .= " and rid='{$rid}'";
+		$q[2] .= ")";
 
-		/* 登记次数 */
-		$modelRec = $this->model('matter\enroll\record');
-		$records = $modelRec->byUser($oApp->id, $oUser, ['fields' => 'id']);
-		$result->enroll_num = count($records);
-
-		/* 发表评论次数 */
-		$modelRec = $this->model('matter\enroll\remark');
-		$remarks = $modelRec->byUser($oApp, $oUser, ['fields' => 'id']);
-		$result->remark_other_num = count($remarks);
+		$result->enrolled = $this->query_val_ss($q);
 
 		return $result;
 	}
