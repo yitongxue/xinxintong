@@ -155,7 +155,7 @@ define(['frame'], function(ngApp) {
             });
         };
         $scope.remove = function(phase) {
-            if (window.confirm('确定删除项目阶段？')) {
+            if (window.confirm('确定删除课程期数？')) {
                 http2.get('/rest/pl/fe/matter/mission/phase/remove?mission=' + $scope.mission.id + '&id=' + phase.phase_id, function(rsp) {
                     $scope.phases.splice($scope.phases.indexOf(phase), 1);
                 });
