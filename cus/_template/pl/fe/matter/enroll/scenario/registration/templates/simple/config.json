@@ -9,10 +9,10 @@
                 "id": "name",
                 "title": "姓名",
                 "type": "shorttext",
+                "required": "Y",
                 "format": "name"
             },
             "config": {
-                "required": "Y",
                 "showname": "label"
             }
         }, {
@@ -20,10 +20,10 @@
                 "id": "mobile",
                 "title": "手机",
                 "type": "shorttext",
+                "required": "Y",
                 "format": "mobile"
             },
             "config": {
-                "required": "Y",
                 "showname": "label"
             }
         }, {
@@ -31,6 +31,7 @@
                 "id": "gender",
                 "title": "性别",
                 "type": "single",
+                "required": "Y",
                 "ops": [{
                     "v": "v1",
                     "l": "男"
@@ -40,7 +41,6 @@
                 }]
             },
             "config": {
-                "required": "Y",
                 "showname": "label",
                 "component": "R",
                 "align": "H"
@@ -50,10 +50,10 @@
                 "id": "department",
                 "title": "部门",
                 "type": "shorttext",
+                "required": "Y",
                 "format": ""
             },
             "config": {
-                "required": "Y",
                 "showname": "label"
             }
         }, {
@@ -61,10 +61,10 @@
                 "id": "position",
                 "title": "职务",
                 "type": "shorttext",
+                "required": "Y",
                 "format": ""
             },
             "config": {
-                "required": "Y",
                 "showname": "label"
             }
         }],
@@ -89,6 +89,8 @@
                 "id": "name",
                 "title": "名称",
                 "type": "shorttext",
+                "required": "Y",
+
                 "format": "name"
             }
         }, {
@@ -102,6 +104,7 @@
                 "id": "mobile",
                 "title": "手机",
                 "type": "shorttext",
+                "required": "Y",
                 "format": "mobile"
             }
         }, {
@@ -115,6 +118,7 @@
                 "id": "gender",
                 "title": "性别",
                 "type": "single",
+                "required": "Y",
                 "ops": [{
                     "v": "v1",
                     "l": "男"
@@ -134,6 +138,7 @@
                 "id": "department",
                 "title": "部门",
                 "type": "shorttext",
+                "required": "Y",
                 "format": ""
             }
         }, {
@@ -147,6 +152,7 @@
                 "id": "position",
                 "title": "职务",
                 "type": "shorttext",
+                "required": "Y",
                 "format": ""
             }
         }, {
@@ -178,16 +184,19 @@
         "id": "name",
         "title": "名称",
         "type": "shorttext",
+        "required": "Y",
         "format": "name"
     }, {
         "id": "mobile",
         "title": "手机",
         "type": "shorttext",
+        "required": "Y",
         "format": "mobile"
     }, {
         "id": "gender",
         "title": "性别",
         "type": "single",
+        "required": "Y",
         "ops": [{
             "v": "v1",
             "l": "男"
@@ -199,11 +208,13 @@
         "id": "department",
         "title": "部门",
         "type": "shorttext",
+        "required": "Y",
         "format": ""
     }, {
         "id": "position",
         "title": "职务",
         "type": "shorttext",
+        "required": "Y",
         "format": ""
     }],
     "scenarioConfig": {
