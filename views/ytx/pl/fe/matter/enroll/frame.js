@@ -23,7 +23,8 @@ define(['require', 'enrollService'], function(require) {
         alertMsg: {
             'schema.duplicated': '不允许重复添加题目',
             'require.mission.phase': '请先指定项目的课程期数'
-        }
+        },
+        naming: { 'mission_phase': '课程期数' }
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvEnrollAppProvider', 'srvEnrollRoundProvider', 'srvEnrollPageProvider', 'srvEnrollRecordProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvEnrollAppProvider, srvEnrollRoundProvider, srvEnrollPageProvider, srvEnrollRecordProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
@@ -45,7 +46,7 @@ define(['require', 'enrollService'], function(require) {
             directive: $compileProvider.directive
         };
         $routeProvider
-            .when('/rest/pl/fe/matter/enroll/main', new RouteParam('main', '/views/ytx/pl/fe/matter/enroll/'))
+            .when('/rest/pl/fe/matter/enroll/main', new RouteParam('main'))
             .when('/rest/pl/fe/matter/enroll/access', new RouteParam('access'))
             .when('/rest/pl/fe/matter/enroll/time', new RouteParam('time'))
             .when('/rest/pl/fe/matter/enroll/preview', new RouteParam('preview'))
@@ -60,6 +61,7 @@ define(['require', 'enrollService'], function(require) {
             .when('/rest/pl/fe/matter/enroll/log', new RouteParam('log'))
             .when('/rest/pl/fe/matter/enroll/coin', new RouteParam('coin'))
             .when('/rest/pl/fe/matter/enroll/notice', new RouteParam('notice'))
+            .when('/rest/pl/fe/matter/enroll/enrollee', new RouteParam('enrollee'))
             .otherwise(new RouteParam('entry'));
 
         $locationProvider.html5Mode(true);
@@ -82,7 +84,8 @@ define(['require', 'enrollService'], function(require) {
             srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
-    ngApp.controller('ctrlFrame', ['$scope', 'srvSite', 'srvEnrollApp', 'templateShop', '$location', function($scope, srvSite, srvEnrollApp, templateShop, $location) {
+    ngApp.controller('ctrlFrame', ['$scope', 'cstApp', 'srvSite', 'srvEnrollApp', 'templateShop', '$location', function($scope, cstApp, srvSite, srvEnrollApp, templateShop, $location) {
+        $scope.cstApp = cstApp;
         $scope.scenarioNames = {
             'common': '通用登记',
             'registration': '报名',
