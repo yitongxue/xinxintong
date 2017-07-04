@@ -28,7 +28,8 @@ define(['require'], function() {
             { v: 'mschema', l: '通讯录联系人' },
             { v: 'registration', l: '报名' },
             { v: 'signin', l: '签到' },
-        ]
+        ],
+        naming: { 'mission_phase': '课程期数' }
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', 'srvQuickEntryProvider', 'srvSiteProvider', 'srvGroupAppProvider', 'srvGroupRoundProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, srvQuickEntryProvider, srvSiteProvider, srvGroupAppProvider, srvGroupRoundProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
@@ -50,7 +51,7 @@ define(['require'], function() {
             directive: $compileProvider.directive
         };
         $routeProvider
-            .when('/rest/pl/fe/matter/group/main', new RouteParam('main', '/views/ytx/pl/fe/matter/group/'))
+            .when('/rest/pl/fe/matter/group/main', new RouteParam('main'))
             .when('/rest/pl/fe/matter/group/player', new RouteParam('player'))
             .when('/rest/pl/fe/matter/group/notice', new RouteParam('notice'))
             .otherwise(new RouteParam('player'));
@@ -69,7 +70,8 @@ define(['require'], function() {
             srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
-    ngApp.controller('ctrlApp', ['$scope', 'srvSite', 'srvGroupApp', '$location', function($scope, srvSite, srvGroupApp, $location) {
+    ngApp.controller('ctrlApp', ['$scope', 'cstApp', 'srvSite', 'srvGroupApp', '$location', function($scope, cstApp, srvSite, srvGroupApp, $location) {
+        $scope.cstApp = cstApp;
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
             $scope.subView = subView[1] === 'group' ? 'player' : subView[1];

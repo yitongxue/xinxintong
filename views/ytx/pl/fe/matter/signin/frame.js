@@ -19,7 +19,8 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
             value: 'article',
             title: '项目资料',
             url: '/rest/pl/fe/matter'
-        }]
+        }],
+        naming: { 'mission_phase': '课程期数' }
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvSigninAppProvider', 'srvSigninRoundProvider', 'srvSigninPageProvider', 'srvSigninRecordProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvSigninAppProvider, srvSigninRoundProvider, srvSigninPageProvider, srvSigninRecordProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
@@ -41,7 +42,7 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
             directive: $compileProvider.directive
         };
         $routeProvider
-            .when('/rest/pl/fe/matter/signin/main', new RouteParam('main', '/views/ytx/pl/fe/matter/signin/'))
+            .when('/rest/pl/fe/matter/signin/main', new RouteParam('main'))
             .when('/rest/pl/fe/matter/signin/page', new RouteParam('page', '/views/ytx/pl/fe/matter/signin/'))
             .when('/rest/pl/fe/matter/signin/schema', new RouteParam('schema'))
             .when('/rest/pl/fe/matter/signin/record', new RouteParam('record'))
@@ -77,7 +78,8 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
             srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
-    ngApp.controller('ctrlFrame', ['$scope', 'srvSite', 'srvSigninApp', '$location', function($scope, srvSite, srvSigninApp, $location) {
+    ngApp.controller('ctrlFrame', ['$scope', 'cstApp', 'srvSite', 'srvSigninApp', '$location', function($scope, cstApp, srvSite, srvSigninApp, $location) {
+        $scope.cstApp = cstApp;
         $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
