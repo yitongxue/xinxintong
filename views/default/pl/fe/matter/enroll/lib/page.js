@@ -95,7 +95,7 @@ define(['wrap'], function(SchemaWrap) {
          * 添加题目的html
          */
         _appendWrap: function(tag, attrs, html, afterWrap) {
-            var newDomWrap, $html, $lastInputWrap;
+            var newDomWrap, $html, $lastInputWrap, $btnWrap;
 
             $html = $('<div>' + this.html + '</div>');
             newDomWrap = $(document.createElement(tag)).attr(attrs).html(html);
@@ -109,8 +109,14 @@ define(['wrap'], function(SchemaWrap) {
                 // 加到最后一个题目后面
                 $lastInputWrap.after(newDomWrap);
             } else {
-                // 加在文档的最后
-                $html.append(newDomWrap);
+                // 加在按钮的前面
+                $btnWrap = $html.find("[wrap='button']:first");
+                if ($btnWrap.length) {
+                    $btnWrap.before(newDomWrap);
+                } else {
+                    // 加在文档的最后
+                    $html.append(newDomWrap);
+                }
             }
 
             this.html = $html.html();
@@ -224,7 +230,7 @@ define(['wrap'], function(SchemaWrap) {
          * 添加题目的html
          */
         _appendWrap: function(tag, attrs, html, afterWrap) {
-            var $html, domNewWrap, $lastInputWrap;
+            var $html, domNewWrap, $lastInputWrap, $btnWrap;
 
             $html = $('<div>' + this.html + '</div>');
             domNewWrap = $(document.createElement(tag)).attr(attrs).html(html);
@@ -237,7 +243,14 @@ define(['wrap'], function(SchemaWrap) {
             if ($lastInputWrap.length) {
                 $lastInputWrap.after(domNewWrap);
             } else {
-                $html.append(domNewWrap);
+                // 加在按钮的前面
+                $btnWrap = $html.find("[wrap='button']:first");
+                if ($btnWrap.length) {
+                    $btnWrap.before(domNewWrap);
+                } else {
+                    // 加在文档的最后
+                    $html.append(domNewWrap);
+                }
             }
 
             this.html = $html.html();
@@ -378,10 +391,10 @@ define(['wrap'], function(SchemaWrap) {
     var protoListPage = {
         _arrange: function(mapOfAppSchemas) {
             if (this.data_schemas.length) {
-                angular.forEach(this.data_schemas, function(item) {
+                this.data_schemas.forEach(function(item) {
                     if (item.config && item.config.pattern === 'records') {
                         var listSchemas = [];
-                        angular.forEach(item.schemas, function(schema) {
+                        item.schemas.forEach(function(schema) {
                             listSchemas.push(mapOfAppSchemas[schema.id] ? mapOfAppSchemas[schema.id] : schema);
                         });
                         item.schemas = listSchemas;
@@ -393,36 +406,6 @@ define(['wrap'], function(SchemaWrap) {
         },
         appendSchema: function(schema, afterSchema) {
             return false;
-        },
-        appendRecordList: function(oApp) {
-            var dataWrap = {
-                config: {
-                    id: 'L' + (new Date() * 1),
-                    pattern: 'records',
-                    dataScope: 'U',
-                    onclick: '',
-                },
-                schemas: angular.copy(oApp.data_schemas)
-            };
-
-            dataWrap.schemas.push({
-                id: 'enrollAt',
-                type: '_enrollAt',
-                title: '登记时间'
-            });
-
-            if (oApp.pages && oApp.pages.length) {
-                for (var i = 0, ii = oApp.pages.length; i < ii; i++) {
-                    if (oApp.pages[i].type === 'V') {
-                        dataWrap.config.onclick = oApp.pages[i].name;
-                        break;
-                    }
-                }
-            }
-
-            this.data_schemas.push(dataWrap);
-
-            return SchemaWrap.records.embed(dataWrap);
         },
         wrapByList: function(config) {
             for (var i = this.data_schemas.length - 1; i >= 0; i--) {
@@ -444,6 +427,7 @@ define(['wrap'], function(SchemaWrap) {
                     schemaInList = listWrap.schemas[j];
                     if (schema.id === schemaInList.id) {
                         return {
+                            list: listWrap,
                             schema: schemaInList
                         };
                     }

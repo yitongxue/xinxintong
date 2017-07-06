@@ -774,24 +774,26 @@ define([], function() {
             }
         }
     };
-    ValueWrap.prototype.dataByDom = function(domWrap, page) {
+    ValueWrap.prototype.dataByDom = function(domWrap, oPage) {
         var $wrap = $(domWrap),
             wrapId = $wrap.attr('id');
 
-        if (page) {
+        if (oPage) {
             if (wrapId) {
-                return page.wrapById(wrapId);
+                return oPage.wrapById(wrapId);
             } else {
-                var data = page.wrapBySchema({
-                    id: $wrap.attr('schema')
-                });
-                if (data.config === undefined) {
-                    data.config = {
-                        inline: $wrap.hasClass('wrap-inline') ? 'Y' : 'N',
-                        splitLine: $wrap.hasClass('wrap-splitline') ? 'Y' : 'N'
-                    };
+                var schemaId, data;
+                schemaId = $wrap.attr('schema');
+                if (schemaId) {
+                    data = oPage.wrapBySchema({ id: schemaId });
+                    if (data.config === undefined) {
+                        data.config = {
+                            inline: $wrap.hasClass('wrap-inline') ? 'Y' : 'N',
+                            splitLine: $wrap.hasClass('wrap-splitline') ? 'Y' : 'N'
+                        };
+                    }
+                    return data;
                 }
-                return data;
             }
         } else {
             return {
@@ -879,8 +881,11 @@ define([], function() {
             wrap: 'records',
             class: 'form-group'
         };
-
-        return this.append('div', attrs, html);
+        return {
+            tag: 'div',
+            attrs: attrs,
+            html: html
+        };
     };
     RecordsWrap.prototype.modify = function(domWrap, oWrap) {
         var html, attrs = {},
@@ -977,8 +982,11 @@ define([], function() {
             } else if (['editRecord', 'removeRecord', 'remarkRecord'].indexOf(schema.name) !== -1) {
                 attrs['ng-controller'] = 'ctrlRecord';
             }
-
-            return this.append('div', attrs, tmplBtn(action, schema.label));
+            return {
+                tag: 'div',
+                attrs: attrs,
+                html: tmplBtn(action, schema.label)
+            };
         } else if (schema.name === 'sendInvite') {
             var html;
             action = "send($event,'" + schema.accept + "'";
@@ -991,7 +999,11 @@ define([], function() {
             attrs.class += "  input-group input-group-lg";
             attrs['ng-controller'] = 'ctrlInvite';
 
-            return this.append('div', attrs, html);
+            return {
+                tag: 'div',
+                attrs: attrs,
+                html: html
+            };
         }
     };
     ButtonWrap.prototype.modify = function(dowWrap, oWrap) {
@@ -1028,34 +1040,6 @@ define([], function() {
         }
     };
     /**
-     * user wrap class
-     */
-    var UserWrap = function() {};
-    UserWrap.prototype = Object.create(Wrap.prototype);
-    UserWrap.prototype.embed = function(page, config) {
-        if (config.nickname === true) {
-            html = "<label>昵称</label><div>{{User.nickname}}</div>";
-            this.append(page, 'div', {
-                wrap: 'value',
-                class: 'form-group'
-            }, html);
-        }
-        if (config.headpic === true) {
-            html = '<label>头像</label><div><img ng-src="{{User.headimgurl}}"></div>';
-            this.append(page, 'div', {
-                wrap: 'value',
-                class: 'form-group'
-            }, html);
-        }
-        if (config.rankByFollower === true) {
-            html = '<label>邀请用户排名</label><div tms-exec="onReady(\'Statistic.rankByFollower()\')">{{Statistic.result.rankByFollower.rank}}</div>';
-            this.append(page, 'div', {
-                wrap: 'value',
-                class: 'form-group'
-            }, html);
-        }
-    };
-    /**
      *
      */
     return {
@@ -1068,16 +1052,16 @@ define([], function() {
         setEditor: function(editor) {
             _editor = editor;
         },
-        setPage: function(page) {
-            _page = page;
+        setPage: function(oPage) {
+            _page = oPage;
         },
-        dataByDom: function(domWrap, page) {
+        dataByDom: function(domWrap, oPage) {
             var wrapType = $(domWrap).attr('wrap'),
                 dataWrap;
             if (!this[wrapType]) {
                 return false;
             }
-            dataWrap = this[wrapType].dataByDom(domWrap, page);
+            dataWrap = this[wrapType].dataByDom(domWrap, oPage);
 
             return dataWrap;
         }
