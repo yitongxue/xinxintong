@@ -10,6 +10,8 @@ require.config({
     paths: {
         "domReady": '/static/js/domReady',
         "frame": '/views/ytx/pl/fe/matter/enroll/frame',
+        "enrollSchema": '/views/default/pl/fe/matter/enroll/lib/enroll.schema',
+        "enrollPage": '/views/default/pl/fe/matter/enroll/lib/enroll.page',
         "enrollService": '/views/default/pl/fe/matter/enroll/lib/enroll.service',
         "page": '/views/default/pl/fe/matter/enroll/lib/page',
         "schema": '/views/default/pl/fe/matter/enroll/lib/schema',

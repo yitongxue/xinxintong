@@ -1,6 +1,6 @@
-define(['require', 'page', 'schema', 'signinService'], function(require, pageLib, schemaLib) {
+define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPage'], function(require, pageLib, schemaLib) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'service.matter', 'service.signin', 'tinymce.enroll', 'ui.xxt']);
+    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'service.matter', 'service.signin', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'ui.xxt']);
     ngApp.constant('cstApp', {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -112,13 +112,13 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
         srvSite.snsList().then(function(aSns) {
             $scope.sns = aSns;
         });
-        srvSite.memberSchemaList().then(function(aMemberSchemas) {
-            $scope.memberSchemas = aMemberSchemas;
-        });
         $scope.mapOfAppSchemas = {};
         srvSigninApp.get().then(function(app) {
             $scope.app = app;
             app.__schemasOrderConsistent = 'Y'; //页面上登记项显示顺序与定义顺序一致
+            srvSite.memberSchemaList(app.mission).then(function(aMemberSchemas) {
+                $scope.memberSchemas = aMemberSchemas;
+            });
         });
     }]);
     /***/

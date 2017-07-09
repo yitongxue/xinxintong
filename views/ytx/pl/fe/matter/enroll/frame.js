@@ -1,6 +1,6 @@
-define(['require', 'enrollService'], function(require) {
+define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(require) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'service.enroll', 'tinymce.enroll', 'ui.xxt']);
+    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'service.enroll', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'ui.xxt']);
     ngApp.constant('cstApp', {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -141,18 +141,17 @@ define(['require', 'enrollService'], function(require) {
         srvSite.get().then(function(oSite) {
             $scope.site = oSite;
         });
-        srvSite.memberSchemaList().then(function(aMemberSchemas) {
-            $scope.memberSchemas = aMemberSchemas;
-        });
         srvEnrollApp.get().then(function(oApp) {
-            var oApp = app,
-                tagById = {};
+            var tagById = {};
             oApp.dataTags.forEach(function(tag) {
                 tagById[tag.id] = tag;
             });
             oApp._tagsById = tagById;
             oApp.__schemasOrderConsistent = 'Y'; //页面上登记项显示顺序与定义顺序一致
             $scope.app = oApp;
+            srvSite.snsList().then(function(oSns) {
+                $scope.sns = oSns;
+            });
             srvSite.memberSchemaList(oApp.mission).then(function(aMemberSchemas) {
                 $scope.memberSchemas = aMemberSchemas;
             });
