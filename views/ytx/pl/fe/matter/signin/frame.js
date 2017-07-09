@@ -43,7 +43,7 @@ define(['require', 'page', 'schema', 'signinService'], function(require, pageLib
         };
         $routeProvider
             .when('/rest/pl/fe/matter/signin/main', new RouteParam('main'))
-            .when('/rest/pl/fe/matter/signin/page', new RouteParam('page', '/views/ytx/pl/fe/matter/signin/'))
+            .when('/rest/pl/fe/matter/signin/page', new RouteParam('page'))
             .when('/rest/pl/fe/matter/signin/schema', new RouteParam('schema'))
             .when('/rest/pl/fe/matter/signin/record', new RouteParam('record'))
             .when('/rest/pl/fe/matter/signin/access', new RouteParam('access'))

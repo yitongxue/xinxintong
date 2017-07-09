@@ -51,8 +51,8 @@ define(['require', 'enrollService'], function(require) {
             .when('/rest/pl/fe/matter/enroll/time', new RouteParam('time'))
             .when('/rest/pl/fe/matter/enroll/preview', new RouteParam('preview'))
             .when('/rest/pl/fe/matter/enroll/entry', new RouteParam('entry'))
-            .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema', '/views/ytx/pl/fe/matter/enroll/'))
-            .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page', '/views/ytx/pl/fe/matter/enroll/'))
+            .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema'))
+            .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
             .when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
             .when('/rest/pl/fe/matter/enroll/remark', new RouteParam('remark'))
             .when('/rest/pl/fe/matter/enroll/editor', new RouteParam('editor'))
@@ -111,12 +111,15 @@ define(['require', 'enrollService'], function(require) {
                 case 'record':
                 case 'remark':
                 case 'stat':
+                case 'enrollee':
+                case 'tag':
                     $scope.opened = 'data';
                     break;
                 case 'recycle':
                 case 'log':
                 case 'coin':
                 case 'notice':
+                case 'overview':
                     $scope.opened = 'other';
                     break;
                 default:
@@ -135,19 +138,24 @@ define(['require', 'enrollService'], function(require) {
                 location.href = '/rest/pl/fe/template/enroll?site=' + template.siteid + '&id=' + template.id;
             });
         };
-
         srvSite.get().then(function(oSite) {
             $scope.site = oSite;
-        });
-        srvSite.snsList().then(function(aSns) {
-            $scope.sns = aSns;
         });
         srvSite.memberSchemaList().then(function(aMemberSchemas) {
             $scope.memberSchemas = aMemberSchemas;
         });
-        srvEnrollApp.get().then(function(app) {
-            $scope.app = app;
-            app.__schemasOrderConsistent = 'Y'; //页面上登记项显示顺序与定义顺序一致
+        srvEnrollApp.get().then(function(oApp) {
+            var oApp = app,
+                tagById = {};
+            oApp.dataTags.forEach(function(tag) {
+                tagById[tag.id] = tag;
+            });
+            oApp._tagsById = tagById;
+            oApp.__schemasOrderConsistent = 'Y'; //页面上登记项显示顺序与定义顺序一致
+            $scope.app = oApp;
+            srvSite.memberSchemaList(oApp.mission).then(function(aMemberSchemas) {
+                $scope.memberSchemas = aMemberSchemas;
+            });
         });
     }]);
     /***/
