@@ -10,45 +10,64 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$http', '$uibModal', 'tmsFavor
         }
     }
 
-    function listSites(number) {
-        $http.get('/rest/home/listSite' + '?page=1' + '&size=' + number).success(function(rsp) {
-            $scope.sites = rsp.data.sites;
-            $scope.sites.total = rsp.data.total;
+    var _sites = [];
+    function listSites() {
+        $http.get('/rest/home/listSite' + '?page=' + $scope.page.at + '&size=10').success(function(rsp) {
+           if(rsp.data.sites.length) {
+                rsp.data.sites.forEach(function(item) {
+                    _sites.push(item);
+                });
+                $scope.sites = _sites;
+                $scope.sites.total = rsp.data.total;
+           }
         });
     }
-
     function listTemplates() {
         $http.get('/rest/home/listTemplate').success(function(rsp) {
             $scope.templates = rsp.data;
         });
     }
     $scope.moreMatters = function(matterType) {
-        $scope.page.size = $scope.page.size + 5;
+        $scope.page.at = $scope.page.at + 1;
         switch (matterType) {
             case 'article':
-                $scope.listArticles($scope.page.size);
+                $scope.listArticles();
                 break;
             case 'app':
-                $scope.listSites($scope.page.size);
+                $scope.listSites();
                 break;
             case 'site':
-                $scope.listApps($scope.page.size);
+                $scope.listApps();
                 break;
         }
-    }
+    };
     $scope.openMatter = function(matter) {
         location.href = matter.url;
     };
-    $scope.listApps = function(number) {
-        $http.get('/rest/home/listApp' + '?page=1' + '&size=' + number).success(function(rsp) {
-            $scope.apps = rsp.data.matters;
-            $scope.apps.total = rsp.data.total;
+
+    var _apps = [];
+    $scope.listApps = function() {
+        $http.get('/rest/home/listApp' + '?page=' + $scope.page.at + '&size=10').success(function(rsp) {
+            if(rsp.data.matters.length) {
+                rsp.data.matters.forEach(function(item) {
+                    _apps.push(item);
+                });
+                $scope.apps = _apps;
+                $scope.apps.total = rsp.data.total;
+            }
         });
     };
-    $scope.listArticles = function(number) {
-        $http.get('/rest/home/listArticle' + '?page=1' + '&size=' + number).success(function(rsp) {
-            $scope.articles = rsp.data.matters;
-            $scope.articles.total = rsp.data.total;
+
+    var _articles = [];
+    $scope.listArticles = function() {
+        $http.get('/rest/home/listArticle' + '?page=' + $scope.page.at + '&size=10').success(function(rsp) {
+            if(rsp.data.matters.length) {
+                rsp.data.matters.forEach(function(item) {
+                    _articles.push(item);
+                });
+                $scope.articles = _articles;
+                $scope.articles.total = rsp.data.total;
+            }
         });
     };
     $scope.favor = function(user, article) {
