@@ -307,6 +307,42 @@ define(['require'], function(require) {
                 }
             });
         };
+        $scope.matterTagsFram = function(filter, filter2) {
+            var oTags, tagsOfData;
+            tagsOfData = filter2.byTags;
+            oTags = $scope.tagsMatter;
+            $uibModal.open({
+                templateUrl: 'tagMatterData.html',
+                controller: ['$scope', '$uibModalInstance', function($scope2, $mi) {
+                    var model;
+                    $scope2.apptags = oTags;
+                    $scope2.model = model = {
+                        selected: []
+                    };
+                    if (tagsOfData) {
+                        tagsOfData.forEach(function(oTag) {
+                            var index;
+                            if (-1 !== (index = $scope2.apptags.indexOf(oTag))) {
+                                model.selected[$scope2.apptags.indexOf(oTag)] = true;
+                            }
+                        });
+                    }
+                    $scope2.cancel = function() { $mi.dismiss(); };
+                    $scope2.ok = function() {
+                        var addMatterTag = [];
+                        model.selected.forEach(function(selected, index) {
+                            if (selected) {
+                                addMatterTag.push($scope2.apptags[index]);
+                            }
+                        });
+                        filter2.byTags = addMatterTag;
+                        angular.extend(filter, filter2);
+                        $mi.close();
+                    };
+                }],
+                backdrop: 'static',
+            });
+        };
         $scope.list();
         var isNavCollapsed = false;
         if (document.body.clientWidth <= 768) {
