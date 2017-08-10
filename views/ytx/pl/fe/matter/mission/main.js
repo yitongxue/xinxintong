@@ -29,7 +29,7 @@ define(['frame'], function(ngApp) {
         $scope.tagMatter = function(subType) {
             var oTags;
             oTags = $scope.oTag;
-            srvTag._tagMatter($scope.editing, oTags, subType);
+            srvTag._tagMatter($scope.mission, oTags, subType);
         };
         $scope.$on('xxt.tms-datepicker.change', function(event, data) {
             var prop;
