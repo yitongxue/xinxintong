@@ -15,7 +15,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             'split': '分组'
         }
     });
-    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvMissionProvider', 'srvQuickEntryProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvMissionProvider, srvQuickEntryProvider) {
+    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvMissionProvider', 'srvQuickEntryProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvMissionProvider, srvQuickEntryProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/ytx/pl/fe/matter/mission/';
             this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
@@ -55,6 +55,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             missionId = ls.match(/[\?&]id=([^&]*)/)[1];
             //
             srvSiteProvider.config(siteId);
+            srvTagProvider.config(siteId);
             srvQuickEntryProvider.setSiteId(siteId);
             srvMissionProvider.config(siteId, missionId);
         })();

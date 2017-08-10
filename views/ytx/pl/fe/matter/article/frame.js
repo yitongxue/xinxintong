@@ -22,7 +22,7 @@ define(['require'], function() {
             url: '/rest/pl/fe/matter'
         }],
     });
-    ngApp.config(['$routeProvider', '$locationProvider', '$controllerProvider', 'srvSiteProvider', 'srvAppProvider', function($routeProvider, $locationProvider, $controllerProvider, srvSiteProvider, srvAppProvider) {
+    ngApp.config(['$routeProvider', '$locationProvider', '$controllerProvider', 'srvSiteProvider', 'srvAppProvider', 'srvTagProvider', function($routeProvider, $locationProvider, $controllerProvider, srvSiteProvider, srvAppProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/article/';
             this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
@@ -54,6 +54,7 @@ define(['require'], function() {
             articleId = ls.match(/[\?&]id=([^&]*)/)[1];
             //
             srvSiteProvider.config(siteId);
+            srvTagProvider.config(siteId);
             srvAppProvider.setSiteId(siteId);
             srvAppProvider.setAppId(articleId);
         })();
