@@ -68,6 +68,8 @@ define(['frame'], function(ngApp) {
                     config.proto.title = $scope.mission.title + '-周报';
                 } else if (assignedScenario === 'quiz') {
                     config.proto.title = $scope.mission.title + '-测验';
+                } else if (assignedScenario === 'score_sheet') {
+                    config.proto.title = $scope.mission.title + '-记分表';
                 } else if (assignedScenario === 'common') {
                     config.proto.title = $scope.mission.title + '-登记';
                 }
@@ -115,7 +117,7 @@ define(['frame'], function(ngApp) {
         };
         $scope.addMatter = function(matterType) {
             $('body').click();
-            if (/quiz|voting|registration|group_week_report|common/.test(matterType)) {
+            if (/quiz|voting|registration|group_week_report|score_sheet|common/.test(matterType)) {
                 $scope.addEnroll(matterType);
             } else {
                 $scope['add' + matterType[0].toUpperCase() + matterType.substr(1)]();
@@ -228,7 +230,7 @@ define(['frame'], function(ngApp) {
                 if ('enroll' === matterType) {
                     url += 'enroll';
                     scenario = '';
-                } else if (/registration|voting|group_week_report|quiz|common/.test(matterType)) {
+                } else if (/registration|voting|group_week_report|quiz|score_sheet|common/.test(matterType)) {
                     url += 'enroll'
                     scenario = $scope.matterType;
                 } else {
@@ -244,7 +246,7 @@ define(['frame'], function(ngApp) {
                         if (rsp.data.total == 0) {
                             indicators.article && $scope.indicators.push(indicators.article);
                         }
-                    } else if (/enroll|voting|registration|group_week_report|quiz|common|signin|group/.test(matterType)) {
+                    } else if (/enroll|voting|registration|group_week_report|quiz|score_sheet|common|signin|group/.test(matterType)) {
                         $scope.matters = rsp.data.apps;
                         if (rsp.data.total == 0) {
                             indicators[matterType] && $scope.indicators.push(indicators[matterType]);
@@ -268,7 +270,7 @@ define(['frame'], function(ngApp) {
                 if ('enroll' === $scope.matterType) {
                     url += 'enroll';
                     scenario = '';
-                } else if (/registration|voting|group_week_report|quiz|common/.test($scope.matterType)) {
+                } else if (/registration|voting|group_week_report|quiz|score_sheet|common/.test($scope.matterType)) {
                     url += 'enroll'
                     scenario = $scope.matterType;
                 } else {
@@ -285,7 +287,7 @@ define(['frame'], function(ngApp) {
                     if (rsp.data.total == 0) {
                         indicators.article && $scope.indicators.push(indicators.article);
                     }
-                } else if (/enroll|voting|registration|group_week_report|quiz|common|signin|group/.test($scope.matterType)) {
+                } else if (/enroll|voting|registration|group_week_report|quiz|score_sheet|common|signin|group/.test($scope.matterType)) {
                     $scope.matters = rsp.data.apps;
                     if (rsp.data.total == 0) {
                         indicators[$scope.matterType] && $scope.indicators.push(indicators[$scope.matterType]);
@@ -302,7 +304,7 @@ define(['frame'], function(ngApp) {
             });
             if (!nv) return;
             $scope.matterType = location.hash ? location.hash.substr(1) : '';
-            if (/enroll|registration|voting|group_week_report|quiz|common/.test($scope.matterType)) {
+            if (/enroll|registration|voting|group_week_report|quiz|score_sheet|common/.test($scope.matterType)) {
                 $scope.matter_scenario = $scope.matterType;
             }
             $scope.mission = nv;
