@@ -93,6 +93,7 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             'registration': '报名',
             'voting': '评价',
             'quiz': '测验',
+            'score': '记分表'
         };
         $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {

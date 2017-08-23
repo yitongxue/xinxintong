@@ -1,56 +1,85 @@
 {
-    "common": {
+    "common":
+    {
         "title": "通用登记",
         "name": "common",
         "description": "向多人收集数据",
-        "templates": {
-            "simple": {
+        "templates":
+        {
+            "simple":
+            {
                 "title": "简单",
                 "name": "simple",
                 "description": "简单快速"
             },
-            "ask": {
+            "ask":
+            {
                 "title": "问答库",
                 "name": "ask",
                 "description": "在线问答库"
             }
         }
     },
-    "registration": {
+    "registration":
+    {
         "title": "在线报名",
         "name": "registration",
         "description": "报名信息收集",
-        "templates": {
-            "simple": {
+        "templates":
+        {
+            "simple":
+            {
                 "title": "默认报名表",
                 "name": "simple",
                 "description": "简单快速"
             }
         }
     },
-    "voting": {
+    "voting":
+    {
         "title": "评价",
         "name": "voting",
         "description": "评价信息收集",
-        "templates": {
-            "simple": {
+        "templates":
+        {
+            "simple":
+            {
                 "title": "简单",
                 "name": "simple",
                 "description": "简单快速"
             },
-            "custom": {
+            "custom":
+            {
                 "title": "定制",
                 "name": "custom",
                 "description": "自有定制展示内容"
             }
         }
     },
-    "quiz": {
+    "quiz":
+    {
         "title": "测验",
         "name": "quiz",
         "description": "测验信息收集",
-        "templates": {
-            "simple": {
+        "templates":
+        {
+            "simple":
+            {
+                "title": "简单",
+                "name": "simple",
+                "description": "简单快速"
+            }
+        }
+    },
+    "score_sheet":
+    {
+        "title": "记分表",
+        "name": "score_sheet",
+        "description": "记录得分",
+        "templates":
+        {
+            "simple":
+            {
                 "title": "简单",
                 "name": "simple",
                 "description": "简单快速"

@@ -22,7 +22,8 @@ define(['require'], function(require) {
             'common': '通用登记',
             'registration': '报名',
             'voting': '评价',
-            'quiz': '测验'
+            'quiz': '测验',
+            'score_sheet': '记分表'
         }
     });
     ngApp.config(['$controllerProvider', '$provide', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', function($controllerProvider, $provide, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider) {

@@ -18,7 +18,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             url = '/rest/pl/fe/matter/' + $scope.matterType + '/get?site=' + $scope.siteId + page.j();
         } else if ('enroll' === $scope.matterType) {
             url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + page.j();
-        } else if (/registration|voting|quiz|common/.test($scope.matterType)) {
+        } else if (/registration|voting|quiz|score_sheet|common/.test($scope.matterType)) {
             url = '/rest/pl/fe/matter/enroll/list?site=' + $scope.siteId + '&scenario=' + $scope.matterType + page.j();
         } else {
             url = '/rest/pl/fe/matter/' + $scope.matterType + '/list?site=' + $scope.siteId + page.j();
@@ -47,7 +47,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                         $scope.matters = rsp.data.articles;
                     }
                     page.total = rsp.data.total;
-                } else if (/enroll|registration|voting|quiz|common|signin|group|contribute/.test($scope.matterType)) {
+                } else if (/enroll|registration|voting|quiz|score_sheet|common|signin|group|contribute/.test($scope.matterType)) {
                     if (append) {
                         $scope.matters = $scope.matters.concat(rsp.data.apps);
                     } else {
@@ -227,6 +227,8 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 title = '评价';
             } else if (assignedScenario === 'quiz') {
                 title = '测验';
+            } else if (assignedScenario === 'score_sheet') {
+                title = '记分表';
             } else {
                 title = '通用登记';
             }

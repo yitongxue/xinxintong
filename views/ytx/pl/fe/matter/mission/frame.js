@@ -11,6 +11,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             'registration': '报名',
             'voting': '评价',
             'quiz': '测验',
+            'score_sheet': '记分表',
             'signin': '签到',
             'split': '分组'
         }

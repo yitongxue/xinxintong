@@ -8,6 +8,11 @@ define(['require'], function() {
             url: '/rest/pl/fe/matter'
         }, {
             value: 'enroll',
+            scenario: 'common',
+            title: '通用登记',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'enroll',
             scenario: 'registration',
             title: '报名',
             url: '/rest/pl/fe/matter'
@@ -15,6 +20,16 @@ define(['require'], function() {
             value: 'enroll',
             scenario: 'voting',
             title: '评价',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'enroll',
+            scenario: 'quiz',
+            title: '测验',
+            url: '/rest/pl/fe/matter'
+        }, {
+            value: 'enroll',
+            scenario: 'score_sheet',
+            title: '记分表',
             url: '/rest/pl/fe/matter'
         }, {
             value: 'signin',
