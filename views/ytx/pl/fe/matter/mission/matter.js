@@ -15,35 +15,6 @@ define(['frame'], function(ngApp) {
             })
 
         };
-        var indicators = {
-            registration: {
-                title: '在线报名',
-                handler: function() {
-                    $scope.addEnroll('registration');
-                }
-            },
-            signin: {
-                title: '签到',
-                handler: function() {
-                    $scope.addSignin();
-                }
-            },
-            group: {
-                title: '分组',
-                handler: function() {
-                    $scope.addGroup();
-                }
-            },
-            voting: {
-                title: '投票',
-                handler: function() {
-                    $scope.addEnroll('voting');
-                }
-            },
-        };
-        $scope.addByIndicator = function(indicator) {
-            indicator.handler();
-        };
         $scope.addArticle = function() {
             var url = '/rest/pl/fe/matter/article/create?mission=' + $scope.mission.id,
                 config = {
@@ -205,24 +176,7 @@ define(['frame'], function(ngApp) {
                 url += '&_=' + (new Date() * 1);
 
                 http2.get(url, function(rsp) {
-                    var typeCount = {};
-                    angular.forEach(rsp.data, function(matter) {
-                        matter._operator = matter.modifier_name || matter.creater_name;
-                        matter._operateAt = matter.modifiy_at || matter.create_at;
-                        if (matter.type === 'enroll') {
-                            typeCount[matter.scenario] ? typeCount[matter.scenario]++ : (typeCount[matter.scenario] = 1);
-                        } else {
-                            typeCount[matter.type] ? typeCount[matter.type]++ : (typeCount[matter.type] = 1);
-                        }
-                    });
                     $scope.matters = rsp.data;
-                    $scope.indicators = [];
-                    if (matterType === '') {
-                        !typeCount.registration && $scope.indicators.push(indicators.registration);
-                        !typeCount.signin && $scope.indicators.push(indicators.signin);
-                        !typeCount.group && $scope.indicators.push(indicators.group);
-                        !typeCount.voting && $scope.indicators.push(indicators.voting);
-                    }
                 });
             } else {
                 var scenario;
@@ -243,14 +197,8 @@ define(['frame'], function(ngApp) {
                     $scope.indicators = [];
                     if (/article/.test(matterType)) {
                         $scope.matters = rsp.data.articles;
-                        if (rsp.data.total == 0) {
-                            indicators.article && $scope.indicators.push(indicators.article);
-                        }
                     } else if (/enroll|voting|registration|group_week_report|quiz|score_sheet|common|signin|group/.test(matterType)) {
                         $scope.matters = rsp.data.apps;
-                        if (rsp.data.total == 0) {
-                            indicators[matterType] && $scope.indicators.push(indicators[matterType]);
-                        }
                     } else {
                         $scope.matters = rsp.data;
                     }
@@ -281,17 +229,10 @@ define(['frame'], function(ngApp) {
             }
 
             http2.post(url, { mission_phase_id: pid }, function(rsp) {
-                $scope.indicators = [];
                 if (/article/.test($scope.matterType)) {
                     $scope.matters = rsp.data.articles;
-                    if (rsp.data.total == 0) {
-                        indicators.article && $scope.indicators.push(indicators.article);
-                    }
                 } else if (/enroll|voting|registration|group_week_report|quiz|score_sheet|common|signin|group/.test($scope.matterType)) {
                     $scope.matters = rsp.data.apps;
-                    if (rsp.data.total == 0) {
-                        indicators[$scope.matterType] && $scope.indicators.push(indicators[$scope.matterType]);
-                    }
                 } else {
                     $scope.matters = rsp.data;
                 }
