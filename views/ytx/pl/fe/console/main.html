@@ -216,7 +216,7 @@
                 <tbody>
                     <tr ng-repeat='m in missions'>
                         <td>{{$index+1}}</td>
-                        <td><span ng-if="!frameState.sid">{{m.site_name}}\</span>{{m.title}}</td>
+                        <td ng-click="open(m,'matter')"><span ng-if="!frameState.sid">{{m.site_name}}\</span>{{m.title}}</td>
                         <td>{{m.creater_name}}</td>
                         <td>{{m.create_at*1000|date:'yy-MM-dd HH:mm'}}</td>
                         <td>
@@ -312,7 +312,7 @@
                     <tr ng-repeat='m in matters'>
                         <td data-th='序号' class='hidden-xs'><span>{{$index+1}}</span></td>
                         <td data-th='场景' ng-if="filter.byType=='enroll'"><span>{{scenarioNames[m.matter_scenario||m.scenario]}}</span></td>
-                        <td data-th='名称'><span>{{m.matter_title||m.title}}</span></td>
+                        <td data-th='名称' ng-click="openMatter(m)" style='cursor:pointer;'><span>{{m.matter_title||m.title}}</span></td>
                         <td data-th='签到轮次' ng-if="filter.byType =='signin'"><span>{{m.opData[0].title}}</span></td>
                         <td data-th='记录数' ng-if="filter.byType =='enroll'" ng-click="openMatter(m,'record')" title='点击查看详细数据' style='cursor:pointer;'><span>{{m.opData[0].total}}</span></td>
                         <td data-th='记录数' ng-if="filter.byType =='signin'" ng-click="openMatter(m,'record')" title='点击查看详细数据' style='cursor:pointer;'><span>{{m.opData[0].total}}</span></td>
@@ -330,7 +330,7 @@
                                 <button class='btn btn-sm btn-default' ng-click="copyMatter($event,m)">复制</button>
                             </span>
                             <span ng-switch-when="enroll">
-                                <button class='btn btn-sm btn-default' ng-click="openMatter(m,'preview')">预览</button>
+                                <button class='btn btn-sm btn-default' ng-click="openMatter(m,'main')">定义</button>
                                 <button class='btn btn-sm btn-default' ng-click="openMatter(m,'entry')">发放</button>
                                 <button class='btn btn-sm btn-default hidden-xs' ng-click="copyMatter($event,m)">复制</button>
                             </span>
