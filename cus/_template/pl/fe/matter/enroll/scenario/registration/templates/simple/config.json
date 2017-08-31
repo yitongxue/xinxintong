@@ -1,91 +1,114 @@
 {
     "scenario": "registration",
-    "pages": [{
+    "pages": [
+    {
         "name": "enroll",
         "title": "填写报名信息页",
         "type": "I",
-        "data_schemas": [{
-            "schema": {
+        "data_schemas": [
+        {
+            "schema":
+            {
                 "id": "name",
                 "title": "姓名",
                 "type": "shorttext",
                 "required": "Y",
                 "format": "name"
             },
-            "config": {
+            "config":
+            {
                 "showname": "label"
             }
-        }, {
-            "schema": {
+        },
+        {
+            "schema":
+            {
                 "id": "mobile",
                 "title": "手机",
                 "type": "shorttext",
                 "required": "Y",
                 "format": "mobile"
             },
-            "config": {
+            "config":
+            {
                 "showname": "label"
             }
-        }, {
-            "schema": {
+        },
+        {
+            "schema":
+            {
                 "id": "gender",
                 "title": "性别",
                 "type": "single",
                 "required": "Y",
-                "ops": [{
+                "ops": [
+                {
                     "v": "v1",
                     "l": "男"
-                }, {
+                },
+                {
                     "v": "v2",
                     "l": "女"
                 }]
             },
-            "config": {
+            "config":
+            {
                 "showname": "label",
                 "component": "R",
                 "align": "H"
             }
-        }, {
-            "schema": {
+        },
+        {
+            "schema":
+            {
                 "id": "department",
                 "title": "部门",
                 "type": "shorttext",
                 "required": "Y",
                 "format": ""
             },
-            "config": {
+            "config":
+            {
                 "showname": "label"
             }
-        }, {
-            "schema": {
+        },
+        {
+            "schema":
+            {
                 "id": "position",
                 "title": "职务",
                 "type": "shorttext",
                 "required": "Y",
                 "format": ""
             },
-            "config": {
+            "config":
+            {
                 "showname": "label"
             }
         }],
-        "act_schemas": [{
+        "act_schemas": [
+        {
             "id": "btnSubmit",
             "name": "submit",
             "label": "提交信息",
             "next": "result"
         }]
-    }, {
+    },
+    {
         "name": "result",
         "title": "学员报名后展示页",
         "type": "V",
-        "data_schemas": [{
-            "config": {
+        "data_schemas": [
+        {
+            "config":
+            {
                 "id": "s1",
                 "pattern": "record",
                 "inline": "N",
                 "splitLine": "Y"
             },
-            "schema": {
+            "schema":
+            {
                 "id": "name",
                 "title": "名称",
                 "type": "shorttext",
@@ -93,147 +116,180 @@
 
                 "format": "name"
             }
-        }, {
-            "config": {
+        },
+        {
+            "config":
+            {
                 "id": "s2",
                 "pattern": "record",
                 "inline": "N",
                 "splitLine": "Y"
             },
-            "schema": {
+            "schema":
+            {
                 "id": "mobile",
                 "title": "手机",
                 "type": "shorttext",
                 "required": "Y",
                 "format": "mobile"
             }
-        }, {
-            "config": {
+        },
+        {
+            "config":
+            {
                 "id": "s3",
                 "pattern": "record",
                 "inline": "N",
                 "splitLine": "Y"
             },
-            "schema": {
+            "schema":
+            {
                 "id": "gender",
                 "title": "性别",
                 "type": "single",
                 "required": "Y",
-                "ops": [{
+                "ops": [
+                {
                     "v": "v1",
                     "l": "男"
-                }, {
+                },
+                {
                     "v": "v2",
                     "l": "女"
                 }]
             }
-        }, {
-            "config": {
+        },
+        {
+            "config":
+            {
                 "id": "s4",
                 "pattern": "record",
                 "inline": "N",
                 "splitLine": "Y"
             },
-            "schema": {
+            "schema":
+            {
                 "id": "department",
                 "title": "部门",
                 "type": "shorttext",
                 "required": "Y",
                 "format": ""
             }
-        }, {
-            "config": {
+        },
+        {
+            "config":
+            {
                 "id": "s5",
                 "pattern": "record",
                 "inline": "N",
                 "splitLine": "Y"
             },
-            "schema": {
+            "schema":
+            {
                 "id": "position",
                 "title": "职务",
                 "type": "shorttext",
                 "required": "Y",
                 "format": ""
             }
-        }, {
-            "config": {
+        },
+        {
+            "config":
+            {
                 "id": "s6",
                 "pattern": "record",
                 "inline": "N",
                 "splitLine": "Y"
             },
-            "schema": {
+            "schema":
+            {
                 "id": "enrollAt",
                 "title": "报名时间",
                 "type": "_enrollAt"
             }
         }],
-        "act_schemas": [{
+        "act_schemas": [
+        {
             "id": "act2",
             "name": "editRecord",
             "label": "修改报名信息",
             "next": "enroll"
-        }, {
+        },
+        {
             "id": "act3",
             "name": "removeRecord",
             "label": "取消报名",
             "next": "enroll"
         }]
     }],
-    "schema": [{
+    "schema": [
+    {
         "id": "name",
         "title": "名称",
         "type": "shorttext",
         "required": "Y",
         "format": "name"
-    }, {
+    },
+    {
         "id": "mobile",
         "title": "手机",
         "type": "shorttext",
         "required": "Y",
         "format": "mobile"
-    }, {
+    },
+    {
         "id": "gender",
         "title": "性别",
         "type": "single",
         "required": "Y",
-        "ops": [{
+        "ops": [
+        {
             "v": "v1",
             "l": "男"
-        }, {
+        },
+        {
             "v": "v2",
             "l": "女"
         }]
-    }, {
+    },
+    {
         "id": "department",
         "title": "部门",
         "type": "shorttext",
         "required": "Y",
         "format": ""
-    }, {
+    },
+    {
         "id": "position",
         "title": "职务",
         "type": "shorttext",
         "required": "Y",
         "format": ""
     }],
-    "scenarioConfig": {
+    "scenarioConfig":
+    {
         "can_rounds": "D"
     },
-    "entryRule": {
-        "otherwise": {
+    "entryRule":
+    {
+        "otherwise":
+        {
             "entry": "enroll"
         },
         "scope": "sns",
-        "sns": {
-            "wx": {
+        "sns":
+        {
+            "wx":
+            {
                 "entry": "enroll"
             }
         },
-        "other": {
+        "other":
+        {
             "entry": "$mpfollow"
         }
     },
+    "count_limit": "1",
     "multi_rounds": "N",
     "enrolled_entry_page": "result",
     "schema_include_mission_phases": "Y"
