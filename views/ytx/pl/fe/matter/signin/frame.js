@@ -50,6 +50,7 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
             .when('/rest/pl/fe/matter/signin/preview', new RouteParam('preview'))
             .when('/rest/pl/fe/matter/signin/entry', new RouteParam('entry'))
             .when('/rest/pl/fe/matter/signin/notice', new RouteParam('notice'))
+            .when('/rest/pl/fe/matter/signin/coin', new RouteParam('coin'))
             .otherwise(new RouteParam('entry'));
 
         $locationProvider.html5Mode(true);
@@ -89,12 +90,19 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
                 case 'main':
                 case 'page':
                 case 'schema':
+                case 'preview':
                     $scope.opened = 'edit';
                     break;
                 case 'access':
-                case 'preview':
                 case 'entry':
                     $scope.opened = 'publish';
+                    break;
+                case 'record':
+                    $scope.opened = 'data';
+                    break;
+                case 'coin':
+                case 'notice':
+                    $scope.opened = 'other';
                     break;
                 default:
                     $scope.opened = '';
