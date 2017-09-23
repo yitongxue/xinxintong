@@ -23,7 +23,7 @@ class main extends \pl\fe\matter\base {
 	/**
 	 * 获得可见的图文列表
 	 *
-	 * $id article's id
+	 * @param $id article's id
 	 * $page
 	 * $size
 	 * post options
@@ -34,66 +34,66 @@ class main extends \pl\fe\matter\base {
 	 *
 	 */
 	public function list_action($site = null, $mission = null, $page = 1, $size = 30) {
-		if (false === ($user = $this->accountUser())) {
+		if (false === ($oUser = $this->accountUser())) {
 			return new \ResponseTimeout();
 		}
 
-		if (!($options = $this->getPostJson())) {
-			$options = new \stdClass;
+		if (!($oOptions = $this->getPostJson())) {
+			$oOptions = new \stdClass;
 		}
-		$model = $this->model();
+		$modelArt = $this->model('matter\article');
 		/**
 		 * select fields
 		 */
-		$s = "'article' type,a.id,a.siteid,a.title,a.summary,a.approved,a.mission_id";
+		$s = "a.id,a.siteid,a.title,a.summary,a.approved,a.mission_id";
 		$s .= ",a.create_at,a.modify_at,a.creater,a.creater_name,a.creater_src";
 		$s .= ",a.read_num,a.score,a.remark_num,a.share_friend_num,a.share_timeline_num,a.download_num";
 		/**
 		 * where
 		 */
 		$w = "a.custom_body='N' and a.state=1 and finished='Y'";
-		/*按名称过滤*/
-		if (!empty($options->byTitle)) {
-			$w .= " and a.title like '%" . $model->escape($options->byTitle) . "%'";
+		/* 按名称过滤 */
+		if (!empty($oOptions->byTitle)) {
+			$w .= " and a.title like '%" . $modelArt->escape($oOptions->byTitle) . "%'";
 		}
-		if(!empty($options->byTags)){
-			foreach($options->byTags as $tag){
-				$w .= " and a.matter_mg_tag like '%" . $model->escape($tag->id) . "%'";
+		if (!empty($oOptions->byTags)) {
+			foreach ($oOptions->byTags as $tag) {
+				$w .= " and a.matter_mg_tag like '%" . $modelArt->escape($tag->id) . "%'";
 			}
 		}
-		/**
-		 * 按项目过滤
-		 */
+		/* 按项目过滤 */
 		if (!empty($mission)) {
-			$mission = $model->escape($mission);
+			$mission = $modelArt->escape($mission);
 			$w .= " and a.mission_id=$mission";
 			//按项目阶段过滤
-			if (isset($options->mission_phase_id) && !empty($options->mission_phase_id) && $options->mission_phase_id !== "ALL") {
-				$mission_phase_id = $model->escape($options->mission_phase_id);
+			if (isset($oOptions->mission_phase_id) && !empty($oOptions->mission_phase_id) && $oOptions->mission_phase_id !== "ALL") {
+				$mission_phase_id = $modelArt->escape($oOptions->mission_phase_id);
 				$w .= " and a.mission_phase_id = '" . $mission_phase_id . "'";
 			}
 		} else {
-			$site = $model->escape($site);
+			$site = $modelArt->escape($site);
 			$w .= " and a.siteid='$site'";
 		}
-		/**
-		 * 按频道过滤
-		 */
-		if (!empty($options->channel)) {
-			is_array($options->channel) && $options->channel = implode(',', $options->channel);
-			$whichChannel = "exists (select 1 from xxt_channel_matter c where a.id = c.matter_id and c.matter_type='article' and c.channel_id in ($options->channel))";
+		/* 按频道过滤 */
+		if (!empty($oOptions->channel)) {
+			is_array($oOptions->channel) && $oOptions->channel = implode(',', $oOptions->channel);
+			$whichChannel = "exists (select 1 from xxt_channel_matter c where a.id = c.matter_id and c.matter_type='article' and c.channel_id in ($oOptions->channel))";
 			$w .= " and $whichChannel";
 		}
-		/**
-		 * 按标签过滤
-		 */
-		!isset($options->order) && $options->order = '';
-		$q = array(
+		/* 按星标过滤 */
+		if (isset($oOptions->byStar) && $oOptions->byStar === 'Y') {
+			$w .= " and exists(select 1 from xxt_account_topmatter t where t.matter_type='article' and t.matter_id=a.id and userid='{$oUser->id}')";
+		}
+		$q = [
 			$s,
 			'xxt_article a',
 			$w,
-		);
-		switch ($options->order) {
+		];
+		/**
+		 * order
+		 */
+		!isset($oOptions->order) && $oOptions->order = '';
+		switch ($oOptions->order) {
 		case 'title':
 			$q2['o'] = 'CONVERT(a.title USING gbk ) COLLATE gbk_chinese_ci';
 			break;
@@ -121,30 +121,20 @@ class main extends \pl\fe\matter\base {
 		/**
 		 * limit
 		 */
-		$q2['r'] = array('o' => ($page - 1) * $size, 'l' => $size);
+		$q2['r'] = ['o' => ($page - 1) * $size, 'l' => $size];
 
-		if ($articles = $model->query_objs_ss($q, $q2)) {
-			/**
-			 * 活的符合条件的图文数量
-			 */
+		if ($articles = $modelArt->query_objs_ss($q, $q2)) {
 			$q[0] = 'count(*)';
-			$total = (int) $model->query_val_ss($q);
-			/**
-			 * 处理每个图文的附件信息
-			 */
-			$modelArt = $this->model('matter\article');
-			foreach ($articles as &$a) {
-				$ids[] = $a->id;
-				$map[$a->id] = &$a;
-				/**
-				 * 获得每个图文的url
-				 */
+			$total = (int) $modelArt->query_val_ss($q);
+			foreach ($articles as $a) {
+				$a->type = 'article';
 				$a->url = $modelArt->getEntryUrl($a->siteid, $a->id);
 			}
-
-			return new \ResponseData(array('articles' => $articles, 'total' => $total));
 		}
-		return new \ResponseData(array('articles' => array(), 'total' => 0));
+		$q[0] = 'count(*)';
+		$total = (int) $modelArt->query_val_ss($q);
+
+		return new \ResponseData(['articles' => $articles, 'docs' => $articles, 'total' => $total]);
 	}
 	/**
 	 * 获得指定的图文
@@ -317,7 +307,7 @@ class main extends \pl\fe\matter\base {
 		$article->hide_pic = $copied->hide_pic;
 		$article->url = $copied->url;
 		$article->can_siteuser = $copied->can_siteuser;
-		$article->matter_cont_tag = empty($copied->matter_cont_tag)? '' : json_encode($copied->matter_cont_tag);
+		$article->matter_cont_tag = empty($copied->matter_cont_tag) ? '' : json_encode($copied->matter_cont_tag);
 		$article->from_siteid = $modelArt->escape($site);
 		$article->from_site_name = $modelArt->escape($fromSite->name);
 		$article->from_id = $modelArt->escape($id);
@@ -382,17 +372,16 @@ class main extends \pl\fe\matter\base {
 	/**
 	 * 更新单图文的字段
 	 *
-	 * $id article's id
-	 * $nv pair of name and value
+	 * @param int $id article's id
 	 */
 	public function update_action($site, $id) {
-		if (false === ($user = $this->accountUser())) {
+		if (false === ($oUser = $this->accountUser())) {
 			return new \ResponseTimeout();
 		}
 
 		$model = $this->model();
-		$article = $this->model('matter\article')->byId($id, ['fields' => 'from_mode,siteid,id,title,summary,pic']);
-		if ($article === false) {
+		$oArticle = $this->model('matter\article')->byId($id, ['fields' => 'from_mode,siteid,id,mission_id,title,summary,pic']);
+		if ($oArticle === false) {
 			return new \ObjectNotFoundError();
 		}
 
@@ -401,7 +390,7 @@ class main extends \pl\fe\matter\base {
 		isset($nv['summary']) && $nv['summary'] = $model->escape($nv['summary']);
 		isset($nv['author']) && $nv['author'] = $model->escape($nv['author']);
 		isset($nv['body']) && $nv['body'] = $model->escape(urldecode($nv['body']));
-		if ($article->from_mode === 'C') {
+		if ($oArticle->from_mode === 'C') {
 			if (isset($nv['body'])) {
 				unset($nv['body']);
 			}
@@ -413,10 +402,15 @@ class main extends \pl\fe\matter\base {
 		$rst = $this->_update($site, $id, $nv);
 		if ($rst) {
 			// 记录操作日志并更新信息
-			isset($nv['title']) && $article->title = $nv['title'];
-			isset($nv['summary']) && $article->summary = $nv['summary'];
-			isset($nv['pic']) && $article->pic = $nv['pic'];
-			$this->model('matter\log')->matterOp($site, $user, $article, 'U');
+			isset($nv['title']) && $oArticle->title = $nv['title'];
+			isset($nv['summary']) && $oArticle->summary = $nv['summary'];
+			isset($nv['pic']) && $oArticle->pic = $nv['pic'];
+			// 更新所在项目信息
+			if ($oArticle->mission_id) {
+				$this->model('matter\mission')->updateMatter($oArticle->mission_id, $oArticle);
+			}
+			// 记录日志
+			$this->model('matter\log')->matterOp($site, $oUser, $oArticle, 'U');
 		}
 
 		return new \ResponseData($rst);
