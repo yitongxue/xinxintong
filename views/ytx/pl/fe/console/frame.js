@@ -3,20 +3,19 @@ define(['require'], function(require) {
     var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'page.ui.xxt', 'modal.ui.xxt']);
     ngApp.constant('cstApp', {
         matterNames: {
-            'article': '项目资料',
-            'news': '多图文',
-            'channel': '频道',
-            'link': '链接',
-            'contribute': '投稿',
-            'text': '文本',
-            'custom': '定制页',
-            'enroll': '登记',
-            'signin': '签到',
-            'group': '分组',
-            'lottery': '抽奖',
-            'wall': '信息墙',
+            doc: {
+                'article': '项目资料',
+                'channel': '频道',
+            },
+            docOrder: ['article', 'channel'],
+            app: {
+                'enroll': '登记',
+                'signin': '签到',
+                'group': '分组',
+            },
+            appOrder: ['enroll', 'signin', 'group'],
+            'site': '团队',
             'mission': '项目',
-            'site': '团队'
         },
         scenarioNames: {
             'common': '通用登记',
@@ -24,17 +23,18 @@ define(['require'], function(require) {
             'voting': '评价',
             'quiz': '测验',
             'score_sheet': '记分表'
-        }
+        },
+        scenarioOrder: ['common', 'registration', 'voting', 'quiz', 'score_sheet']
     });
     ngApp.config(['$controllerProvider', '$provide', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', function($controllerProvider, $provide, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider) {
-        var RouteParam = function(name, htmlBase, jsBase) {
+        var RouteParam = function(name) {
             var baseURL = '/views/default/pl/fe/console/';
-            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
+            this.templateUrl = baseURL + name + '.html?_=' + (new Date() * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
-                    require([(jsBase || baseURL) + name + '.js'], function() {
+                    require([baseURL + name + '.js'], function() {
                         defer.resolve();
                     });
                     return defer.promise;
@@ -43,15 +43,16 @@ define(['require'], function(require) {
         };
         ngApp.provider = {
             controller: $controllerProvider.register,
-            directive: $compileProvider.directive
+            directive: $compileProvider.directive,
+            service: $provide.service
         };
         $locationProvider.html5Mode(true);
-        $routeProvider.otherwise(new RouteParam('main', '/views/ytx/pl/fe/console/'));
+        $routeProvider.otherwise(new RouteParam('main'));
         $uibTooltipProvider.setTriggers({
             'show': 'hide'
         });
     }]);
-    ngApp.controller('ctrlFrame', ['$scope', '$location', 'http2', 'srvUserNotice', '$uibModal', 'templateShop', function($scope, $location, http2, srvUserNotice, $uibModal, templateShop) {
+    ngApp.controller('ctrlFrame', ['$scope', '$location', 'http2', 'srvUserNotice', '$uibModal', 'cstApp', function($scope, $location, http2, srvUserNotice, $uibModal, cstApp) {
         var frameState, lsearch;
         /* 恢复上一次访问的状态 */
         if (window.localStorage) {
@@ -87,8 +88,8 @@ define(['require'], function(require) {
                 frameState.scope = lsearch.scope;
             }
         }
+        $scope.opened = '';
         $scope.frameState = frameState;
-
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/[^\/]+$/)[0];
             subView.indexOf('?') !== -1 && (subView = subView.substr(0, subView.indexOf('?')));
@@ -96,13 +97,29 @@ define(['require'], function(require) {
             if (subView !== frameState.view) {
                 frameState.view = subView;
                 if (frameState.view === 'main') {
-                    frameState.scope = 'top';
+                    frameState.scope = 'mission';
                 } else if (frameState.view === 'friend') {
                     frameState.scope = 'subscribeSite';
                 }
             }
+            switch (frameState.scope) {
+                case 'mission':
+                case 'activity':
+                case 'doc':
+                case 'user':
+                case 'recycle':
+                    $scope.opened = 'main';
+                    break;
+                case 'subscribeSite':
+                case 'contributeSite':
+                case 'favorSite':
+                    $scope.opened = 'friend';
+                    break;
+                default:
+                    $scope.opened = '';
+            }
         });
-        var url = '/rest/pl/fe/user/get?_=' + (new Date() * 1);
+        var url = '/rest/pl/fe/user/get?_=' + (new Date * 1);
         http2.get(url, function(rsp) {
             $scope.loginUser = rsp.data;
         });
@@ -129,17 +146,15 @@ define(['require'], function(require) {
         $scope.openSite = function(id) {
             location.href = '/rest/pl/fe/site/setting?site=' + id;
         };
+        $scope.createSite = function() {
+            var url = '/rest/pl/fe/site/create?_=' + (new Date * 1);
+
+            http2.get(url, function(rsp) {
+                location.href = '/rest/pl/fe/site/setting?site=' + rsp.data.id;
+            });
+        };
         /*新建素材*/
         var _fns = {
-            createSite: function() {
-                var defer = $q.defer(),
-                    url = '/rest/pl/fe/site/create?_=' + (new Date() * 1);
-
-                http2.get(url, function(rsp) {
-                    defer.resolve(rsp.data);
-                });
-                return defer.promise;
-            },
             addLink: function(site) {
                 http2.get('/rest/pl/fe/matter/link/create?site=' + site.id, function(rsp) {
                     location.href = '/rest/pl/fe/matter/link?site=' + site.id + '&id=' + rsp.data.id;
@@ -183,11 +198,6 @@ define(['require'], function(require) {
                     location.href = '/rest/pl/fe/matter/contribute?site=' + site.id + '&id=' + rsp.data.id;
                 });
             },
-            addMission: function(site) {
-                http2.get('/rest/pl/fe/matter/mission/create?site=' + site.id, function(rsp) {
-                    location.href = '/rest/pl/fe/matter/mission?site=' + site.id + '&id=' + rsp.data.id;
-                });
-            },
             addCustom: function(site) {
                 http2.get('/rest/pl/fe/matter/custom/create?site=' + site.id, function(rsp) {
                     location.href = '/rest/pl/fe/matter/custom?site=' + site.id + '&id=' + rsp.data;
@@ -209,12 +219,13 @@ define(['require'], function(require) {
         };
 
         function addMatter(site, matterType, scenario) {
+            $('body').click();
             var fnName = 'add' + matterType[0].toUpperCase() + matterType.substr(1);
             _fns[fnName].call(_fns, site, scenario);
         }
         $scope.addMatter = function(matterType, scenario) {
             if (matterType == 'site') {
-                var url = '/rest/pl/fe/site/create?_=' + (new Date() * 1);
+                var url = '/rest/pl/fe/site/create?_=' + (new Date * 1);
                 http2.get(url, function(rsp) {
                     location.href = '/rest/pl/fe/site/setting?site=' + rsp.data.id;
                 });

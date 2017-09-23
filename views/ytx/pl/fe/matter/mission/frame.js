@@ -14,7 +14,6 @@ define(['missionService', 'enrollService', 'signinService'], function() {
                 'enroll': '登记',
                 'signin': '签到',
                 'group': '分组',
-                'wall': '信息墙',
             },
             appOrder: ['enroll', 'signin', 'group']
         },
@@ -26,17 +25,19 @@ define(['missionService', 'enrollService', 'signinService'], function() {
                 'quiz': '测验',
                 'score_sheet': '记分表',
             },
+            enrollOrder: ['common', 'registration', 'voting', 'quiz', 'score_sheet'],
             group: {
                 'split': '分组',
                 'wall': '信息墙'
-            }
+            },
+            groupOrder: ['split', 'wall']
         },
         naming: { 'phase': '课程期数' }
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvMissionProvider', 'srvQuickEntryProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvMissionProvider, srvQuickEntryProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
-            var baseURL = '/views/ytx/pl/fe/matter/mission/';
-            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
+            var baseURL = '/views/default/pl/fe/matter/mission/';
+            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
             this.resolve = {
                 load: function($q) {
@@ -53,16 +54,18 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             directive: $compileProvider.directive
         };
         $routeProvider
-            .when('/rest/pl/fe/matter/mission/main', new RouteParam('main'))
-            .when('/rest/pl/fe/matter/mission/entry', new RouteParam('entry', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/mschema', new RouteParam('mschema', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/access', new RouteParam('access', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/doc', new RouteParam('doc', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/app', new RouteParam('app', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/enrollee', new RouteParam('enrollee', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/report', new RouteParam('report', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/overview', new RouteParam('report', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
-            .when('/rest/pl/fe/matter/mission/notice', new RouteParam('report', '/views/default/pl/fe/matter/mission/', '/views/default/pl/fe/matter/mission/'))
+            .when('/rest/pl/fe/matter/mission/main', new RouteParam('main', '/views/ytx/pl/fe/matter/mission/'))
+            .when('/rest/pl/fe/matter/mission/phase', new RouteParam('phase'))
+            .when('/rest/pl/fe/matter/mission/entry', new RouteParam('entry'))
+            .when('/rest/pl/fe/matter/mission/access', new RouteParam('access'))
+            .when('/rest/pl/fe/matter/mission/coworker', new RouteParam('coworker'))
+            .when('/rest/pl/fe/matter/mission/app', new RouteParam('app'))
+            .when('/rest/pl/fe/matter/mission/doc', new RouteParam('doc'))
+            .when('/rest/pl/fe/matter/mission/mschema', new RouteParam('mschema'))
+            .when('/rest/pl/fe/matter/mission/enrollee', new RouteParam('enrollee'))
+            .when('/rest/pl/fe/matter/mission/report', new RouteParam('report'))
+            .when('/rest/pl/fe/matter/mission/overview', new RouteParam('overview'))
+            .when('/rest/pl/fe/matter/mission/notice', new RouteParam('notice'))
             .otherwise(new RouteParam('main'));
 
         $locationProvider.html5Mode(true);
@@ -109,8 +112,10 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             $scope.subView = subView[1] === 'mission' ? 'main' : subView[1];
             switch ($scope.subView) {
                 case 'main':
+                case 'phase':
                 case 'access':
                 case 'mschema':
+                case 'coworker':
                     $scope.opened = 'rule';
                     break;
                 case 'app':
@@ -138,74 +143,30 @@ define(['missionService', 'enrollService', 'signinService'], function() {
         });
         srvSite.tagList().then(function(oTag) {
             $scope.oTag = oTag;
-        });
-        srvMission.get().then(function(mission) {
-            if (mission.matter_mg_tag !== '') {
-                mission.matter_mg_tag.forEach(function(cTag, index) {
-                    $scope.oTag.forEach(function(oTag) {
-                        if (oTag.id === cTag) {
-                            mission.matter_mg_tag[index] = oTag;
+            srvMission.get().then(function(mission) {
+                if (mission.matter_mg_tag !== '') {
+                    mission.matter_mg_tag.forEach(function(cTag, index) {
+                        $scope.oTag.forEach(function(oTag) {
+                            if (oTag.id === cTag) {
+                                mission.matter_mg_tag[index] = oTag;
+                            }
+                        });
+                    });
+                }
+                $scope.mission = mission;
+                if (location.href.indexOf('/mission?') !== -1) {
+                    srvMission.matterCount().then(function(count) {
+                        if (count) {
+                            $location.path('/rest/pl/fe/matter/mission/app').search({ id: mission.id, site: mission.siteid });
+                            $location.replace();
+                        } else {
+                            $location.path('/rest/pl/fe/matter/mission/main').search({ id: mission.id, site: mission.siteid });
+                            $location.replace();
                         }
                     });
-                });
-            }
-            $scope.mission = mission;
-            if (location.href.indexOf('/mission?') !== -1) {
-                srvMission.matterCount().then(function(count) {
-                    if (count) {
-                        $location.path('/rest/pl/fe/matter/mission/app').search({ id: mission.id, site: mission.siteid });
-                        $location.replace();
-                    } else {
-                        $location.path('/rest/pl/fe/matter/mission/main').search({ id: mission.id, site: mission.siteid });
-                        $location.replace();
-                    }
-                });
-            }
-        });
-    }]);
-    ngApp.controller('ctrlOpUrl', ['$scope', 'http2', 'srvQuickEntry', '$timeout', function($scope, http2, srvQuickEntry, $timeout) {
-        var targetUrl, host, opEntry;
-        $scope.opEntry = opEntry = {};
-        $timeout(function() {
-            new ZeroClipboard(document.querySelectorAll('.text2Clipboard'));
-        });
-        $scope.$watch('mission', function(mission) {
-            if (!mission) return;
-            targetUrl = mission.opUrl;
-            host = targetUrl.match(/\/\/(\S+?)\//);
-            host = host.length === 2 ? host[1] : location.host;
-            srvQuickEntry.get(targetUrl).then(function(entry) {
-                if (entry) {
-                    opEntry.url = 'http://' + host + '/q/' + entry.code;
-                    opEntry.password = entry.password;
-                    opEntry.code = entry.code;
-                    opEntry.can_favor = entry.can_favor;
                 }
             });
         });
-        $scope.makeOpUrl = function() {
-            srvQuickEntry.add(targetUrl, $scope.mission.title).then(function(task) {
-                opEntry.url = 'http://' + host + '/q/' + task.code;
-                opEntry.code = task.code;
-            });
-        };
-        $scope.closeOpUrl = function() {
-            srvQuickEntry.remove(targetUrl).then(function(task) {
-                opEntry.url = '';
-                opEntry.code = '';
-                opEntry.can_favor = 'N';
-                opEntry.password = '';
-            });
-        };
-        $scope.configOpUrl = function(event, prop) {
-            event.preventDefault();
-            srvQuickEntry.config(targetUrl, {
-                password: opEntry.password
-            });
-        };
-        $scope.updCanFavor = function() {
-            srvQuickEntry.update(opEntry.code, { can_favor: opEntry.can_favor });
-        };
     }]);
     /*bootstrap*/
     require(['domReady!'], function(document) {
