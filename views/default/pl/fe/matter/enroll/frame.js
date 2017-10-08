@@ -114,16 +114,6 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             'score_sheet': '记分表'
         };
         $scope.opened = '';
-        $scope.$on('$locationChangeStart', function(event, nextRoute, currentRoute) {
-            if (nextRoute.indexOf('/enroll?') !== -1 || nextRoute.indexOf('/preview?') !== -1) {
-                var nr = nextRoute.replace(/#.*/, ''),
-                    cr = currentRoute.replace(/#.*/, '');
-                console.log(event);
-                if (nr === cr) {
-                    //event.preventDefault();
-                }
-            }
-        });
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
             $scope.subView = subView[1] === 'enroll' ? 'preview' : subView[1];
@@ -131,12 +121,12 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                 case 'main':
                 case 'page':
                 case 'schema':
-                case 'preview':
                     $scope.opened = 'edit';
                     break;
                 case 'access':
                 case 'time':
                 case 'entry':
+                case 'preview':
                     $scope.opened = 'publish';
                     break;
                 case 'record':
@@ -157,9 +147,9 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                     $scope.opened = '';
             }
         });
-        $scope.switchTo = function(subView) {
+        $scope.switchTo = function(subView, hash) {
             var url = '/rest/pl/fe/matter/enroll/' + subView;
-            $location.path(url);
+            $location.path(url).hash(hash || '');
         };
         $scope.update = function(name) {
             srvEnrollApp.update(name);

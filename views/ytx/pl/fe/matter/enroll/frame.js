@@ -29,8 +29,9 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvEnrollAppProvider', 'srvEnrollRoundProvider', 'srvEnrollPageProvider', 'srvEnrollRecordProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvEnrollAppProvider, srvEnrollRoundProvider, srvEnrollPageProvider, srvEnrollRecordProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/enroll/';
-            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
+            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
+            this.reloadOnSearch = false;
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
@@ -47,12 +48,12 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
         };
         $routeProvider
             .when('/rest/pl/fe/matter/enroll/main', new RouteParam('main'))
+            .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema'))
+            .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
             .when('/rest/pl/fe/matter/enroll/access', new RouteParam('access'))
             .when('/rest/pl/fe/matter/enroll/time', new RouteParam('time'))
             .when('/rest/pl/fe/matter/enroll/preview', new RouteParam('preview'))
             .when('/rest/pl/fe/matter/enroll/entry', new RouteParam('entry'))
-            .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema'))
-            .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
             .when('/rest/pl/fe/matter/enroll/record', new RouteParam('record'))
             .when('/rest/pl/fe/matter/enroll/remark', new RouteParam('remark'))
             .when('/rest/pl/fe/matter/enroll/editor', new RouteParam('editor'))
@@ -103,23 +104,23 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                 case 'main':
                 case 'page':
                 case 'schema':
-                case 'preview':
                     $scope.opened = 'edit';
                     break;
                 case 'access':
                 case 'time':
                 case 'entry':
+                case 'preview':
                     $scope.opened = 'publish';
                     break;
                 case 'record':
                 case 'remark':
                 case 'stat':
                 case 'enrollee':
+                case 'log':
                 case 'tag':
                     $scope.opened = 'data';
                     break;
                 case 'recycle':
-                case 'log':
                 case 'coin':
                 case 'notice':
                 case 'overview':

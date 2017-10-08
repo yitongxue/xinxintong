@@ -1,4 +1,4 @@
-<div class="col-md-6 col-md-offset-3">
+<div id='entry-view' class="col-md-6 col-md-offset-3">
     <div id='enrollee' class="panel panel-default">
         <div class="panel-body">
             <div class='form-group'>
@@ -11,11 +11,11 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group compact" ng-if="app.entry_rule.scope!=='sns'||sns.qy.joined==='Y'">
+            <div class="form-group" ng-if="app.entry_rule.scope!=='sns'||sns.qy.joined==='Y'">
                 <span><img id='entryQrcode' ng-src="{{entry.qrcode}}"></span>
                 <button class='btn btn-default' ng-click="downloadQrcode(entry.qrcode)">下载</button>
             </div>
-            <div class='form-group compact' ng-if="app.entry_rule.scope==='sns'&&sns.wx.can_qrcode==='Y'" ng-controller="ctrlWxQrcode">
+            <div class='form-group' ng-if="app.entry_rule.scope==='sns'&&sns.wx.can_qrcode==='Y'" ng-controller="ctrlWxQrcode">
                 <label>微信二维码</label>
                 <div ng-if='!qrcode'>
                     <button class='btn btn-default' ng-click="create()">生成微信二维码</button>
@@ -25,7 +25,7 @@
                     <button class='btn btn-default' ng-click="download()">下载</button>
                 </div>
             </div>
-            <div class='form-group compact' ng-if="app.entry_rule.scope==='sns'&&sns.yx.can_qrcode==='Y'">
+            <div class='form-group' ng-if="app.entry_rule.scope==='sns'&&sns.yx.can_qrcode==='Y'">
                 <label>易信二维码</label>
             </div>
             <div class='form-group' ng-if="app.entry_rule.exclude.indexOf('repos')!==-1">
@@ -471,7 +471,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-3" id="myScrollspy" style='position:relative;'>
+<div class="col-md-3" id="entryScrollspy" style='position:relative;'>
     <ul class="nav nav-pills nav-stacked pl-workspace" style='position:fixed;'>
         <li><a href="#enrollee">用户入口</a></li>
         <li><a href="#organizer">组织者入口</a></li>

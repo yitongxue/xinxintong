@@ -40,8 +40,9 @@ define(['require'], function() {
     ngApp.config(['$routeProvider', '$locationProvider', '$controllerProvider', 'srvSiteProvider', 'srvAppProvider', 'srvTagProvider', function($routeProvider, $locationProvider, $controllerProvider, srvSiteProvider, srvAppProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/article/';
-            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
+            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
+            this.reloadOnSearch = false;
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
@@ -55,11 +56,12 @@ define(['require'], function() {
         ngApp.provider = {
             controller: $controllerProvider.register
         };
-        $routeProvider.when('/rest/pl/fe/matter/article/log', new RouteParam('log'))
+        $routeProvider
+            .when('/rest/pl/fe/matter/article/body', new RouteParam('body'))
+            .when('/rest/pl/fe/matter/article/preview', new RouteParam('preview'))
             .when('/rest/pl/fe/matter/article/coin', new RouteParam('coin'))
-            .when('/rest/pl/fe/matter/article/discuss', new RouteParam('discuss', '/views/default/pl/fe/_module/'))
+            .when('/rest/pl/fe/matter/article/log', new RouteParam('log'))
             .otherwise(new RouteParam('main', '/views/ytx/pl/fe/matter/article/'));
-
         $locationProvider.html5Mode(true);
         //设置服务参数
         (function() {
@@ -74,17 +76,31 @@ define(['require'], function() {
             srvAppProvider.setAppId(articleId);
         })();
     }]);
-    ngApp.controller('ctrlArticle', ['$scope', 'srvSite', 'srvApp', function($scope, srvSite, srvApp) {
-        $scope.viewNames = {
-            'main': '发布预览',
-            'coin': '积分规则',
-            'log': '运行日志',
-        };
+    ngApp.controller('ctrlArticle', ['$scope', '$location', 'srvSite', 'srvApp', function($scope, $location, srvSite, srvApp) {
         $scope.subView = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
             $scope.subView = subView[1] === 'article' ? 'main' : subView[1];
+            switch ($scope.subView) {
+                case 'main':
+                case 'body':
+                    $scope.opened = 'edit';
+                    break;
+                case 'preview':
+                    $scope.opened = 'publish';
+                    break;
+                case 'coin':
+                case 'log':
+                    $scope.opened = 'other';
+                    break;
+                default:
+                    $scope.opened = '';
+            }
         });
+        $scope.switchTo = function(subView) {
+            var url = '/rest/pl/fe/matter/article/' + subView;
+            $location.path(url);
+        };
         $scope.update = function(names) {
             return srvApp.update(names);
         };
