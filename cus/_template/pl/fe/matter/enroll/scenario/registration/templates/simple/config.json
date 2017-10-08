@@ -110,10 +110,9 @@
             "schema":
             {
                 "id": "name",
-                "title": "名称",
+                "title": "姓名",
                 "type": "shorttext",
                 "required": "Y",
-
                 "format": "name"
             }
         },
@@ -225,7 +224,7 @@
     "schema": [
     {
         "id": "name",
-        "title": "名称",
+        "title": "姓名",
         "type": "shorttext",
         "required": "Y",
         "format": "name"
