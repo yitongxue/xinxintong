@@ -94,7 +94,8 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             'registration': '报名',
             'voting': '评价',
             'quiz': '测验',
-            'score': '记分表'
+            'score_sheet': '记分表',
+            index: ['common', 'registration', 'voting', 'quiz', 'score_sheet']
         };
         $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
@@ -106,7 +107,6 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                 case 'schema':
                     $scope.opened = 'edit';
                     break;
-                case 'access':
                 case 'time':
                 case 'entry':
                 case 'preview':
