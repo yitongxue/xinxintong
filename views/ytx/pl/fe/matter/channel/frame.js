@@ -33,7 +33,7 @@ ngApp.controller('ctrlChannel', ['$scope', '$location', 'http2', 'srvSite', func
         $scope.entryUrl = 'http://' + location.host + '/rest/site/fe/matter?site=' + $scope.siteId + '&id=' + $scope.id + '&type=channel';
     });
 }]);
-ngApp.controller('ctrlMain', ['$scope', '$uibModal', 'http2', 'mattersgallery', 'srvTag', function($scope, $uibModal, http2, mattersgallery, srvTag) {
+ngApp.controller('ctrlMain', ['$scope', 'http2', 'srvSite', 'noticebox', '$uibModal', 'srvTag', function($scope, http2, srvSite, noticebox, $uibModal, srvTag) {
     var modifiedData = {};
     $scope.modified = false;
     $scope.matterTypes = [{
@@ -49,8 +49,8 @@ ngApp.controller('ctrlMain', ['$scope', '$uibModal', 'http2', 'mattersgallery', 
         title: '签到活动',
         url: '/rest/pl/fe/matter'
     }, {
-        value: 'link',
-        title: '外部链接',
+        value: 'mission',
+        title: '项目',
         url: '/rest/pl/fe/matter'
     }];
     $scope.acceptMatterTypes = [{
@@ -101,19 +101,53 @@ ngApp.controller('ctrlMain', ['$scope', '$uibModal', 'http2', 'mattersgallery', 
             }
         });
     };
+    $scope.applyToHome = function() {
+        var url = '/rest/pl/fe/matter/home/apply?site=' + $scope.siteId + '&type=channel&id=' + $scope.id;
+        http2.get(url, function(rsp) {
+            noticebox.success('完成申请！');
+        });
+    }
     $scope.update = function(name) {
         $scope.modified = true;
         modifiedData[name] = $scope.editing[name];
     };
-    $scope.addMatter = function() {
-        mattersgallery.open($scope.siteId, function(matters, type) {
-            var relations = { matter: matters };
-            http2.post('/rest/pl/fe/matter/channel/addMatter?site=' + $scope.siteId + '&channel=' + $scope.editing.id, relations, function(rsp) {
-                $scope.editing.matters = rsp.data;
-                arrangeMatters();
+    $scope.setFixed = function(pos, clean) {
+        if (!clean) {
+            srvSite.openGallery({
+                matterTypes: $scope.matterTypes,
+                singleMatter: true
+            }).then(function(result) {
+                if (result.matters.length === 1) {
+                    var params = {
+                        t: result.type,
+                        id: result.matters[0].id
+                    };
+                    postFixed(pos, params);
+                }
             });
-        }, {
-            matterTypes: $scope.matterTypes,
+        } else {
+            var params = {
+                t: null,
+                id: null
+            };
+            postFixed(pos, params);
+        }
+    };
+    $scope.addMatter = function() {
+        srvSite.openGallery({
+            matterTypes: $scope.matterTypes
+        }).then(function(result) {
+            var relations;
+            if (result.matters && result.matters.length) {
+                result.matters.forEach(function(matter) {
+                    matter.type = result.type;
+                });
+                relations = { matter: result.matters };
+                http2.post('/rest/pl/fe/matter/channel/addMatter?site=' + $scope.siteId + '&channel=' + $scope.editing.id, relations, function(rsp) {
+                    $scope.editing.matters = rsp.data;
+                    arrangeMatters();
+                });
+            }
         });
     };
     $scope.createArticle = function() {
@@ -133,28 +167,6 @@ ngApp.controller('ctrlMain', ['$scope', '$uibModal', 'http2', 'mattersgallery', 
                 location.href = '/rest/pl/fe/matter/link?site=' + $scope.siteId + '&id=' + link.id;
             });
         });
-    };
-    $scope.setFixed = function(pos, clean) {
-        if (!clean) {
-            mattersgallery.open($scope.siteId, function(matters, type) {
-                if (matters.length === 1) {
-                    var params = {
-                        t: type,
-                        id: matters[0].id
-                    };
-                    postFixed(pos, params);
-                }
-            }, {
-                matterTypes: $scope.matterTypes,
-                singleMatter: true
-            });
-        } else {
-            var params = {
-                t: null,
-                id: null
-            };
-            postFixed(pos, params);
-        }
     };
     $scope.removeMatter = function(matter) {
         var removed = {
