@@ -113,8 +113,6 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             switch ($scope.subView) {
                 case 'main':
                 case 'phase':
-                case 'access':
-                case 'mschema':
                 case 'coworker':
                     $scope.opened = 'rule';
                     break;
@@ -123,6 +121,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
                 case 'entry':
                     $scope.opened = 'task';
                     break;
+                case 'mschema':
                 case 'enrollee':
                 case 'report':
                     $scope.opened = 'result';
