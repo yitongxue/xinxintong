@@ -262,8 +262,8 @@ class main extends \pl\fe\matter\main_base {
 				$oRule->entry = isset($oEntryRule->otherwise->entry) ? $oEntryRule->otherwise->entry : '';
 				$oSns = new \stdClass;
 				if (isset($oProtoEntryRule->sns)) {
-					foreach ($oProtoEntryRule->sns as $snsName => $oRule2) {
-						if (isset($oRule2->entry) && $oRule2->entry === 'Y') {
+					foreach ($oProtoEntryRule->sns as $snsName => $bValid) {
+						if ($bValid) {
 							$oSns->{$snsName} = $oRule;
 						}
 					}
@@ -1536,14 +1536,15 @@ class main extends \pl\fe\matter\main_base {
 		 * 处理页面
 		 */
 		if (!empty($config->pages)) {
-			foreach ($config->pages as &$page) {
+			foreach ($config->pages as &$oPage) {
+				$templateFile = $templateDir . '/' . $oPage->name;
 				/* 填充代码 */
 				$code = [
-					'html' => file_get_contents($templateDir . '/' . $page->name . '.html'),
-					'css' => file_get_contents($templateDir . '/' . $page->name . '.css'),
-					'js' => file_get_contents($templateDir . '/' . $page->name . '.js'),
+					'html' => file_exists($templateFile . '.html') ? file_get_contents($templateFile . '.html') : '',
+					'css' => file_exists($templateFile . '.css') ? file_get_contents($templateFile . '.css') : '',
+					'js' => file_exists($templateFile . '.js') ? file_get_contents($templateFile . '.js') : '',
 				];
-				$page->code = $code;
+				$oPage->code = $code;
 			}
 		}
 
