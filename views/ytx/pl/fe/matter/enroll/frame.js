@@ -50,7 +50,6 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             .when('/rest/pl/fe/matter/enroll/main', new RouteParam('main'))
             .when('/rest/pl/fe/matter/enroll/schema', new RouteParam('schema'))
             .when('/rest/pl/fe/matter/enroll/page', new RouteParam('page'))
-            .when('/rest/pl/fe/matter/enroll/access', new RouteParam('access'))
             .when('/rest/pl/fe/matter/enroll/time', new RouteParam('time'))
             .when('/rest/pl/fe/matter/enroll/preview', new RouteParam('preview'))
             .when('/rest/pl/fe/matter/enroll/entry', new RouteParam('entry'))
@@ -108,7 +107,6 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                     $scope.opened = 'edit';
                     break;
                 case 'time':
-                case 'entry':
                 case 'preview':
                     $scope.opened = 'publish';
                     break;

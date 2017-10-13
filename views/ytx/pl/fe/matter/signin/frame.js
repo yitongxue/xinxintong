@@ -92,7 +92,6 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
                     $scope.opened = 'edit';
                     break;
                 case 'preview':
-                case 'entry':
                     $scope.opened = 'publish';
                     break;
                 case 'record':

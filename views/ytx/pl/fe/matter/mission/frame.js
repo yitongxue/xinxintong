@@ -57,7 +57,6 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             .when('/rest/pl/fe/matter/mission/main', new RouteParam('main', '/views/ytx/pl/fe/matter/mission/'))
             .when('/rest/pl/fe/matter/mission/phase', new RouteParam('phase'))
             .when('/rest/pl/fe/matter/mission/entry', new RouteParam('entry'))
-            .when('/rest/pl/fe/matter/mission/access', new RouteParam('access'))
             .when('/rest/pl/fe/matter/mission/coworker', new RouteParam('coworker'))
             .when('/rest/pl/fe/matter/mission/app', new RouteParam('app'))
             .when('/rest/pl/fe/matter/mission/doc', new RouteParam('doc'))
@@ -118,7 +117,6 @@ define(['missionService', 'enrollService', 'signinService'], function() {
                     break;
                 case 'app':
                 case 'doc':
-                case 'entry':
                     $scope.opened = 'task';
                     break;
                 case 'mschema':
