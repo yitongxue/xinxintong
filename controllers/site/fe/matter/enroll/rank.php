@@ -73,8 +73,8 @@ class rank extends base {
 		$q2['r'] = ['o' => ($page - 1) * $size, 'l' => $size];
 
 		$result = new \stdClass;
-		$users = $modelUsr->query_objs_ss($q, $q2)
-		if ((count($users)) && !empty($oApp->group_app_id)) {
+		$users = $modelUsr->query_objs_ss($q, $q2);
+		if (count($users) && !empty($oApp->group_app_id)) {
 			$q = [
 				'userid,round_id,round_title',
 				'xxt_group_player',
