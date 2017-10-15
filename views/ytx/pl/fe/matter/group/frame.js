@@ -31,7 +31,7 @@ define(['require'], function() {
         ],
         naming: { 'mission_phase': '课程期数' }
     });
-    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', 'srvQuickEntryProvider', 'srvSiteProvider', 'srvGroupAppProvider', 'srvGroupRoundProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, srvQuickEntryProvider, srvSiteProvider, srvGroupAppProvider, srvGroupRoundProvider, srvTagProvider) {
+    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvQuickEntryProvider', 'srvSiteProvider', 'srvGroupAppProvider', 'srvGroupRoundProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvQuickEntryProvider, srvSiteProvider, srvGroupAppProvider, srvGroupRoundProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/group/';
             this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
@@ -59,6 +59,9 @@ define(['require'], function() {
             .otherwise(new RouteParam('user'));
 
         $locationProvider.html5Mode(true);
+        $uibTooltipProvider.setTriggers({
+            'show': 'hide'
+        });
         //设置服务参数
         (function() {
             var ls, siteId, appId;
