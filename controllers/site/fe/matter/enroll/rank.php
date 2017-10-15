@@ -84,7 +84,7 @@ class rank extends base {
 			if (count($userGroups)) {
 				$userGroups2 = new \stdClass;
 				foreach ($userGroups as $oUserGroup) {
-					if (isset($oUserGroup->userid)) {
+					if (!empty($oUserGroup->userid)) {
 						$userGroups2->{$oUserGroup->userid} = new \stdClass;
 						$userGroups2->{$oUserGroup->userid}->round_id = $oUserGroup->round_id;
 						$userGroups2->{$oUserGroup->userid}->round_title = $oUserGroup->round_title;
