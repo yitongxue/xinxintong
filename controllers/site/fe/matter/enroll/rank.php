@@ -106,7 +106,8 @@ class rank extends base {
 	 * 分组排行榜
 	 */
 	public function groupByApp_action($app) {
-		$oApp = $this->model('matter\enroll')->byId($app, ['cascaded' => 'N']);
+		$modelApp = $this->model('matter\enroll');
+		$oApp = $modelApp->byId($app, ['cascaded' => 'N']);
 		if ($oApp === false) {
 			return new \ObjectNotFoundError();
 		}
@@ -150,7 +151,7 @@ class rank extends base {
 			break;
 		}
 		$sql .= ' from xxt_enroll_user where aid=\'' . $oApp->id . "'";
-		$round = empty($oCriteria->round) ? 'ALL' : $modelUsr->escape($oCriteria->round);
+		$round = empty($oCriteria->round) ? 'ALL' : $modelApp->escape($oCriteria->round);
 		$sql .= " and rid='" . $round . "'";
 
 		/* 获取分组的数据 */
