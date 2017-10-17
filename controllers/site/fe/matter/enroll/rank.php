@@ -22,8 +22,8 @@ class rank extends base {
 		$modelUsr = $this->model('matter\enroll\user');
 
 		$q = [
-			'u.userid,u.nickname,u.rid',
-			'xxt_enroll_user u',
+			'u.userid,u.nickname,u.rid,a.headimgurl',
+			'xxt_enroll_user u left join xxt_site_account a on u.userid = a.uid and u.siteid = a.siteid',
 			"u.aid='{$oApp->id}'",
 		];
 		$round = empty($oCriteria->round) ? 'ALL' : $modelUsr->escape($oCriteria->round);
