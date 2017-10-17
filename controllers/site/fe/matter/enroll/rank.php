@@ -26,10 +26,10 @@ class rank extends base {
 			'xxt_enroll_user u left join xxt_site_account a on u.userid = a.uid and u.siteid = a.siteid',
 			"u.aid='{$oApp->id}'",
 		];
-		if (!empty($oCriteria->round) && $oCriteria->round !== 'ALL') {
-			$round = $modelUsr->escape($oCriteria->round);
-		} else {
+		if (empty($oCriteria->round)) {
 			$round = 'ALL';
+		} else {
+			$round = $modelUsr->escape($oCriteria->round);
 		}
 		$q[2] .= " and u.rid = '$round'";
 
