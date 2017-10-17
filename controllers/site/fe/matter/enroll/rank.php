@@ -22,15 +22,11 @@ class rank extends base {
 		$modelUsr = $this->model('matter\enroll\user');
 
 		$q = [
-			'u.userid,u.nickname,u.rid,a.headimgurl',
-			'xxt_enroll_user u left join xxt_site_account a on u.userid = a.uid and u.siteid = a.siteid',
+			'u.userid,u.nickname,u.rid',
+			'xxt_enroll_user u',
 			"u.aid='{$oApp->id}'",
 		];
-		if (empty($oCriteria->round)) {
-			$round = 'ALL';
-		} else {
-			$round = $modelUsr->escape($oCriteria->round);
-		}
+		$round = empty($oCriteria->round) ? 'ALL' : $modelUsr->escape($oCriteria->round);
 		$q[2] .= " and u.rid = '$round'";
 
 		switch ($oCriteria->orderby) {
