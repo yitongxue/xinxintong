@@ -9,6 +9,34 @@
         {
             "schema":
             {
+                "id": "desc000",
+                "title": "为更好的为您提供服务，您的意见将是我们的宝贵资源，烦请您不吝赐教！ 感谢您的时间！",
+                "type": "html",
+                "required": "N",
+                "content": "<div>为更好的为您提供服务，您的意见将是我们的宝贵资源，烦请您不吝赐教！ 感谢您的时间！</div>"
+            },
+            "config":
+            {
+                "showname": "label"
+            }
+        },
+        {
+            "schema":
+            {
+                "id": "desc001",
+                "title": "1、课程",
+                "type": "html",
+                "required": "N",
+                "content": "<div>1、课程</div>"
+            },
+            "config":
+            {
+                "showname": "label"
+            }
+        },
+        {
+            "schema":
+            {
                 "id": "c1001",
                 "title": "本次培训对您有价值或帮助",
                 "type": "single",
@@ -214,6 +242,20 @@
                 "showname": "label",
                 "component": "R",
                 "align": "V"
+            }
+        },
+        {
+            "schema":
+            {
+                "id": "desc002",
+                "title": "2、讲师",
+                "type": "html",
+                "required": "N",
+                "content": "<div>2、讲师</div>"
+            },
+            "config":
+            {
+                "showname": "label"
             }
         },
         {
@@ -555,6 +597,20 @@
         {
             "schema":
             {
+                "id": "desc003",
+                "title": "3、培训经理",
+                "type": "html",
+                "required": "N",
+                "content": "<div>3、培训经理</div>"
+            },
+            "config":
+            {
+                "showname": "label"
+            }
+        },
+        {
+            "schema":
+            {
                 "id": "c3001",
                 "title": "培训经理有很强的专业度和责任心",
                 "type": "single",
@@ -592,6 +648,20 @@
                 "showname": "label",
                 "component": "R",
                 "align": "V"
+            }
+        },
+        {
+            "schema":
+            {
+                "id": "desc004",
+                "title": "4、其它",
+                "type": "html",
+                "required": "N",
+                "content": "<div>4、其它</div>"
+            },
+            "config":
+            {
+                "showname": "label"
             }
         },
         {
@@ -720,6 +790,23 @@
         {
             "config":
             {
+                "id": "Vdesc001",
+                "pattern": "record",
+                "inline": "N",
+                "splitLine": "Y"
+            },
+            "schema":
+            {
+                "id": "desc001",
+                "title": "1、课程",
+                "type": "html",
+                "required": "N",
+                "content": "<div>1、课程</div>"
+            }
+        },
+        {
+            "config":
+            {
                 "id": "s1",
                 "pattern": "record",
                 "inline": "N",
@@ -795,6 +882,23 @@
                 "title": "您对本次培训的整体评价",
                 "type": "single",
                 "required": "Y"
+            }
+        },
+        {
+            "config":
+            {
+                "id": "Vdesc002",
+                "pattern": "record",
+                "inline": "N",
+                "splitLine": "Y"
+            },
+            "schema":
+            {
+                "id": "desc002",
+                "title": "2、讲师",
+                "type": "html",
+                "required": "N",
+                "content": "<div>2、讲师</div>"
             }
         },
         {
@@ -928,6 +1032,23 @@
         {
             "config":
             {
+                "id": "Vdesc003",
+                "pattern": "record",
+                "inline": "N",
+                "splitLine": "Y"
+            },
+            "schema":
+            {
+                "id": "desc003",
+                "title": "3、培训经理",
+                "type": "html",
+                "required": "N",
+                "content": "<div>3、培训经理</div>"
+            }
+        },
+        {
+            "config":
+            {
                 "id": "s14",
                 "pattern": "record",
                 "inline": "N",
@@ -939,6 +1060,23 @@
                 "title": "培训经理有很强的专业度和责任心",
                 "type": "single",
                 "required": "Y"
+            }
+        },
+        {
+            "config":
+            {
+                "id": "Vdesc004",
+                "pattern": "record",
+                "inline": "N",
+                "splitLine": "Y"
+            },
+            "schema":
+            {
+                "id": "desc004",
+                "title": "4、其它",
+                "type": "html",
+                "required": "N",
+                "content": "<div>4、其它</div>"
             }
         },
         {
@@ -1014,6 +1152,20 @@
         }]
     }],
     "schema": [
+    {
+        "id": "desc000",
+        "title": "为更好的为您提供服务，您的意见将是我们的宝贵资源，烦请您不吝赐教！ 感谢您的时间！",
+        "type": "html",
+        "content": "<div>为更好的为您提供服务，您的意见将是我们的宝贵资源，烦请您不吝赐教！ 感谢您的时间！</div>",
+        "required": "N"
+    },
+    {
+        "id": "desc001",
+        "title": "1、课程",
+        "type": "html",
+        "content": "<div>1、课程</div>",
+        "required": "N"
+    },
     {
         "id": "c1001",
         "title": "本次培训对您有价值或帮助",
@@ -1178,6 +1330,13 @@
             "l": "不同意",
             "score": 1
         }]
+    },
+    {
+        "id": "desc002",
+        "title": "2、讲师",
+        "type": "html",
+        "content": "<div>2、讲师</div>",
+        "required": "N"
     },
     {
         "id": "c2001",
@@ -1444,6 +1603,13 @@
         }]
     },
     {
+        "id": "desc003",
+        "title": "3、培训经理",
+        "type": "html",
+        "content": "<div>3、培训经理</div>",
+        "required": "N"
+    },
+    {
         "id": "c3001",
         "title": "培训经理有很强的专业度和责任心",
         "type": "single",
@@ -1475,6 +1641,13 @@
             "l": "不同意",
             "score": 1
         }]
+    },
+    {
+        "id": "desc004",
+        "title": "4、其它",
+        "type": "html",
+        "content": "<div>4、其它</div>",
+        "required": "N"
     },
     {
         "id": "c4001",

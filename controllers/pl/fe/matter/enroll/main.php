@@ -1,11 +1,11 @@
 <?php
 namespace pl\fe\matter\enroll;
 
-require_once dirname(dirname(__FILE__)) . '/main_base.php';
+require_once dirname(__FILE__) . '/main_base.php';
 /*
  * 登记活动主控制器
  */
-class main extends \pl\fe\matter\main_base {
+class main extends main_base {
 	/**
 	 * 返回视图
 	 */
@@ -14,9 +14,9 @@ class main extends \pl\fe\matter\main_base {
 		exit;
 	}
 	/**
-	 * 返回一个登记活动
+	 * 返回指定的登记活动
 	 */
-	public function get_action($site, $id) {
+	public function get_action($id) {
 		if (false === ($oUser = $this->accountUser())) {
 			return new \ResponseTimeout();
 		}
@@ -534,7 +534,12 @@ class main extends \pl\fe\matter\main_base {
 	}
 	/**
 	 *
-	 * 复制一个登记活动
+	 * 复制指定的登记活动
+	 *
+	 * 跨项目进行复制：
+	 * 1、关联了项目的通讯录，取消关联，修改相关题目的id和type
+	 * 2、关联了分组活动，取消和分组活动的关联，修改分组题目，修改相关题目的id和type
+	 * 3、关联了登记活动，取消和登记活动的关联，修改分组题目，修改相关题目的id和type
 	 *
 	 * @param string $site 是否要支持跨团队进行活动的复制？
 	 * @param string $app
@@ -546,22 +551,76 @@ class main extends \pl\fe\matter\main_base {
 			return new \ResponseTimeout();
 		}
 
-		$current = time();
 		$modelApp = $this->model('matter\enroll')->setOnlyWriteDbConn(true);
+		$modelPg = $this->model('matter\enroll\page');
 		$modelCode = $this->model('code\page');
 
 		$oCopied = $modelApp->byId($app);
 		if (false === $oCopied) {
 			return new \ObjectNotFoundError();
 		}
-		/**
-		 * 获得的基本信息
-		 */
+		$oEntryRule = $oCopied->entry_rule;
+		$aDataSchemas = $oCopied->dataSchemas;
+		$aPages = $oCopied->pages;
 		$newaid = uniqid();
 		$oNewApp = new \stdClass;
 		$oNewApp->siteid = $site;
 		$oNewApp->id = $newaid;
-		$oNewApp->start_at = $current;
+
+		/**
+		 * 如果通讯录的所属范围和新活动的范围不一致，需要解除关联的通信录
+		 */
+		if (isset($oEntryRule->scope) && $oEntryRule->scope === 'member') {
+			$aMatterMschemas = $modelApp->getEntryMemberSchema($oEntryRule);
+			foreach ($aMatterMschemas as $oMschema) {
+				if (!empty($oMschema->matter_type) && ($oMschema->matter_type !== 'mission' || $oMschema->matter_id !== $mission)) {
+					/* 应用的题目 */
+					$modelApp->replaceMemberSchema($aDataSchemas, $oMschema);
+					/* 页面的题目 */
+					foreach ($aPages as $oPage) {
+						$modelPg->replaceMemberSchema($oPage, $oMschema);
+					}
+					unset($oEntryRule->member->{$oMschema->id});
+				}
+			}
+			if (count((array) $oEntryRule->member) === 0) {
+				$oEntryRule->scope = 'none';
+				unset($oEntryRule->member);
+			}
+		}
+		/**
+		 * 如果关联了分组或登记活动，需要去掉题目的关联信息
+		 */
+		if ($oCopied->mission_id !== $mission) {
+			$aAssocApps = [];
+			if (!empty($oCopied->group_app_id)) {
+				$aAssocApps[] = $oCopied->group_app_id;
+				$oCopied->group_app_id = '';
+			}
+			if (!empty($oCopied->enroll_app_id)) {
+				$aAssocApps[] = $oCopied->enroll_app_id;
+				$oCopied->enroll_app_id = '';
+			}
+			if (count($aAssocApps)) {
+				/* 页面的题目 */
+				foreach ($aPages as $oPage) {
+					$modelPg->replaceAssocSchema($oPage, $aAssocApps);
+				}
+				/* 应用的题目 */
+				$modelApp->replaceAssocSchema($aDataSchemas, $aAssocApps);
+			}
+		}
+
+		/* 作为昵称的题目 */
+		$oNicknameSchema = $modelApp->findAssignedNicknameSchema($aDataSchemas);
+		if (!empty($oNicknameSchema)) {
+			$oNewApp->assigned_nickname = json_encode(['valid' => 'Y', 'schema' => ['id' => $oNicknameSchema->id]]);
+		}
+
+		/**
+		 * 获得的基本信息
+		 */
+		$oNewApp->start_at = 0;
 		$oNewApp->title = $modelApp->escape($oCopied->title) . '（副本）';
 		$oNewApp->pic = $oCopied->pic;
 		$oNewApp->summary = $modelApp->escape($oCopied->summary);
@@ -569,11 +628,13 @@ class main extends \pl\fe\matter\main_base {
 		$oNewApp->scenario_config = $oCopied->scenario_config;
 		$oNewApp->count_limit = $oCopied->count_limit;
 		$oNewApp->multi_rounds = $oCopied->multi_rounds;
-		$oNewApp->data_schemas = $modelApp->escape($oCopied->data_schemas);
-		$oNewApp->entry_rule = json_encode($oCopied->entry_rule);
 		$oNewApp->enrolled_entry_page = $oCopied->enrolled_entry_page;
 		$oNewApp->extattrs = $oCopied->extattrs;
 		$oNewApp->can_siteuser = 'Y';
+		$oNewApp->entry_rule = json_encode($oEntryRule);
+		$oNewApp->data_schemas = $modelApp->escape($modelApp->toJson($aDataSchemas));
+		$oNewApp->group_app_id = $oCopied->group_app_id;
+		$oNewApp->enroll_app_id = $oCopied->enroll_app_id;
 
 		/* 所属项目 */
 		if (!empty($mission)) {
@@ -589,10 +650,9 @@ class main extends \pl\fe\matter\main_base {
 		 * 复制自定义页面
 		 */
 		if (count($oCopied->pages)) {
-			$modelPage = $this->model('matter\enroll\page');
 			foreach ($oCopied->pages as $ep) {
-				$oNewPage = $modelPage->add($oUser, $oNewApp->siteid, $oNewApp->id);
-				$rst = $modelPage->update(
+				$oNewPage = $modelPg->add($oUser, $oNewApp->siteid, $oNewApp->id);
+				$rst = $modelPg->update(
 					'xxt_enroll_page',
 					[
 						'title' => $ep->title,
@@ -1167,75 +1227,6 @@ class main extends \pl\fe\matter\main_base {
 		}
 
 		return [true];
-	}
-	/**
-	 * 应用的登记项更新时，级联更新页面的登记项
-	 */
-	private function _refreshPagesSchema($appId) {
-		$app = $this->model('matter\enroll')->byId($appId);
-		if (count($app->pages)) {
-			$dataSchemas = json_decode($app->data_schemas);
-			$mapOfDateSchemas = new \stdClass;
-			foreach ($dataSchemas as $ds) {
-				$mapOfDateSchemas->{$ds->id} = $ds;
-			}
-			foreach ($app->pages as $page) {
-				if (!empty($page->data_schemas)) {
-					$this->_refreshOnePageSchema($appId, $page, $mapOfDateSchemas);
-				}
-			}
-		}
-		return true;
-	}
-	/**
-	 * 应用的登记项更新时，级联更新页面的登记项
-	 */
-	private function _refreshOnePageSchema($appId, &$page, &$mapOfDateSchemas) {
-		$pageDataSchemas = json_decode($page->data_schemas);
-		if (count($pageDataSchemas)) {
-			if ($page->type === 'V') {
-				$newPageDataSchemas = new \stdClass;
-				if (isset($pageDataSchemas->record)) {
-					$newPageDataSchemas->record = clone $pageDataSchemas->record;
-					$newPageDataSchemas->record->schemas = [];
-					foreach ($pageDataSchemas->record->schemas as $pds) {
-						if (isset($mapOfDateSchemas->{$pds->id})) {
-							$newPageDataSchemas->record->schemas[] = $mapOfDateSchemas->{$pds->id};
-						} elseif (in_array($pds->id, ['enrollAt', 'enrollerNickname', 'enrollerHeadpic'])) {
-							$newPageDataSchemas->record->schemas[] = $pds;
-						}
-					}
-				}
-				if (isset($pageDataSchemas->list)) {
-					$newPageDataSchemas->list = clone $pageDataSchemas->list;
-					$newPageDataSchemas->list->schemas = [];
-					foreach ($pageDataSchemas->list->schemas as $pds) {
-						if (isset($mapOfDateSchemas->{$pds->id})) {
-							$newPageDataSchemas->list->schemas[] = $mapOfDateSchemas->{$pds->id};
-						} elseif (in_array($pds->id, ['enrollAt', 'enrollerNickname', 'enrollerHeadpic'])) {
-							$newPageDataSchemas->list->schemas[] = $pds;
-						}
-					}
-				}
-			} else {
-				$newPageDataSchemas = [];
-				foreach ($pageDataSchemas as $pds) {
-					if (isset($mapOfDateSchemas->{$pds->id})) {
-						$newPageDataSchemas[] = $mapOfDateSchemas->{$pds->id};
-					}
-				}
-
-			}
-			$model = $this->model();
-			$newPageDataSchemas = $model->toJson($newPageDataSchemas);
-			$rst = $model->update(
-				'xxt_enroll_page',
-				['data_schemas' => $newPageDataSchemas],
-				"aid='$appId' and id={$page->id}"
-			);
-			return $rst;
-		}
-		return 0;
 	}
 	/**
 	 * 重置活动进入规则

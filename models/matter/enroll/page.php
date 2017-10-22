@@ -1,7 +1,17 @@
 <?php
 namespace matter\enroll;
 
-class page_model extends \TMS_MODEL {
+require_once dirname(__FILE__) . '/page_base.php';
+/**
+ *
+ */
+class page_model extends page_base {
+	/**
+	 *
+	 */
+	protected function table() {
+		return 'xxt_enroll_page';
+	}
 	/**
 	 *
 	 */
@@ -354,7 +364,7 @@ class page_model extends \TMS_MODEL {
 	/**
 	 *
 	 */
-	public function &htmlBySchema(&$schema, $template) {
+	public function &htmlBySchema($aSchemas, $template) {
 		if (defined('SAE_TMP_PATH')) {
 			$tmpfname = tempnam(SAE_TMP_PATH, "template");
 		} else {
@@ -364,7 +374,7 @@ class page_model extends \TMS_MODEL {
 		fwrite($handle, $template);
 		fclose($handle);
 		$s = new \Savant3(array('template' => $tmpfname, 'exceptions' => true));
-		$s->assign('schema', $schema);
+		$s->assign('schema', $aSchemas);
 		$html = $s->getOutput();
 		unlink($tmpfname);
 
