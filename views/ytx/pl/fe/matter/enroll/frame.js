@@ -106,7 +106,6 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                     $scope.opened = 'edit';
                     break;
                 case 'time':
-                case 'preview':
                     $scope.opened = 'publish';
                     break;
                 case 'record':
@@ -120,7 +119,6 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                 case 'recycle':
                 case 'coin':
                 case 'notice':
-                case 'overview':
                     $scope.opened = 'other';
                     break;
                 default:
