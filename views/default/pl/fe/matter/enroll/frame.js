@@ -1,6 +1,6 @@
 define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(require) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'service.enroll', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'ui.xxt']);
+    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'tmplshop.ui.xxt', 'pl.const', 'service.matter', 'service.enroll', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'ui.xxt']);
     ngApp.constant('cstApp', {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -102,7 +102,7 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
-    ngApp.controller('ctrlFrame', ['$scope', 'cstApp', 'srvSite', 'srvEnrollApp', 'templateShop', '$location', function($scope, cstApp, srvSite, srvEnrollApp, templateShop, $location) {
+    ngApp.controller('ctrlFrame', ['$scope', 'CstNaming', 'cstApp', 'srvSite', 'srvEnrollApp', 'templateShop', '$location', function($scope, CstNaming, cstApp, srvSite, srvEnrollApp, templateShop, $location) {
         $scope.cstApp = cstApp;
         $scope.scenarioes = {
             names: CstNaming.scenario.enroll,
