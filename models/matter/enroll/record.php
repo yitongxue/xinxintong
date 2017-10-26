@@ -897,8 +897,8 @@ class record_model extends record_base {
 									$oRec->data->member->{$nicknameSchemaId[1]} = $oRec->nickname;
 								}
 							} else {
-								if (!$oRec->data[$nicknameSchemaId]) {
-									$oRec->data[$nicknameSchemaId] = $oRec->nickname;
+								if (!$oRec->data->{$nicknameSchemaId}) {
+									$oRec->data->{$nicknameSchemaId} = $oRec->nickname;
 								}
 							}
 						}
