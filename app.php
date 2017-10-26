@@ -193,9 +193,8 @@ function custom_version($file) {
 	if (0 !== strpos($file, DIRECTORY_SEPARATOR)) {
 		$file .= DIRECTORY_SEPARATOR . $file;
 	}
-
 	$full = '/views/' . TMS_APP_VIEW_NAME . $file;
-	if (!file_exists($full)) {
+	if (!file_exists(TMS_APP_DIR . $full)) {
 		$full = '/views/' . TMS_APP_VIEW_NAME_DEFAULT . $file;
 	}
 

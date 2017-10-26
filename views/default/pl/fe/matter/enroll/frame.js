@@ -104,14 +104,9 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
     }]);
     ngApp.controller('ctrlFrame', ['$scope', 'cstApp', 'srvSite', 'srvEnrollApp', 'templateShop', '$location', function($scope, cstApp, srvSite, srvEnrollApp, templateShop, $location) {
         $scope.cstApp = cstApp;
-        $scope.scenarioNames = {
-            'common': '通用登记',
-            'registration': '报名',
-            'voting': '投票',
-            'quiz': '测验',
-            'group_week_report': '周报',
-            'score_sheet': '记分表',
-            index: ['common', 'registration', 'voting', 'quiz', 'group_week_report', 'score_sheet']
+        $scope.scenarioes = {
+            names: CstNaming.scenario.enroll,
+            index: CstNaming.scenario.enrollIndex,
         };
         $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {

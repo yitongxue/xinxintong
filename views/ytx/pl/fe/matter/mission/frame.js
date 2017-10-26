@@ -1,6 +1,6 @@
 define(['missionService', 'enrollService', 'signinService'], function() {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'tinymce.ui.xxt', 'service.matter', 'service.mission', 'service.enroll', 'service.signin']);
+    var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'tinymce.ui.xxt', 'pl.const', 'service.matter', 'service.mission', 'service.enroll', 'service.signin']);
     ngApp.constant('cstApp', {
         notifyMatter: [],
         innerlink: [],
@@ -16,21 +16,6 @@ define(['missionService', 'enrollService', 'signinService'], function() {
                 'group': '分组',
             },
             appOrder: ['enroll', 'signin', 'group']
-        },
-        scenarioNames: {
-            enroll: {
-                'common': '通用登记',
-                'registration': '报名',
-                'voting': '评价',
-                'quiz': '测验',
-                'score_sheet': '记分表',
-            },
-            enrollOrder: ['common', 'registration', 'voting', 'quiz', 'score_sheet'],
-            group: {
-                'split': '分组',
-                'wall': '信息墙'
-            },
-            groupOrder: ['split', 'wall']
         },
         naming: { 'phase': '课程期数' }
     });

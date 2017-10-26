@@ -2,7 +2,7 @@ angular.module('pl.const', []).
 constant('CstNaming', {
     matter: {
         doc: {
-            'article': '图文',
+            'article': '项目资料',
             'link': '链接',
             'channel': '频道',
         },
@@ -11,22 +11,20 @@ constant('CstNaming', {
             'enroll': '登记',
             'signin': '签到',
             'group': '分组',
-            'wall': '信息墙',
             'memberschema': '通讯录',
         },
-        appOrder: ['enroll', 'signin', 'group', 'wall', 'memberschema']
+        appOrder: ['enroll', 'signin', 'group', 'memberschema']
     },
     scenario: {
         enroll: {
             'common': '通用登记',
             'registration': '报名',
-            'voting': '投票',
+            'voting': '评价',
             'quiz': '测验',
-            'group_week_report': '周报',
-            'discuss': '讨论',
+            'discuss': '萃取记录',
             'score_sheet': '记分表',
         },
-        enrollIndex: ['common', 'registration', 'voting', 'quiz', 'group_week_report', 'discuss', 'score_sheet'],
+        enrollIndex: ['common', 'registration', 'voting', 'quiz', 'discuss', 'score_sheet'],
         group: {
             'split': '分组',
             'extract': '抓阄'

@@ -1,6 +1,6 @@
 define(['require'], function(require) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'tmplshop.ui.xxt', 'service.matter', 'page.ui.xxt', 'modal.ui.xxt']);
+    var ngApp = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ui.tms', 'tmplshop.ui.xxt', 'pl.const', 'service.matter', 'page.ui.xxt', 'modal.ui.xxt']);
     ngApp.constant('cstApp', {
         matterNames: {
             doc: {
@@ -17,14 +17,6 @@ define(['require'], function(require) {
             'site': '团队',
             'mission': '项目',
         },
-        scenarioNames: {
-            'common': '通用登记',
-            'registration': '报名',
-            'voting': '评价',
-            'quiz': '测验',
-            'score_sheet': '记分表'
-        },
-        scenarioOrder: ['common', 'registration', 'voting', 'quiz', 'score_sheet']
     });
     ngApp.config(['$controllerProvider', '$provide', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', function($controllerProvider, $provide, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider) {
         var RouteParam = function(name) {

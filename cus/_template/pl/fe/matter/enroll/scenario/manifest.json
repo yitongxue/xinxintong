@@ -71,6 +71,21 @@
             }
         }
     },
+    "discuss":
+    {
+        "title": "萃取记录",
+        "name": "discuss",
+        "description": "在线讨论，通过发表评论和点赞，提取有价值的信息",
+        "templates":
+        {
+            "simple":
+            {
+                "title": "简单",
+                "name": "simple",
+                "description": "简单快速"
+            }
+        }
+    },
     "score_sheet":
     {
         "title": "记分表",
