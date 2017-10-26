@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta content="width=device-width,user-scalable=no,initial-scale=1.0" name="viewport">
     <base href="/" />
     <title>签到活动</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -77,16 +78,26 @@
         <div class='pl-layout-main pl-layout-main-topnav'>
             <nav class="navbar pl-navbar-default pl-navbar-fixed-top">
                 <div class='container-fluid'>
-                    <nav class='nav navbar-nav tms-breadcrumb'>
-                        <li><a href="/rest/pl/fe?view=main&scope=activity&type=signin&sid={{site.id}}" target='_self'>个人工作台</a></li>
-                        <li ng-if="site.yourRole"><a href="/rest/pl/fe?view=main&scope=activity&type=signin&sid={{site.id}}" target='_self'>{{site.name}}</a></li>
-                        <li ng-if="!site.yourRole"><a href="javascript:void(0)">{{site.name}}</a></li>
-                        <li ng-if="app.mission"><a href="/rest/pl/fe/matter/mission?site={{app.siteid}}&id={{app.mission.id}}" target='_self' title="{{app.mission.title}}">{{app.mission.title}}</a></li>
-                        <li ng-if="app.mission"><a href="/rest/pl/fe/matter/mission/app?site={{app.siteid}}&id={{app.mission.id}}#signin" target='_self'>签到</a></li>
-                        <li>
-                            <a href="" ng-click="switchTo('main')">{{app.title}}</a>
-                        </li>
-                    </nav>
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" ng-click="isNavCollapsed=!isNavCollapsed">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
+                        <nav class='nav navbar-nav tms-breadcrumb'>
+                            <li><a href="/rest/pl/fe?view=main&scope=activity&type=signin&sid={{site.id}}" target='_self'>个人工作台</a></li>
+                            <li ng-if="site.yourRole"><a href="/rest/pl/fe?view=main&scope=activity&type=signin&sid={{site.id}}" target='_self'>{{site.name}}</a></li>
+                            <li ng-if="!site.yourRole"><a href="javascript:void(0)">{{site.name}}</a></li>
+                            <li ng-if="app.mission"><a href="/rest/pl/fe/matter/mission?site={{app.siteid}}&id={{app.mission.id}}" target='_self' title="{{app.mission.title}}">{{app.mission.title}}</a></li>
+                            <li ng-if="app.mission"><a href="/rest/pl/fe/matter/mission/app?site={{app.siteid}}&id={{app.mission.id}}#signin" target='_self'>签到</a></li>
+                            <li>
+                                <a href="" ng-click="switchTo('main')">{{app.title}}</a>
+                            </li>
+                        </nav>
+                    </div>
                 </div>
             </nav>
             <div class='container-fluid'>
