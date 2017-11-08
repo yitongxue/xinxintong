@@ -1616,10 +1616,12 @@ class record_model extends record_base {
 
 				$values = $this->query_objs_ss($q);
 				foreach ($values as $value) {
-					$value = json_decode($value->value);
-					foreach ($value as $opKey => $opValue) {
-						if (isset($scoreByOp[$opKey]->c)) {
-							$scoreByOp[$opKey]->c += (int) $opValue;
+					if (!empty($value)) {
+						$value = json_decode($value->value);
+						foreach ($value as $opKey => $opValue) {
+							if (isset($scoreByOp[$opKey]->c)) {
+								$scoreByOp[$opKey]->c += (int) $opValue;
+							}
 						}
 					}
 				}
