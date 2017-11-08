@@ -1618,9 +1618,11 @@ class record_model extends record_base {
 				foreach ($values as $oValue) {
 					if (!empty($oValue->value)) {
 						$oValue = json_decode($oValue->value);
-						foreach ($oValue as $opKey => $opValue) {
-							if (isset($scoreByOp[$opKey]->c)) {
-								$scoreByOp[$opKey]->c += (int) $opValue;
+						if (!empty($oValue) && is_object($oValue)) {
+							foreach ($oValue as $opKey => $opValue) {
+								if (isset($scoreByOp[$opKey]->c)) {
+									$scoreByOp[$opKey]->c += (int) $opValue;
+								}
 							}
 						}
 					}
