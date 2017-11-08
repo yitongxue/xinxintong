@@ -355,9 +355,9 @@ class stat extends \pl\fe\matter\base {
 				$oSchemaStat = $aStatResult[$schema->id];
 				if (in_array($schema->type, ['single', 'phase'])) {
 					// Create a pie pot
-					$graph = $this->_setSingleSchemaGraph($oSchemaStat->ops, $oPlConfig);
+					$graph = $this->_setSingleSchemaGraph($oSchemaStat->ops, isset($oPlConfig) ? $oPlConfig : null);
 				} else if ($schema->type === 'multiple') {
-					$graph = $this->_setMultipleSchemaGraph($oSchemaStat->ops, $oPlConfig);
+					$graph = $this->_setMultipleSchemaGraph($oSchemaStat->ops, isset($oPlConfig) ? $oPlConfig : null);
 				}
 				if ($graph) {
 					$graph->Stroke(_IMG_HANDLER);
