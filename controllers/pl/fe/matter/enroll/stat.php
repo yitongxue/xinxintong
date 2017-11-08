@@ -376,10 +376,10 @@ class stat extends \pl\fe\matter\base {
 				$table2->addRow(500);
 				$table2->addCell($cell_w1, $fancyTableCellStyle)->addText('选项编号', $firstStyle, $paragraphStyle);
 				$table2->addCell($cell_w2, $fancyTableCellStyle)->addText('选项内容', $firstStyle, $paragraphStyle);
-				if (isset($oPlConfig->number) && $oPlConfig->number === 'Y') {
+				if (!isset($oPlConfig->number) || $oPlConfig->number === 'Y') {
 					$table2->addCell($cell_w3, $fancyTableCellStyle)->addText('数量', $firstStyle, $paragraphStyle);
 				}
-				if (isset($oPlConfig->percentage) && $oPlConfig->percentage === 'Y') {
+				if (!isset($oPlConfig->percentage) || $oPlConfig->percentage === 'Y') {
 					$table2->addCell($cell_w3, $fancyTableCellStyle)->addText('占比', $firstStyle, $paragraphStyle);
 				}
 				for ($i = 0, $l = count($oSchemaStat->ops); $i < $l; $i++) {
