@@ -387,10 +387,10 @@ class stat extends \pl\fe\matter\base {
 					$table2->addRow(500);
 					$table2->addCell($cell_w1, $fancyTableCellStyle)->addText("选项" . ($i + 1), $cellTextStyle);
 					$table2->addCell($cell_w2, $fancyTableCellStyle)->addText($op->l, $cellTextStyle);
-					if (isset($oPlConfig->number) && $oPlConfig->number === 'Y') {
+					if (!isset($oPlConfig->number) || $oPlConfig->number === 'Y') {
 						$table2->addCell($cell_w3, $fancyTableCellStyle)->addText($op->c, $cellTextStyle);
 					}
-					if (isset($oPlConfig->percentage) && $oPlConfig->percentage === 'Y') {
+					if (!isset($oPlConfig->percentage) || $oPlConfig->percentage === 'Y') {
 						$table2->addCell($cell_w3, $fancyTableCellStyle)->addText(round($op->c / $oSchemaStat->sum * 100, 2) . '%', $cellTextStyle);
 					}
 				}
