@@ -1017,7 +1017,8 @@ class record extends \pl\fe\matter\base {
 
 		$filename = $oApp->title . '.xlsx';
 		$ua = $_SERVER["HTTP_USER_AGENT"];
-		if (preg_match("/MSIE/", $ua) || preg_match("/Trident\/7.0/", $ua)) {
+		//if (preg_match("/MSIE/", $ua) || preg_match("/Trident\/7.0/", $ua)) {
+		if (preg_match("/MSIE/", $ua)) {
 			$encoded_filename = urlencode($filename);
 			$encoded_filename = str_replace("+", "%20", $encoded_filename);
 			$encoded_filename = iconv('UTF-8', 'GBK//IGNORE', $encoded_filename);
