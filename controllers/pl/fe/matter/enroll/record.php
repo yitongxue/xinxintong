@@ -1020,6 +1020,7 @@ class record extends \pl\fe\matter\base {
 		if (preg_match("/MSIE/", $ua) || preg_match("/Trident\/7.0/", $ua)) {
 			$encoded_filename = urlencode($filename);
 			$encoded_filename = str_replace("+", "%20", $encoded_filename);
+			$encoded_filename = iconv('UTF-8', 'GBK//IGNORE', $encoded_filename);
 			header('Content-Disposition: attachment; filename="' . $encoded_filename . '"');
 		} else if (preg_match("/Firefox/", $ua)) {
 			header('Content-Disposition: attachment; filename*="utf8\'\'' . $filename . '"');
