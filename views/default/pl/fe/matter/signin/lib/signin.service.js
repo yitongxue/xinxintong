@@ -290,8 +290,10 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
 
                     angular.isString(names) && (names = [names]);
                     names.forEach(function(name) {
-                        if (name === 'data_schemas') {
+                        if (name === 'data_schemas' || name === 'dataSchemas') {
                             modifiedData.data_schemas = app.dataSchemas;
+                        } else if (name === 'recycle_schemas' || name === 'recycleSchemas') {
+                            modifiedData.recycle_schemas = app.recycleSchemas;
                         } else if (name === 'tags') {
                             modifiedData.tags = app.tags.join(',');
                         } else {
@@ -488,7 +490,7 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                     }).result.then(function(data) {
                         app.enroll_app_id = data.source;
                         _this.update('enroll_app_id').then(function(rsp) {
-                            var url = '/rest/pl/fe/matter/enroll/get?site=' + siteId + '&id=' + app.enroll_app_id;
+                            var url = '/rest/pl/fe/matter/enroll/get?site=' + siteId + '&app=' + app.enroll_app_id;
                             http2.get(url, function(rsp) {
                                 rsp.data.data_schemas = rsp.data.dataSchemas;
                                 app.enrollApp = rsp.data;
@@ -501,17 +503,6 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                             }
                             _this.update('data_schemas');
                         });
-                    });
-                },
-                cancelEnrollApp: function() {
-                    var _this = this;
-                    app.enroll_app_id = '';
-                    delete app.enrollApp;
-                    this.update('enroll_app_id').then(function() {
-                        app.dataSchemas.forEach(function(dataSchema) {
-                            delete dataSchema.requireCheck;
-                        });
-                        _this.update('data_schemas');
                     });
                 },
                 assignGroupApp: function() {
@@ -555,17 +546,6 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
 
                     return defer.promise;
                 },
-                cancelGroupApp: function() {
-                    var _this = this;
-                    app.group_app_id = '';
-                    delete app.groupApp;
-                    this.update('group_app_id').then(function() {
-                        app.data_schemas.forEach(function(dataSchema) {
-                            delete dataSchema.requireCheck;
-                        });
-                        _this.update('data_schemas');
-                    });
-                }
             };
         }];
     }).provider('srvSigninRound', function() {
