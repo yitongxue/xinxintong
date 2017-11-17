@@ -1289,7 +1289,7 @@ class record_model extends record_base {
 
 		$sum = $this->query_val_ss($q);
 		$sum = number_format($sum, 2);
-		$result->sum = (float) $sum;
+		$result->sum = (double) $sum;
 
 		return $result;
 	}
