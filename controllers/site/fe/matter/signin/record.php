@@ -206,8 +206,8 @@ class record extends base {
 				}
 				/* 已经登记，更新原先提交的数据 */
 				$modelRec->update('xxt_signin_record',
-					array('verified' => $signState->verified),
-					"enroll_key='{$signState->ek}'"
+					array('verified' => $oSignState->verified),
+					"enroll_key='{$oSignState->ek}'"
 				);
 			}
 		}
