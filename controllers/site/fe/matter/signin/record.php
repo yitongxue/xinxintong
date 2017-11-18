@@ -204,11 +204,6 @@ class record extends base {
 						$oSignState->forword = $oSigninApp->entry_rule->fail->entry;
 					}
 				}
-				/* 已经登记，更新原先提交的数据 */
-				$modelRec->update('xxt_signin_record',
-					array('verified' => $oSignState->verified),
-					"enroll_key='{$oSignState->ek}'"
-				);
 			}
 		}
 		/* 记录操作日志 */
