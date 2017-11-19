@@ -119,11 +119,11 @@ define(['require'], function() {
             }
             $scope.app = oApp;
             if (!oApp.rounds || oApp.rounds.length === 0) {
-                
+
             }
         });
-        $scope.importByApp = function() {
-            srvGroupApp.importByApp(cstApp.importSource).then(function() {});
+        $scope.assocWithApp = function() {
+            srvGroupApp.assocWithApp(cstApp.importSource).then(function() {});
         };
         $scope.cancelSourceApp = function() {
             srvGroupApp.cancelSourceApp();
