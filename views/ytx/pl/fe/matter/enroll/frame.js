@@ -26,7 +26,7 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
         },
         naming: { 'mission_phase': '课程期数' }
     });
-    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvEnrollAppProvider', 'srvEnrollRoundProvider', 'srvEnrollPageProvider', 'srvEnrollRecordProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvEnrollAppProvider, srvEnrollRoundProvider, srvEnrollPageProvider, srvEnrollRecordProvider, srvTagProvider) {
+    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvEnrollAppProvider', 'srvEnrollRoundProvider', 'srvEnrollPageProvider', 'srvEnrollRecordProvider', 'srvTagProvider', 'srvEnrollLogProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvEnrollAppProvider, srvEnrollRoundProvider, srvEnrollPageProvider, srvEnrollRecordProvider, srvTagProvider, srvEnrollLogProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/enroll/';
             this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
@@ -83,6 +83,7 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             srvEnrollRoundProvider.config(siteId, appId);
             srvEnrollPageProvider.config(siteId, appId);
             srvEnrollRecordProvider.config(siteId, appId);
+            srvEnrollLogProvider.config(siteId, appId);
             srvQuickEntryProvider.setSiteId(siteId);
         })();
     }]);
