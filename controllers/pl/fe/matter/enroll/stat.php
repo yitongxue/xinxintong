@@ -17,7 +17,12 @@ class stat extends \pl\fe\matter\base {
 	/**
 	 * 返回视图
 	 */
-	public function index_action() {
+	public function index_action($id) {
+		$access = $this->accessControlUser('enroll', $id);
+		if ($access[0] === false) {
+			die($access[1]);
+		}
+
 		\TPL::output('/pl/fe/matter/enroll/frame');
 		exit;
 	}
@@ -211,7 +216,8 @@ class stat extends \pl\fe\matter\base {
 		$phpWord->setDefaultFontName('Times New Roman');
 		$section = $phpWord->addSection(array('pageNumberingStart' => 1));
 		$header = $section->addHeader();
-		$header->addText($oSite->name, ['bold' => true, 'size' => 14, 'name' => 'Arial'], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+		$oSiteName = str_replace(['&'], ['&amp;'], $oSite->name);
+		$header->addText($oSiteName, ['bold' => true, 'size' => 14, 'name' => 'Arial'], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
 		$footer = $section->addFooter();
 		$footer->addPreserveText('Page {PAGE} of {NUMPAGES}.', null, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
 
@@ -243,11 +249,17 @@ class stat extends \pl\fe\matter\base {
 		];
 		// a4纸宽210mm 取15㎝，1CM=567 twips
 		$a4_width = 15 * 567;
-		$section->addText($oApp->title, ['bold' => true, 'size' => 24], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+		$oAppTitle = str_replace(['&'], ['&amp;'], $oApp->title);
+		$section->addText($oAppTitle, ['bold' => true, 'size' => 24], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
 		$section->addTextBreak(2, null, null);
 
 		foreach ($schemas as $index => $schema) {
-			$section->addText($schema->title, ['bold' => true, 'size' => 16]);
+			if (strpos($schema->title, '&') === false) {
+				$section->addText($schema->title, ['bold' => true, 'size' => 16]);
+			} else {
+				$schemaTitle = str_replace(['&'], ['&amp;'], $schema->title);
+				$section->addText($schemaTitle, ['bold' => true, 'size' => 16]);
+			}
 			$section->addTextBreak(1, null, null);
 
 			if (in_array($schema->type, ['name', 'email', 'mobile', 'date', 'location', 'shorttext', 'longtext'])) {
@@ -284,7 +296,12 @@ class stat extends \pl\fe\matter\base {
 						if (!empty($rpConfig->marks)) {
 							foreach ($rpConfig->marks as $key => $mark) {
 								if ($schema->title !== $mark->title) {
-									$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($mark->title, $firstStyle, $paragraphStyle);
+									if (strpos($mark->title, '&') === false) {
+										$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($mark->title, $firstStyle, $paragraphStyle);
+									} else {
+										$markTile = str_replace(['&'], ['&amp;'], $mark->title);
+										$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($markTile, $firstStyle, $paragraphStyle);
+									}
 									//$sumNumber++;
 								}
 							}
@@ -304,10 +321,18 @@ class stat extends \pl\fe\matter\base {
 							foreach ($rpConfig->marks as $mark) {
 								if ($schema->id !== $mark->id) {
 									if ($mark->id === 'nickname') {
-										$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($record->nickname, $cellTextStyle);
+										if (strpos($record->nickname, '&') === false) {
+											$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($record->nickname, $cellTextStyle);
+										} else {
+											$recordNickname = str_replace(['&'], ['&amp;'], $record->nickname);
+											$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($recordNickname, $cellTextStyle);
+										}
 									} else {
 										$markId = $mark->id;
 										if (isset($record->data->$markId)) {
+											if (!isset($schemasById[$mark->id])) {
+												die('标识项是否被隐藏');
+											}
 											$markSchema = $schemasById[$mark->id];
 											if (in_array($markSchema->type, ['single', 'phase'])) {
 												$label = '';
@@ -320,7 +345,12 @@ class stat extends \pl\fe\matter\base {
 											} else {
 												$label = $record->data->$markId;
 											}
-											$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($label, $cellTextStyle);
+											if (strpos($label, '&') === false) {
+												$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($label, $cellTextStyle);
+											} else {
+												$labelName = str_replace(['&'], ['&amp;'], $label);
+												$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($labelName, $cellTextStyle);
+											}
 										} else {
 											$table1->addCell($cell_w2, $fancyTableCellStyle)->addText('');
 										}
@@ -332,7 +362,12 @@ class stat extends \pl\fe\matter\base {
 						}
 						$schemaId = $schema->id;
 						if (isset($record->data->$schemaId)) {
-							$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($record->data->$schemaId, $cellTextStyle);
+							if (strpos($record->data->$schemaId, '&') === false) {
+								$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($record->data->$schemaId, $cellTextStyle);
+							} else {
+								$recDataSch = str_replace(['&'], ['&amp;'], $record->data->$schemaId);
+								$table1->addCell($cell_w2, $fancyTableCellStyle)->addText($recDataSch, $cellTextStyle);
+							}
 						} else {
 							$table1->addCell($cell_w2, $fancyTableCellStyle)->addText('');
 						}
@@ -562,11 +597,14 @@ class stat extends \pl\fe\matter\base {
 						$rpConfig = json_decode($oApp->rp_config);
 						if (!empty($rpConfig->marks)) {
 							foreach ($rpConfig->marks as $key => $mark) {
-								if ($schema->title !== $mark->name) {
-									$html .= "<th>" . $mark->name . "</th>";
+								if ($schema->title !== $mark->title) {
+									$html .= "<th>" . $mark->title . "</th>";
 									$sumNumber++;
 								}
 							}
+						} else {
+							$html .= "<th>昵称</th>";
+							$sumNumber++;
 						}
 					} else {
 						$html .= "<th>昵称</th>";
@@ -587,6 +625,9 @@ class stat extends \pl\fe\matter\base {
 									} else {
 										$markId = $mark->id;
 										if (isset($record->data->$markId)) {
+											if (!isset($schemasById[$mark->id])) {
+												die('标识项是否被隐藏');
+											}
 											$markSchema = $schemasById[$mark->id];
 											if (in_array($markSchema->type, ['single', 'phase'])) {
 												$label = '';
@@ -632,9 +673,9 @@ class stat extends \pl\fe\matter\base {
 			} else if (in_array($schema->type, ['single', 'phase', 'multiple'])) {
 				$oSchemaStat = $aStatResult[$schema->id];
 				if (in_array($schema->type, ['single', 'phase'])) {
-					$graph = $this->_setSingleSchemaGraph($oSchemaStat->ops, $oPlConfig);
+					$graph = $this->_setSingleSchemaGraph($oSchemaStat->ops, isset($oPlConfig) ? $oPlConfig : null);
 				} else if ($schema->type === 'multiple') {
-					$graph = $this->_setMultipleSchemaGraph($oSchemaStat, $oPlConfig);
+					$graph = $this->_setMultipleSchemaGraph($oSchemaStat, isset($oPlConfig) ? $oPlConfig : null);
 				}
 				if ($graph) {
 					$graph->Stroke(_IMG_HANDLER);
@@ -693,7 +734,7 @@ class stat extends \pl\fe\matter\base {
 				$html .= "<tbody>";
 				for ($i = 0, $l = count($oSchemaStat->ops); $i < $l; $i++) {
 					$op2 = $oSchemaStat->ops[$i];
-					$html .= "<tr><td>打分项" . ($i + 1) . "</td><td>{$op2['l']}</td><td>{$op2['c']}</td></tr>";
+					$html .= "<tr><td>打分项" . ($i + 1) . "</td><td>{$op2->l}</td><td>{$op2->c}</td></tr>";
 				}
 				$avgScore = round($oSchemaStat->sum / count($oSchemaStat->ops), 2);
 				$html .= "<tr><td>本项平均分</td><td>{$avgScore}</td></tr>";
