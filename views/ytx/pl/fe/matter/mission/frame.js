@@ -1,24 +1,6 @@
 define(['missionService', 'enrollService', 'signinService'], function() {
     'use strict';
     var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'tinymce.ui.xxt', 'pl.const', 'service.matter', 'service.mission', 'service.enroll', 'service.signin']);
-    ngApp.constant('cstApp', {
-        notifyMatter: [],
-        innerlink: [],
-        alertMsg: {},
-        matterNames: {
-            doc: {
-                'article': '项目资料'
-            },
-            docOrder: ['article'],
-            app: {
-                'enroll': '登记',
-                'signin': '签到',
-                'group': '分组',
-            },
-            appOrder: ['enroll', 'signin', 'group']
-        },
-        naming: { 'phase': '课程期数' }
-    });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvMissionProvider', 'srvQuickEntryProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvMissionProvider, srvQuickEntryProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/mission/';
@@ -69,9 +51,9 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             srvMissionProvider.config(siteId, missionId);
         })();
     }]);
-    ngApp.controller('ctrlFrame', ['$scope', '$location', 'cstApp', 'srvSite', 'srvMission', function($scope, $location, cstApp, srvSite, srvMission) {
+    ngApp.controller('ctrlFrame', ['$scope', '$location', 'CstNaming', 'srvSite', 'srvMission', function($scope, $location, CstNaming, srvSite, srvMission) {
         $scope.subView = '';
-        $scope.cstApp = cstApp;
+        $scope.CstNaming = CstNaming;
         $scope.update = function(name) {
             var modifiedData = {};
             if (angular.isObject(name)) {

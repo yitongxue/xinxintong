@@ -11,9 +11,10 @@ constant('CstNaming', {
             'enroll': '登记',
             'signin': '签到',
             'group': '分组',
+            'plan': '计划任务',
             'memberschema': '通讯录',
         },
-        appOrder: ['enroll', 'signin', 'group', 'memberschema']
+        appOrder: ['enroll', 'signin', 'group', 'plan', 'memberschema']
     },
     scenario: {
         enroll: {
@@ -30,5 +31,6 @@ constant('CstNaming', {
             'extract': '抓阄'
         },
         groupIndex: ['split', 'extract']
-    }
+    },
+    mission: { 'phase': '课程期数' }
 });
