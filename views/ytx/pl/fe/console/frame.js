@@ -218,19 +218,22 @@ define(['require'], function(require) {
                 }
             }
         };
-        $scope.list = function() {
-            $scope.siteType = 1;
-            var url = '/rest/pl/fe/site/list';
-            http2.get(url + '?_=' + (new Date() * 1), function(rsp) {
+        $scope.listSite = function() {
+            var url, oPlSite;
+            url = '/rest/pl/fe/site/list';
+            oPlSite = { id: '_coworker', name: '被邀合作项目' };
+            http2.get(url + '?_=' + (new Date * 1), function(rsp) {
                 if (rsp.data.length === 0) {
                     http2.get('/rest/pl/fe/site/create', function(rsp) {
-                        http2.get(url + '?_=' + (new Date() * 1), function(rsp) {
+                        http2.get(url + '?_=' + (new Date * 1), function(rsp) {
                             $scope.sites = rsp.data;
+                            $scope.sites.splice(0, 0, oPlSite);
                             frameState.sid = rsp.data[0].id;
                         });
                     });
                 } else {
                     $scope.sites = rsp.data;
+                    $scope.sites.splice(0, 0, oPlSite);
                 }
             });
         };
@@ -270,7 +273,7 @@ define(['require'], function(require) {
                 backdrop: 'static',
             });
         };
-        $scope.list();
+        $scope.listSite();
         var isNavCollapsed = false;
         if (document.body.clientWidth <= 768) {
             isNavCollapsed = true;
