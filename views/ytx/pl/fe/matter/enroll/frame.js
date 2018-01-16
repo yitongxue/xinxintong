@@ -88,6 +88,7 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
         })();
     }]);
     ngApp.controller('ctrlFrame', ['$scope', 'CstNaming', 'cstApp', 'srvSite', 'srvEnrollApp', 'templateShop', '$location', function($scope, CstNaming, cstApp, srvSite, srvEnrollApp, templateShop, $location) {
+        $scope.isNavCollapsed = true;
         $scope.cstApp = cstApp;
         $scope.scenarioes = {
             names: CstNaming.scenario.enroll,

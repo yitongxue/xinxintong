@@ -139,6 +139,9 @@ define(['require'], function() {
                     case 'signin':
                         location.href = '/rest/pl/fe/matter/signin?site=' + oSourceApp.siteid + '&id=' + oSourceApp.id;
                         break;
+                    case 'mschema':
+                        location.href = '/rest/pl/fe/site/mschema?site=' + oSourceApp.siteid + '#' + oSourceApp.id;
+                        break;
                 }
             }
         };
