@@ -278,7 +278,8 @@ define(['require'], function(require) {
         if (document.body.clientWidth <= 768) {
             isNavCollapsed = true;
         }
-        $scope.isNavCollapsed = { frame: isNavCollapsed, activity: isNavCollapsed };
+        $scope.isNavCollapsed = isNavCollapsed;
+        console.log('ss', $scope.isNavCollapsed);
     }]);
     /***/
     require(['domReady!'], function(document) {
