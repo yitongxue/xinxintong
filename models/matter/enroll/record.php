@@ -219,10 +219,10 @@ class record_model extends record_base {
 	 *
 	 */
 	private function _processRecord(&$oRecord, $fields, $verbose = 'Y') {
-		if ($fields === '*' || false !== strpos($fields, 'data')) {
+		if (property_exists($oRecord, 'data')) {
 			$oRecord->data = empty($oRecord->data) ? new \stdClass : json_decode($oRecord->data);
 		}
-		if ($fields === '*' || false !== strpos($fields, 'data_tag')) {
+		if (property_exists($oRecord, 'data_tag')) {
 			$oRecord->data_tag = empty($oRecord->data_tag) ? new \stdClass : json_decode($oRecord->data_tag);
 		}
 		if ($fields === '*' || false !== strpos($fields, 'supplement')) {
@@ -298,7 +298,6 @@ class record_model extends record_base {
 		} else {
 			$q[2]['rid'] = $assignRid;
 		}
-
 		/* 登记的时间 */
 		$q2 = [
 			'o' => 'enroll_at desc',
@@ -536,9 +535,7 @@ class record_model extends record_base {
 
 		if ($oOptions) {
 			is_array($oOptions) && $oOptions = (object) $oOptions;
-			$creater = isset($oOptions->creater) ? $oOptions->creater : null;
-			$inviter = isset($oOptions->inviter) ? $oOptions->inviter : null;
-			$orderby = isset($oOptions->orderby) ? $oOptions->orderby : '';
+			$creator = isset($oOptions->creator) ? $oOptions->creator : null;
 			$page = isset($oOptions->page) ? $oOptions->page : null;
 			$size = isset($oOptions->size) ? $oOptions->size : null;
 		}
@@ -549,7 +546,11 @@ class record_model extends record_base {
 		$w = "r.state=1 and r.aid='{$oApp->id}'";
 
 		// 指定轮次，或者当前激活轮次
-		if (isset($oCriteria->record->assignRid)) {
+		if (!empty($oOptions->rid)) {
+			if (strcasecmp('all', $oOptions->rid) !== 0) {
+				$rid = $oOptions->rid;
+			}
+		} else if (isset($oCriteria->record->assignRid)) {
 			$rid = $oCriteria->record->assignRid;
 		} else if (!empty($oCriteria->record->rid)) {
 			if (strcasecmp('all', $oCriteria->record->rid) !== 0) {
@@ -565,13 +566,8 @@ class record_model extends record_base {
 			$w .= " and r.group_id='{$oOptions->userGroup}'";
 		}
 		// 根据填写人筛选（填写端列表页需要）
-		if (!empty($creater)) {
-			$w .= " and r.userid='$creater'";
-		} else if (!empty($inviter)) {
-			$oUser = new \stdClass;
-			$oUser->openid = $inviter;
-			$inviterek = $this->lastKeyByUser($oApp, $oUser);
-			$w .= " and r.referrer='ek:$inviterek'";
+		if (!empty($creator)) {
+			$w .= " and r.userid='$creator'";
 		}
 
 		// 指定了登记记录属性过滤条件
@@ -641,15 +637,16 @@ class record_model extends record_base {
 		}
 
 		// 指定了按关键字过滤
-		if (!empty($oCriteria->keyword)) {
+		if (!empty($oOptions->keyword) || !empty($oCriteria->keyword)) {
+			$keyword = !empty($oOptions->keyword) ? $oOptions->keyword : $oCriteria->keyword;
 			$whereByData = '';
-			$whereByData .= ' and (data like \'%' . $oCriteria->keyword . '%\')';
+			$whereByData .= ' and (data like \'%' . $keyword . '%\')';
 			$w .= $whereByData;
 		}
 
 		// 查询参数
 		$q = [
-			'r.enroll_key,r.rid,r.enroll_at,r.tags,r.userid,r.group_id,r.nickname,r.wx_openid,r.yx_openid,r.qy_openid,r.headimgurl,r.verified,r.comment,r.data,r.supplement,r.data_tag,r.agreed,r.like_num,r.like_log',
+			'r.enroll_key,r.rid,r.enroll_at,r.tags,r.userid,r.group_id,r.nickname,r.wx_openid,r.yx_openid,r.qy_openid,r.headimgurl,r.verified,r.comment,r.data,r.supplement,r.data_tag,r.agreed,r.like_num,r.like_log,remark_num',
 			"xxt_enroll_record r",
 			$w,
 		];
@@ -673,6 +670,8 @@ class record_model extends record_base {
 			$q2['o'] = 'd.' . $orderby . ' desc';
 		} elseif (!empty($oCriteria->order->orderby) && $oCriteria->order->orderby === 'sum') {
 			$q2['o'] = 'r.score desc';
+		} elseif (!empty($oCriteria->order->orderby) && $oCriteria->order->orderby === 'agreed') {
+			$q2['o'] = 'r.agreed desc';
 		} else {
 			$q2['o'] = 'r.enroll_at desc';
 		}
