@@ -1125,7 +1125,15 @@ class record_model extends record_base {
 					'xxt_enroll_record_data',
 					['aid' => $oApp->id, 'schema_id' => $oSchema->id, 'state' => 1],
 				];
-				$rid !== 'ALL' && !empty($rid) && $q[2]['rid'] = $rid;
+				if (!empty($rid)) {
+					if (is_string($rid)) {
+						$rid !== 'ALL' && $q[2]['rid'] = $rid;
+					} else if (is_array($rid)) {
+						if (empty(array_intersect(['all', 'ALL'], $rid))) {
+							$q[2]['rid'] = $rid;
+						}
+					}
+				}
 
 				$sum = (float) $this->query_val_ss($q);
 				$sum = number_format($sum, 2, '.', '');
@@ -1139,7 +1147,15 @@ class record_model extends record_base {
 			'xxt_enroll_record_data',
 			['aid' => $oApp->id, 'state' => 1],
 		];
-		$rid !== 'ALL' && !empty($rid) && $q[2]['rid'] = $rid;
+		if (!empty($rid)) {
+			if (is_string($rid)) {
+				$rid !== 'ALL' && $q[2]['rid'] = $rid;
+			} else if (is_array($rid)) {
+				if (empty(array_intersect(['all', 'ALL'], $rid))) {
+					$q[2]['rid'] = $rid;
+				}
+			}
+		}
 
 		$sum = (float) $this->query_val_ss($q);
 		$sum = number_format($sum, 2, '.', '');

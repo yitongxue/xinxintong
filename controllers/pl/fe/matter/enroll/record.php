@@ -165,6 +165,8 @@ class record extends \pl\fe\matter\base {
 			return new \ObjectNotFoundError();
 		}
 
+		$rid = explode(',', $rid);
+
 		// 查询结果
 		$modelRec = $this->model('matter\enroll\record');
 		$result = $modelRec->score4Schema($enrollApp, $rid);
