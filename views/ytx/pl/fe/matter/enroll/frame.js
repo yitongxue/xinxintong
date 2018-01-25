@@ -132,7 +132,7 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             $location.path(url);
         };
         $scope.update = function(name) {
-            srvEnrollApp.update(name);
+            return srvEnrollApp.update(name);
         };
         $scope.shareAsTemplate = function() {
             templateShop.share($scope.app.siteid, $scope.app).then(function(template) {
