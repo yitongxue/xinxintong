@@ -1024,7 +1024,7 @@ class record extends \pl\fe\matter\base {
 						$v = isset($data->member->{$mbSchemaId}) ? $data->member->{$mbSchemaId} : '';
 					}
 				} else {
-					$v = '_';
+					$v = '';
 				}
 
 				if (in_array($schema->type, ['html'])) {
