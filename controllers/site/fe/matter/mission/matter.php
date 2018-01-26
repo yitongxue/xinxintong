@@ -68,6 +68,13 @@ class matter extends \site\fe\matter\base {
 		foreach ($oMisAgreed->obj->data as $schemaId => $value) {
 			if (!isset($oMisAgreed->matter->dataSchemas->{$schemaId})) {
 				unset($oMisAgreed->obj->data->{$schemaId});
+			} else {
+				$oSchema = $oMisAgreed->matter->dataSchemas->{$schemaId};
+				switch ($oSchema->type) {
+				case 'image':
+					$oMisAgreed->obj->data->{$schemaId} = explode(',', $oMisAgreed->obj->data->{$schemaId});
+					break;
+				}
 			}
 		}
 
@@ -108,6 +115,9 @@ class matter extends \site\fe\matter\base {
 			switch ($oSchema->type) {
 			case 'file':
 				$oData->{$oSchema->id} = json_decode($oData->{$oSchema->id});
+				break;
+			case 'image':
+				$oData->{$oSchema->id} = explode(',', $oData->{$oSchema->id});
 				break;
 			}
 		}
