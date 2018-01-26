@@ -103,8 +103,8 @@ class matter extends \site\fe\matter\base {
 		$oMatter->dataSchemas = $dataSchemas;
 		$oMisAgreed->matter = $oMatter;
 
-		if (isset($dataSchemas->$oRecData->schema_id)) {
-			$oSchema = $dataSchemas->$oRecData->schema_id;
+		if (isset($dataSchemas->{$oRecData->schema_id})) {
+			$oSchema = $dataSchemas->{$oRecData->schema_id};
 			switch ($oSchema->type) {
 			case 'file':
 				$oData->{$oSchema->id} = json_decode($oData->{$oSchema->id});
