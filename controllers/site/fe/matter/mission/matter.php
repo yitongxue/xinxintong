@@ -103,6 +103,14 @@ class matter extends \site\fe\matter\base {
 		$oMatter->dataSchemas = $dataSchemas;
 		$oMisAgreed->matter = $oMatter;
 
+		if (count($dataSchemas) === 1) {
+			switch ($dataSchemas[0]->type) {
+			case 'file':
+				$oData->{$dataSchemas[0]->id} = json_decode($oData->{$dataSchemas[0]->id});
+				break;
+			}
+		}
+
 		if (!isset($this->_modelEnlUsr)) {
 			$this->_modelEnlUsr = $this->model('matter\enroll\user');
 		}
