@@ -122,6 +122,8 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
         });
         srvSite.snsList().then(function(oSns) {
             $scope.sns = oSns;
+            $scope.snsNames = Object.keys(oSns);
+            $scope.snsCount = Object.keys(oSns).length;
             $scope.mapOfAppSchemas = {};
             srvSigninApp.get().then(function(oApp) {
                 if (oApp.matter_mg_tag !== '') {

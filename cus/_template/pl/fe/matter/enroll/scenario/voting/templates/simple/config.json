@@ -1546,17 +1546,16 @@
         {
             "entry": "voting"
         },
-        "scope": "sns",
+        "scope":
+        {
+            "sns": "Y"
+        },
         "sns":
         {
             "wx":
             {
                 "entry": "voting"
             }
-        },
-        "other":
-        {
-            "entry": "$mpfollow"
         }
     },
     "count_limit": "1",

@@ -132,17 +132,16 @@
         {
             "entry": "enroll"
         },
-        "scope": "sns",
+        "scope":
+        {
+            "sns": "Y"
+        },
         "sns":
         {
             "wx":
             {
                 "entry": "enroll"
             }
-        },
-        "other":
-        {
-            "entry": "$mpfollow"
         }
     },
     "count_limit": "0",
