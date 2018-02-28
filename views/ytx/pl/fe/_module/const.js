@@ -32,5 +32,5 @@ constant('CstNaming', {
         },
         groupIndex: ['split', 'extract']
     },
-    mission: { 'phase': '课程期数' }
+    mission: {}
 });

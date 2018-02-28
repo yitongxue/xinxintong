@@ -21,15 +21,14 @@ define(['require'], function() {
             url: '/rest/pl/fe/matter'
         }],
         alertMsg: {
-            'schema.duplicated': '不允许重复添加登记项',
-            'require.mission.phase': '请先指定项目的阶段'
+            'schema.duplicated': '不允许重复添加登记项'
         },
         importSource: [
             { v: 'mschema', l: '通讯录联系人' },
             { v: 'registration', l: '报名' },
             { v: 'signin', l: '签到' },
         ],
-        naming: { 'mission_phase': '课程期数' }
+        naming: {}
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvQuickEntryProvider', 'srvSiteProvider', 'srvGroupAppProvider', 'srvGroupRoundProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvQuickEntryProvider, srvSiteProvider, srvGroupAppProvider, srvGroupRoundProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {

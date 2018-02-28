@@ -21,10 +21,9 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
             url: '/rest/pl/fe/matter'
         }],
         alertMsg: {
-            'schema.duplicated': '不允许重复添加题目',
-            'require.mission.phase': '请先指定项目的课程期数'
+            'schema.duplicated': '不允许重复添加题目'
         },
-        naming: { 'mission_phase': '课程期数' }
+        naming: {}
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvSigninAppProvider', 'srvSigninRoundProvider', 'srvEnrollPageProvider', 'srvSigninRecordProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvSigninAppProvider, srvSigninRoundProvider, srvSigninPageProvider, srvSigninRecordProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
