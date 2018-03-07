@@ -254,11 +254,11 @@ class event_model extends \TMS_MODEL {
 		if (isset($oRecord->score->sum)) {
 			$oUpdatedEnlUsrData->score = $oRecord->score->sum;
 		}
-		if ($oApp->id === '5a9fd2f211d5c') {
-			die('xxxxx:' . json_encode($oRecord));
-		}
 		/* 用户当前轮次的汇总数据 */
 		$oEnlUsrRnd = $modelUsr->byId($oApp, $oUser->uid, ['fields' => 'id,state,nickname,group_id,last_enroll_at,enroll_num,user_total_coin', 'rid' => $oRecord->rid]);
+		if ($oApp->id === '5a9fd2f211d5c') {
+			die('xxxxx:' . json_encode($oEnlUsrRnd));
+		}
 		if (false === $oEnlUsrRnd) {
 			$oUpdatedEnlUsrData->rid = $oRecord->rid;
 			$modelUsr->add($oApp, $oUser, $oUpdatedEnlUsrData);
