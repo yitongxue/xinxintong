@@ -278,9 +278,6 @@ class record extends base {
 			);
 		}
 		/* 处理用户汇总数据，积分数据 */
-		if ($app === '5a9fd2f211d5c') {
-			die('xxxxx:' . json_encode($oRecord));
-		}
 		$oRecord = $modelRec->byId($ek);
 		$this->model('matter\enroll\event')->submitRecord($oEnrollApp, $oRecord, $oUser, $bSubmitNewRecord);
 
