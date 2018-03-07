@@ -254,7 +254,7 @@ class event_model extends \TMS_MODEL {
 		if (isset($oRecord->score->sum)) {
 			$oUpdatedEnlUsrData->score = $oRecord->score->sum;
 		}
-		if ($app === '5a9fd2f211d5c') {
+		if ($oApp->id === '5a9fd2f211d5c') {
 			die('xxxxx:' . json_encode($oRecord));
 		}
 		/* 用户当前轮次的汇总数据 */
