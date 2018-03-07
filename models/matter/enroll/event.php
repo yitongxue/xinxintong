@@ -258,6 +258,9 @@ class event_model extends \TMS_MODEL {
 		/* 用户当前轮次的汇总数据 */
 		$oEnlUsrRnd = $modelUsr->byId($oApp, $oUser->uid, ['fields' => 'id,state,nickname,group_id,last_enroll_at,enroll_num,user_total_coin', 'rid' => $oRecord->rid]);
 		if (false === $oEnlUsrRnd) {
+			if ($oApp->id === '5a9fd2f211d5c') {
+				die('xxxxx:' . json_encode($oRecord));
+			}
 			$oUpdatedEnlUsrData->rid = $oRecord->rid;
 			$modelUsr->add($oApp, $oUser, $oUpdatedEnlUsrData);
 		} else {
