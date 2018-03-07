@@ -27,9 +27,6 @@ class record extends base {
 	 * @param string $submitkey 支持文件分段上传
 	 */
 	public function submit_action($site, $app, $rid = '', $ek = null, $submitkey = '', $subType = 'submit') {
-		if ($app === '5a9fd2f211d5c') {
-			die('xxxxx:' . json_encode($oRecord));
-		}
 		/* support CORS */
 		//header('Access-Control-Allow-Origin:*');
 		//header('Access-Control-Allow-Methods:POST');
@@ -280,8 +277,10 @@ class record extends base {
 				"enroll_key='$ek'"
 			);
 		}
-
 		/* 处理用户汇总数据，积分数据 */
+		if ($app === '5a9fd2f211d5c') {
+			die('xxxxx:' . json_encode($oRecord));
+		}
 		$oRecord = $modelRec->byId($ek);
 		$this->model('matter\enroll\event')->submitRecord($oEnrollApp, $oRecord, $oUser, $bSubmitNewRecord);
 
