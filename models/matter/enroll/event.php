@@ -256,16 +256,12 @@ class event_model extends \TMS_MODEL {
 		}
 		/* 用户当前轮次的汇总数据 */
 		$oEnlUsrRnd = $modelUsr->byId($oApp, $oUser->uid, ['fields' => 'id,state,nickname,group_id,last_enroll_at,enroll_num,user_total_coin', 'rid' => $oRecord->rid]);
-		if ($oApp->id === '5a9fd2f211d5c') {
-			die('xxxxx:' . json_encode($oEnlUsrRnd));
-		}
 		if (false === $oEnlUsrRnd) {
 			$oUpdatedEnlUsrData->rid = $oRecord->rid;
 			$modelUsr->add($oApp, $oUser, $oUpdatedEnlUsrData);
 		} else {
 			$modelUsr->modify($oEnlUsrRnd, $oUpdatedEnlUsrData);
 		}
-
 		/* 用户活动范围的汇总数据 */
 		$oEnlUsrApp = $modelUsr->byId($oApp, $oUser->uid, ['fields' => 'id,state,nickname,group_id,last_enroll_at,enroll_num,user_total_coin', 'rid' => 'ALL']);
 		if (false === $oEnlUsrApp) {
@@ -295,7 +291,7 @@ class event_model extends \TMS_MODEL {
 			}
 			$oMisUser = $modelMisUsr->byId($oMission, $oRecord->userid, ['fields' => 'id,nickname,last_enroll_at,enroll_num,user_total_coin,modify_log']);
 			if (false === $oMisUser) {
-				$modelUsr->add($oApp, $oUser, $oUpdatedUsrData);
+				$modelMisUsr->add($oApp, $oUser, $oUpdatedUsrData);
 			} else {
 				$modelMisUsr->modify($oMisUser, $oUpdatedUsrData);
 			}
