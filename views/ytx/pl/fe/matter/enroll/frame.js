@@ -138,6 +138,17 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
                 location.href = '/rest/pl/fe/template/enroll?site=' + template.siteid + '&id=' + template.id;
             });
         };
+        $scope.editMschema = function(oMschema) {
+            if (oMschema.matter_id) {
+                if (oMschema.matter_type === 'mission') {
+                    location.href = '/rest/pl/fe/matter/mission/mschema?id=' + oMschema.matter_id + '&site=' + $scope.app.siteid + '#' + oMschema.id;
+                } else {
+                    location.href = '/rest/pl/fe/site/mschema?site=' + $scope.app.siteid + '#' + oMschema.id;
+                }
+            } else {
+                location.href = '/rest/pl/fe?view=main&scope=user&sid=' + $scope.app.siteid + '&mschema=' + oMschema.id;
+            }
+        };
         srvSite.tagList().then(function(oTag) {
             $scope.oTag = oTag;
         });
