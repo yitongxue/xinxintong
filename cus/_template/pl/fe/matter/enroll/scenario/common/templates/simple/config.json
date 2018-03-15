@@ -16,9 +16,7 @@
                 "format": ""
             },
             "config":
-            {
-                "showname": "placeholder"
-            }
+            {}
         },
         {
             "schema":
@@ -29,9 +27,7 @@
                 "type": "longtext"
             },
             "config":
-            {
-                "showname": "placeholder"
-            }
+            {}
         }],
         "act_schemas": [
         {
