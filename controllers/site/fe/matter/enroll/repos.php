@@ -410,7 +410,7 @@ class repos extends base {
 		$modelApp = $this->model('matter\enroll');
 		$modelRec = $this->model('matter\enroll\record');
 
-		$fields = 'id,aid,state,enroll_key';
+		$fields = 'id,aid,siteid,state,enroll_key';
 		$oRecord = $modelRec->byId($ek, ['verbose' => 'Y', 'fields' => $fields]);
 		if (false === $oRecord || $oRecord->state !== '1') {
 			return new \ObjectNotFoundError();
