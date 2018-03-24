@@ -410,7 +410,7 @@ class repos extends base {
 		$modelApp = $this->model('matter\enroll');
 		$modelRec = $this->model('matter\enroll\record');
 
-		$fields = 'id,aid,siteid,state,enroll_key';
+		$fields = 'id,aid,state,enroll_key';
 		$oRecord = $modelRec->byId($ek, ['verbose' => 'Y', 'fields' => $fields]);
 		if (false === $oRecord || $oRecord->state !== '1') {
 			return new \ObjectNotFoundError();
@@ -453,7 +453,7 @@ class repos extends base {
 	public function task_action($app) {
 		$modelApp = $this->model('matter\enroll');
 
-		$oApp = $modelApp->byId($app, ['cascaded' => 'N', 'fields' => 'id,state,entry_rule,action_rule']);
+		$oApp = $modelApp->byId($app, ['cascaded' => 'N', 'fields' => 'id,siteid,state,entry_rule,action_rule']);
 		if (false === $oApp || $oApp->state !== '1') {
 			return new \ObjectNotFoundError();
 		}
