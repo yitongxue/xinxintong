@@ -25,39 +25,45 @@ ngApp.controller('ctrlAction', ['$scope', '$q', 'tmsLocation', 'http2', function
     };
     $scope.filter = _oFilter = { scope: 'N' };
     $scope.searchEvent = function(pageAt) {
-        var url;
+        var url, defer;
         pageAt && (_oPage.at = pageAt);
+        defer = $q.defer();
         url = LS.j('event/timeline', 'site', 'app');
         url += '&scope=' + _oFilter.scope || 'A';
         url += '&' + _oPage.j();
         http2.get(url).then(function(rsp) {
             $scope.logs = _aLogs = rsp.data.logs;
             _oPage.total = rsp.data.total;
+            defer.resolve(rsp.data);
         });
+        return defer.promise;
     };
     $scope.searchNotice = function(pageAt) {
-        var url;
+        var url, defer;
         pageAt && (_oPage.at = pageAt);
+        defer = $q.defer();
         url = LS.j('notice/list', 'site', 'app');
         url += '&' + _oPage.j();
         http2.get(url).then(function(rsp) {
             $scope.notices = rsp.data.notices;
             _oPage.total = rsp.data.total;
+            defer.resolve(rsp.data);
         });
+        return defer.promise;
     };
-    $scope.closeNotice = function(oNotice, bGotoRemark) {
+    $scope.closeNotice = function(oNotice, bGotoCowork) {
         fnCloseNotice(oNotice).then(function() {
-            if (bGotoRemark) {
-                $scope.gotoRemark(oNotice.enroll_key);
+            if (bGotoCowork) {
+                $scope.gotoCowork(oNotice.enroll_key);
             }
         });
     };
-    $scope.gotoRemark = function(ek) {
+    $scope.gotoCowork = function(ek) {
         var url;
         if (ek) {
             url = LS.j('', 'site', 'app');
             url += '&ek=' + ek;
-            url += '&page=remark';
+            url += '&page=cowork';
             location.href = url;
         }
     };
@@ -98,7 +104,11 @@ ngApp.controller('ctrlAction', ['$scope', '$q', 'tmsLocation', 'http2', function
         if (Object.keys(oAppNavs)) {
             $scope.appNavs = oAppNavs;
         }
-        //$scope.searchEvent(1);
-        $scope.searchNotice(1);
+        $scope.searchNotice(1).then(function(data) {
+            if (data.total === 0) {
+                $scope.filter.scope = 'A';
+                //$scope.searchEvent(1);
+            }
+        });
     });
 }]);

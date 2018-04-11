@@ -1,11 +1,10 @@
 <?php
 require_once '../../db.php';
 
-$sqls = array();
+$sqls = [];
 //
-$sqls[] = "alter table xxt_site_member_schema add at_user_home char(1) not null default 'N'";
-//
-$sqls[] = "update xxt_site_member_schema set at_user_home='Y'";
+$sqls[] = "ALTER TABLE xxt_enroll_log change target_id target_id varchar(40) not null";
+$sqls[] = "ALTER TABLE xxt_enroll_notice change event_target_id event_target_id varchar(40) not null";
 //
 foreach ($sqls as $sql) {
 	if (!$mysqli->query($sql)) {
