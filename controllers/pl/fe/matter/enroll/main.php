@@ -477,7 +477,7 @@ class main extends main_base {
 
 		if ($oApp = $modelApp->modify($oUser, $oApp, $oUpdated)) {
 			// 记录操作日志并更新信息
-			$this->model('matter\log')->matterOp($oApp->siteid, $oUser, $oApp, 'U', $oUpdated);
+			$this->model('matter\log')->matterOp($oApp->siteid, $oUser, $oApp, 'U', $oPosted);
 		}
 
 		return new \ResponseData($oApp);
