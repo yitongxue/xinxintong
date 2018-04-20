@@ -446,6 +446,7 @@ class proxy_model extends \sns\proxybase {
 		return [true, $url];
 	}
 	/**
+<<<<<<< HEAD
 	 * 获得下载媒体文件的链接（jssdk上传的语音）
 	 *
 	 * @param string $mediaid
@@ -463,6 +464,8 @@ class proxy_model extends \sns\proxybase {
 		return [true, $url];
 	}
 	/**
+=======
+>>>>>>> upstream/master
 	 * 将图文消息上传到微信公众号平台
 	 */
 	public function mediaUploadNews($message) {

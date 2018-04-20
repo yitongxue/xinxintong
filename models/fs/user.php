@@ -41,11 +41,17 @@ class user_model {
 	/**
 	 * 存储指定url对应的文件
 	 */
+<<<<<<< HEAD
 	public function storeUrl($url, $ext = 'jpg') {
 		/**
 		 * 下载文件
 		 */
 		$response = file_get_contents($url);
+=======
+	private function _storeImageUrl($url, $ext = 'jpg') {
+		/* 下载文件 */
+		$imageContent = file_get_contents($url);
+>>>>>>> upstream/master
 		$aResponseInfo = $http_response_header;
 		foreach ($aResponseInfo as $loop) {
 			if (strpos($loop, "Content-disposition") !== false) {
@@ -65,7 +71,7 @@ class user_model {
 		/**
 		 * 写到指定位置
 		 */
-		$newUrl = $this->writeFile($dir, $storename, $response);
+		$newUrl = $this->writeFile($dir, $storename, $imageContent);
 
 		return [true, $newUrl];
 	}
@@ -116,14 +122,14 @@ class user_model {
 			}
 			$rst = $snsProxy->mediaGetUrl($img->serverId);
 			if ($rst[0] !== false) {
-				$rst = $this->storeUrl($rst[1]);
+				$rst = $this->_storeImageUrl($rst[1]);
 			}
 		} else if (isset($img->imgSrc)) {
 			if (0 === strpos($img->imgSrc, 'http')) {
 				/**
 				 * url
 				 */
-				$rst = $this->storeUrl($img->imgSrc);
+				$rst = $this->_storeImageUrl($img->imgSrc);
 			} else if (false !== strpos($img->imgSrc, TMS_UPLOAD_DIR)) {
 				/**
 				 * 已经上传本地的
@@ -177,6 +183,7 @@ class user_model {
 	 * 从指定的url下载微信录音数据，并保存成文件
 	 */
 	private function _storeWxVoiceUrl($url, &$oVoice) {
+<<<<<<< HEAD
 		/**
 		 * 下载文件
 		 */
@@ -227,12 +234,43 @@ class user_model {
 		exec($command, $error);
 
 		$response = $localFs->read($tempname . '.mp3');
+=======
+		/* 下载文件 */
+		$voiceContent = file_get_contents($url);
+
+		/* 文件保存到本地 */
+		$tempname = uniqid();
+		$localFs = new local_model($this->siteId, '_temp');
+		$amr = $localFs->writeFile('', $tempname . '.amr', $voiceContent);
+		if (false === $amr) {
+			return [false, '写入文件失败（1）'];
+		}
+		$mp3 = str_replace('amr', 'mp3', $amr);
+
+		/* 将amr转换成mp3格式 */
+		$command = "/usr/local/bin/ffmpeg -i $amr $mp3";
+		$error = [];
+		exec($command, $error);
+
+		$voiceContent = $localFs->read($tempname . '.mp3');
+		$oVoice->size = strlen($voiceContent);
+		$oVoice->type = 'audio/mpeg';
+>>>>>>> upstream/master
 
 		/* 写到指定位置 */
 		$dir = date("ymdH"); // 每个小时分一个目录
 		$storename = date("is") . rand(10000, 99999) . ".mp3";
+<<<<<<< HEAD
 		$newUrl = $this->writeFile($dir, $storename, $response);
 
+=======
+		$newUrl = $this->writeFile($dir, $storename, $voiceContent);
+
+		/* 删除临时文件 */
+		$localFs->delete($tempname . '.amr');
+		$localFs->delete($tempname . '.mp3');
+
+>>>>>>> upstream/master
 		return [true, $newUrl];
 	}
 }
