@@ -123,7 +123,9 @@ class local_model {
 	 * 和alioss兼容
 	 */
 	public function writeFile($dir, $filename, $content) {
-		$filename = $dir . '/' . $filename;
+		if (!empty($dir)) {
+			$filename = $dir . '/' . $filename;
+		}
 
 		return $this->write($filename, $content);
 	}
