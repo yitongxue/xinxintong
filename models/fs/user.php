@@ -41,17 +41,9 @@ class user_model {
 	/**
 	 * 存储指定url对应的文件
 	 */
-<<<<<<< HEAD
-	public function storeUrl($url, $ext = 'jpg') {
-		/**
-		 * 下载文件
-		 */
-		$response = file_get_contents($url);
-=======
 	private function _storeImageUrl($url, $ext = 'jpg') {
 		/* 下载文件 */
 		$imageContent = file_get_contents($url);
->>>>>>> upstream/master
 		$aResponseInfo = $http_response_header;
 		foreach ($aResponseInfo as $loop) {
 			if (strpos($loop, "Content-disposition") !== false) {
@@ -183,58 +175,6 @@ class user_model {
 	 * 从指定的url下载微信录音数据，并保存成文件
 	 */
 	private function _storeWxVoiceUrl($url, &$oVoice) {
-<<<<<<< HEAD
-		/**
-		 * 下载文件
-		 */
-		$response = file_get_contents($url);
-
-		$aResponseInfo = $http_response_header;
-
-		// $ext = 'amr';
-		// foreach ($aResponseInfo as $loop) {
-		// 	if (strpos($loop, "Content-disposition") !== false) {
-		// 		$disposition = trim(substr($loop, 21));
-		// 		$filename = explode(';', $disposition);
-		// 		$filename = array_pop($filename);
-		// 		$filename = explode('=', $filename);
-		// 		$filename = array_pop($filename);
-		// 		$filename = str_replace('"', '', $filename);
-		// 		$filename = explode('.', $filename);
-		// 		$ext = array_pop($filename);
-		// 	} else if (strpos($loop, "Content-Type") !== false) {
-		// 		list($p, $type) = explode(':', $loop);
-		// 		if (!empty($type)) {
-		// 			//$oVoice->type = trim($type);
-		// 		}
-		// 	} else if (strpos($loop, "Content-Length") !== false) {
-		// 		list($p, $size) = explode(':', $loop);
-		// 		if (!empty($size)) {
-		// 			//$oVoice->size = (int) trim($size);
-		// 		}
-		// 	}
-		// }
-
-		$modelLog = TMS_APP::model('log');
-
-		/* 将amr转换成mp3格式 */
-		$tempname = uniqid();
-		$localFs = new local_model($this->siteId, '_temp');
-		$amr = $localFs->writeFile('', $tempname . '.amr', $response);
-		if (false === $amr) {
-			return [false, '写入文件失败（1）'];
-		}
-		$mp3 = str_replace('amr', 'mp3', $amr);
-
-		$modelLog->log('trace', 'enroll-wxvoice', $amr);
-		$modelLog->log('trace', 'enroll-wxvoice', $mp3);
-
-		$command = "/usr/local/bin/ffmpeg -i $amr $mp3";
-		$error = [];
-		exec($command, $error);
-
-		$response = $localFs->read($tempname . '.mp3');
-=======
 		/* 下载文件 */
 		$voiceContent = file_get_contents($url);
 
@@ -255,22 +195,16 @@ class user_model {
 		$voiceContent = $localFs->read($tempname . '.mp3');
 		$oVoice->size = strlen($voiceContent);
 		$oVoice->type = 'audio/mpeg';
->>>>>>> upstream/master
 
 		/* 写到指定位置 */
 		$dir = date("ymdH"); // 每个小时分一个目录
 		$storename = date("is") . rand(10000, 99999) . ".mp3";
-<<<<<<< HEAD
-		$newUrl = $this->writeFile($dir, $storename, $response);
-
-=======
 		$newUrl = $this->writeFile($dir, $storename, $voiceContent);
 
 		/* 删除临时文件 */
 		$localFs->delete($tempname . '.amr');
 		$localFs->delete($tempname . '.mp3');
 
->>>>>>> upstream/master
 		return [true, $newUrl];
 	}
 }
