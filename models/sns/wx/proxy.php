@@ -456,7 +456,7 @@ class proxy_model extends \sns\proxybase {
 			return $rst[1];
 		}
 
-		$url = 'https://api.weixin.qq.com/cgi-bin/media/get';
+		$url = 'http://api.weixin.qq.com/cgi-bin/media/get';
 		$url .= "?access_token={$rst[1]}";
 		$url .= "&media_id=$mediaId";
 
