@@ -213,7 +213,7 @@ class user_model {
 
 		/* 将amr转换成mp3格式 */
 		$tempname = uniqid();
-		$localFs = new local_model($siteId, '_temp');
+		$localFs = new local_model($this->siteId, '_temp');
 		$amr = $this->writeFile('', $tempname . '.amr', $response);
 		$mp3 = str_replace('amr', 'mp3', $amr);
 
@@ -224,6 +224,6 @@ class user_model {
 		$response = $localFs->read($tempname . 'mp3');
 		$newUrl = $this->writeFile($dir, $storename, $response);
 
-		return array(true, $newUrl);
+		return [true, $newUrl];
 	}
 }
