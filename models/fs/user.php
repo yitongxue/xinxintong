@@ -184,32 +184,29 @@ class user_model {
 
 		$aResponseInfo = $http_response_header;
 
-		$ext = 'amr';
-		foreach ($aResponseInfo as $loop) {
-			if (strpos($loop, "Content-disposition") !== false) {
-				$disposition = trim(substr($loop, 21));
-				$filename = explode(';', $disposition);
-				$filename = array_pop($filename);
-				$filename = explode('=', $filename);
-				$filename = array_pop($filename);
-				$filename = str_replace('"', '', $filename);
-				$filename = explode('.', $filename);
-				$ext = array_pop($filename);
-			} else if (strpos($loop, "Content-Type") !== false) {
-				list($p, $type) = explode(':', $loop);
-				if (!empty($type)) {
-					$oVoice->type = trim($type);
-				}
-			} else if (strpos($loop, "Content-Length") !== false) {
-				list($p, $size) = explode(':', $loop);
-				if (!empty($size)) {
-					$oVoice->size = (int) trim($size);
-				}
-			}
-		}
-		$storename = date("is") . rand(10000, 99999) . "." . $ext;
-
-		$dir = date("ymdH"); // 每个小时分一个目录
+		// $ext = 'amr';
+		// foreach ($aResponseInfo as $loop) {
+		// 	if (strpos($loop, "Content-disposition") !== false) {
+		// 		$disposition = trim(substr($loop, 21));
+		// 		$filename = explode(';', $disposition);
+		// 		$filename = array_pop($filename);
+		// 		$filename = explode('=', $filename);
+		// 		$filename = array_pop($filename);
+		// 		$filename = str_replace('"', '', $filename);
+		// 		$filename = explode('.', $filename);
+		// 		$ext = array_pop($filename);
+		// 	} else if (strpos($loop, "Content-Type") !== false) {
+		// 		list($p, $type) = explode(':', $loop);
+		// 		if (!empty($type)) {
+		// 			//$oVoice->type = trim($type);
+		// 		}
+		// 	} else if (strpos($loop, "Content-Length") !== false) {
+		// 		list($p, $size) = explode(':', $loop);
+		// 		if (!empty($size)) {
+		// 			//$oVoice->size = (int) trim($size);
+		// 		}
+		// 	}
+		// }
 
 		$modelLog = TMS_APP::model('log');
 
@@ -229,8 +226,11 @@ class user_model {
 		$error = [];
 		exec($command, $error);
 
-		/* 写到指定位置 */
 		$response = $localFs->read($tempname . '.mp3');
+
+		/* 写到指定位置 */
+		$dir = date("ymdH"); // 每个小时分一个目录
+		$storename = date("is") . rand(10000, 99999) . ".mp3";
 		$newUrl = $this->writeFile($dir, $storename, $response);
 
 		return [true, $newUrl];
