@@ -216,7 +216,10 @@ class user_model {
 		/* 将amr转换成mp3格式 */
 		$tempname = uniqid();
 		$localFs = new local_model($this->siteId, '_temp');
-		$amr = $this->writeFile('', $tempname . '.amr', $response);
+		$amr = $localFs->writeFile('', $tempname . '.amr', $response);
+		if (false === $amr) {
+			return [false, '写入文件失败（1）'];
+		}
 		$mp3 = str_replace('amr', 'mp3', $amr);
 
 		$modelLog->log('trace', 'enroll-wxvoice', $amr);
