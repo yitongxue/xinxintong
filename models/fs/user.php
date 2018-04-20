@@ -217,7 +217,7 @@ class user_model {
 		$amr = $this->writeFile('', $tempname . '.amr', $response);
 		$mp3 = str_replace('amr', 'mp3', $amr);
 
-		$command = "/usr/local/bin/ffmpeg -i $arm $mp3";
+		$command = "/usr/local/bin/ffmpeg -i $amr $mp3";
 		exec($command, $error);
 
 		/* 写到指定位置 */
