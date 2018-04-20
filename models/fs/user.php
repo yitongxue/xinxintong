@@ -218,6 +218,7 @@ class user_model {
 		$mp3 = str_replace('amr', 'mp3', $amr);
 
 		$command = "/usr/local/bin/ffmpeg -i $amr $mp3";
+		$error = [];
 		exec($command, $error);
 
 		/* 写到指定位置 */
