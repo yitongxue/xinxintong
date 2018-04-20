@@ -46,8 +46,8 @@ class user_model {
 		 * 下载文件
 		 */
 		$response = file_get_contents($url);
-		$responseInfo = $http_response_header;
-		foreach ($responseInfo as $loop) {
+		$aResponseInfo = $http_response_header;
+		foreach ($aResponseInfo as $loop) {
 			if (strpos($loop, "Content-disposition") !== false) {
 				$disposition = trim(substr($loop, 21));
 				$filename = explode(';', $disposition);
@@ -67,7 +67,7 @@ class user_model {
 		 */
 		$newUrl = $this->writeFile($dir, $storename, $response);
 
-		return array(true, $newUrl);
+		return [true, $newUrl];
 	}
 	/**
 	 * 存储base64的文件数据
@@ -163,12 +163,9 @@ class user_model {
 			}
 		}
 
-		$modelLog = TMS_APP::model('log');
-		$modelLog->log('trace', 'enroll-wxvoice-0', $oVoice->serverId);
-
-		$rst = $snsProxy->mediaGetUrl2($oVoice->serverId);
+		$rst = $snsProxy->mediaGetUrl($oVoice->serverId);
 		if ($rst[0] !== false) {
-			$rst = $this->_storeWxVoiceUrl($rst[1]);
+			$rst = $this->_storeWxVoiceUrl($rst[1], $oVoice);
 		}
 
 		$oVoice->url = $rst[1];
@@ -179,19 +176,16 @@ class user_model {
 	/**
 	 * 从指定的url下载微信录音数据，并保存成文件
 	 */
-	private function _storeWxVoiceUrl($url) {
+	private function _storeWxVoiceUrl($url, &$oVoice) {
 		/**
 		 * 下载文件
 		 */
-		$modelLog = TMS_APP::model('log');
-		$modelLog->log('trace', 'enroll-wxvoice-1', $url);
-
 		$response = file_get_contents($url);
 
-		$modelLog->log('trace', 'enroll-wxvoice-2', $response);
+		$aResponseInfo = $http_response_header;
 
-		$responseInfo = $http_response_header;
-		foreach ($responseInfo as $loop) {
+		$ext = 'amr';
+		foreach ($aResponseInfo as $loop) {
 			if (strpos($loop, "Content-disposition") !== false) {
 				$disposition = trim(substr($loop, 21));
 				$filename = explode(';', $disposition);
@@ -201,16 +195,34 @@ class user_model {
 				$filename = str_replace('"', '', $filename);
 				$filename = explode('.', $filename);
 				$ext = array_pop($filename);
-				break;
+			} else if (strpos($loop, "Content-Type") !== false) {
+				list($p, $type) = explode(':', $loop);
+				if (!empty($type)) {
+					$oVoice->type = trim($type);
+				}
+			} else if (strpos($loop, "Content-Length") !== false) {
+				list($p, $size) = explode(':', $loop);
+				if (!empty($size)) {
+					$oVoice->size = (int) trim($size);
+				}
 			}
 		}
-		$dir = date("ymdH"); // 每个小时分一个目录
-		$storename = date("is") . rand(10000, 99999) . ".amr";
+		$storename = date("is") . rand(10000, 99999) . "." . $ext;
 
-		/* 写到指定位置 */
-		$newUrl = $this->writeFile($dir, $storename, $response);
+		$dir = date("ymdH"); // 每个小时分一个目录
 
 		/* 将amr转换成mp3格式 */
+		$tempname = uniqid();
+		$localFs = new local_model($siteId, '_temp');
+		$amr = $this->writeFile('', $tempname . '.amr', $response);
+		$mp3 = str_replace('amr', 'mp3', $amr);
+
+		$command = "/usr/local/bin/ffmpeg -i $arm $mp3";
+		exec($command, $error);
+
+		/* 写到指定位置 */
+		$response = $localFs->read($tempname . 'mp3');
+		$newUrl = $this->writeFile($dir, $storename, $response);
 
 		return array(true, $newUrl);
 	}
