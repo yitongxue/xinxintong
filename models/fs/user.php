@@ -211,18 +211,23 @@ class user_model {
 
 		$dir = date("ymdH"); // 每个小时分一个目录
 
+		$modelLog = TMS_APP::model('log');
+
 		/* 将amr转换成mp3格式 */
 		$tempname = uniqid();
 		$localFs = new local_model($this->siteId, '_temp');
 		$amr = $this->writeFile('', $tempname . '.amr', $response);
 		$mp3 = str_replace('amr', 'mp3', $amr);
 
+		$modelLog->log('trace', 'enroll-wxvoice', $amr);
+		$modelLog->log('trace', 'enroll-wxvoice', $mp3);
+
 		$command = "/usr/local/bin/ffmpeg -i $amr $mp3";
 		$error = [];
 		exec($command, $error);
 
 		/* 写到指定位置 */
-		$response = $localFs->read($tempname . 'mp3');
+		$response = $localFs->read($tempname . '.mp3');
 		$newUrl = $this->writeFile($dir, $storename, $response);
 
 		return [true, $newUrl];
