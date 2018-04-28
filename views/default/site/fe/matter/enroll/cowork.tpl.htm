@@ -9,7 +9,7 @@
         <?php TPL::pt('title');?>
     </title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href='/static/css/site.fe.css?_=2' rel="stylesheet">
+    <link href="<?php echo auto_version('/static/css/site.fe.css');?>" rel="stylesheet">
 </head>
 
 <body ng-controller="ctrlCowork" class='matter_enroll'>
@@ -275,9 +275,9 @@
     </div>
     <script type="text/ng-template" id="writeItem.html">
         <div class="modal-body">
-            <textarea class='form-control' rows=8 placeholder='请输入内容' autofocus ng-model="data.content"></textarea>
+            <div id='remarkEditor' content='data.content' tms-editor></div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer" tms-hide-parent-height='400'>
             <div class='text-center'>
                 <button class="btn btn-default" ng-click="cancel()">取消</button>
                 <button class="btn btn-primary" ng-click="ok()">提交</button>
@@ -286,23 +286,12 @@
     </script>
     <script type="text/ng-template" id="writeRemark.html">
         <div class="modal-body">
-            <div>
-                <ul ng-if="remarks.length" class='list-group' style='overflow-y:auto;'>
-                    <li class='list-group-item' ng-repeat="remark in remarks">
-                        <div style='font-size:.9em;'>
-                            <span class='text-muted' ng-bind="remark.modify_at*1000|date:'MM-dd HH:mm'"></span>
-                            <span class='text-muted' ng-bind="remark.nickname"></span>
-                        </div>
-                        <div ng-bind-html="remark.content"></div>
-                    </li>
-                </ul>
-                <div class='form-group'>
-                    <textarea class='form-control' rows=8 placeholder='请输入留言内容' autofocus ng-model="data.content"></textarea>
-                </div>
-                <div class='text-center'>
-                    <button class="btn btn-default" ng-click="cancel()">关闭</button>
-                    <button class="btn btn-primary" ng-click="ok()">提交留言</button>
-                </div>
+            <div id='remarkEditor' content='data.content' tms-editor></div>
+        </div>
+        <div class="modal-footer" tms-hide-parent-height='400'>
+            <div class='text-center'>
+                <button class="btn btn-default" ng-click="cancel()">关闭</button>
+                <button class="btn btn-primary" ng-click="ok()">提交留言</button>
             </div>
         </div>
     </script>
