@@ -12,7 +12,6 @@ foreach ($sqls as $sql) {
 }
 //
 require_once '../../config.php';
-require_once '../../db.php';
 require_once '../../tms/db.php';
 require_once '../../tms/tms_model.php';
 
