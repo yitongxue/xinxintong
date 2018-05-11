@@ -253,12 +253,6 @@ class record extends base {
 			$this->model('matter\enroll\notice')->addRecord($oEnrollApp, $oRecord, $oUser);
 		}
 
-		/* 记录操作日志 */
-		$oOperation = new \stdClass;
-		$oOperation->name = $bSubmitNewRecord ? 'submit' : 'updateData';
-		$oOperation->data = $modelRec->byId($ek, ['fields' => 'enroll_key,data,rid']);
-		$this->_logUserOp($oEnrollApp, $oOperation, $oUser);
-
 		/* 通知登记活动事件接收人 */
 		if (isset($oEnrollApp->notifyConfig->submit->valid) && $oEnrollApp->notifyConfig->submit->valid === true) {
 			$this->_notifyReceivers($oEnrollApp, $ek);
@@ -380,6 +374,12 @@ class record extends base {
 		}
 		if (!empty($oApp->end_submit_at) && $oApp->end_submit_at < $current) {
 			return [false, ['活动提交时间已经结束，不允许修改数据']];
+		}
+
+		if (!empty($oApp->actionRule->record->submit->pre->editor)) {
+			if (empty($oUser->is_editor) || $oUser->is_editor !== 'Y') {
+				return [false, '仅限活动编辑组用户提交填写记录'];
+			}
 		}
 
 		$modelRec = $this->model('matter\enroll\record');
@@ -635,7 +635,7 @@ class record extends base {
 					$oRecord = new \stdClass;
 				}
 			} else {
-				$oRecord = false;
+				$oRecord = new \stdClass;
 			}
 		} else {
 			$oRecord = $modelRec->byId($ek, ['verbose' => 'Y', 'fields' => $fields]);
@@ -897,7 +897,8 @@ class record extends base {
 		/* 组长只能表态本组用户的数据，或者不属于任何分组的数据 */
 		if ($oGrpLeader->is_leader === 'Y') {
 			$oGrpMemb = $modelGrpUsr->byUser($oApp->entryRule->group, $oRecord->userid, ['fields' => 'round_id', 'onlyOne' => true]);
-			if ($oGrpMemb) {
+			if ($oGrpMemb && !empty($oGrpMemb->round_id)) {
+				/* 填写记录的用户属于一个分组 */
 				if ($oGrpMemb->round_id !== $oGrpLeader->round_id) {
 					return new \ParameterError('只允许组长对本组成员的数据表态');
 				}
@@ -973,15 +974,13 @@ class record extends base {
 	 *
 	 */
 	public function remove_action($app, $ek) {
-		$app = $this->escape($app);
-		$ek = $this->escape($ek);
 		$modelApp = $this->model('matter\enroll');
 		$oApp = $modelApp->byId($app, ['cascaded' => 'N']);
 		if ($oApp === false || $oApp->state !== '1') {
 			return new \ObjectNotFoundError();
 		}
 		$modelRec = $this->model('matter\enroll\record');
-		$oRecord = $modelRec->byId($ek, ['fields' => 'userid,nickname,state,enroll_key,data,rid']);
+		$oRecord = $modelRec->byId($ek, ['fields' => 'id,userid,nickname,state,enroll_key,data,rid']);
 		if (false === $oRecord || $oRecord->state !== '1') {
 			return new \ResponseError('记录已经被删除，不能再次删除');
 		}
@@ -1011,15 +1010,15 @@ class record extends base {
 		$rst = $modelRec->removeByUser($oApp, $oRecord);
 
 		/* 记录操作日志 */
-		$oUser->nickname = $oRecord->nickname;
-		$oOperation = new \stdClass;
-		$oOperation->name = 'removeData';
-		unset($oRecord->userid);
-		unset($oRecord->nickname);
-		unset($oRecord->state);
-		$oOperation->data = $oRecord;
-
-		$this->_logUserOp($oApp, $oOperation, $oUser);
+		$oTarget = new \stdClass;
+		$oTarget->id = $oRecord->id;
+		$oTarget->type = 'record';
+		$oEvent = new \stdClass;
+		$oEvent->name = 'site.matter.enroll.remove';
+		$oEvent->op = 'Del';
+		$oEvent->at = time();
+		$oEvent->user = $oUser;
+		$log = $this->model('matter\enroll\event')->_logEvent($oApp, $oRecord->rid, $ek, $oTarget, $oEvent);
 
 		return new \ResponseData($rst);
 	}

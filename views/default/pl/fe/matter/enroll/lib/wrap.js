@@ -177,12 +177,12 @@ define([], function() {
         if (schema.supplement === 'Y') {
             $supplement = $dom.find('.supplement');
             if ($supplement.length === 0) {
-                html = '<div class="list-group-item supplement">';
+                html = '<div class="list-group-item supplement text-muted">';
                 html += '<div class="top-bar tms-flex-row">';
                 html += '<div class="tms-flex-grow" ng-if="!supplement.'+schema.id+'">请填写补充说明</div>';
                 html += '<div class="tms-flex-grow" ng-if="supplement.'+schema.id+'" dynamic-html="supplement.'+ schema.id+'"></div>';
                 html += '<div class="btn-group" uib-dropdown>';
-                html += '<button class="btn btn-default dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
+                html += '<button class="btn btn-default btn-xs dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
                 html += '<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>';
                 html += '<li><a href ng-click="editSupplement(\'' + schema.id + '\')"><span class="glyphicon glyphicon-edit"></span> 编辑</a></li>';
                 html += '</ul>';
@@ -313,7 +313,7 @@ define([], function() {
                 forEdit && (html += ' readonly');
                 html += '></div>';
                 html += '<div class="btn-group" uib-dropdown>';
-                html += '<button class="btn btn-default dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
+                html += '<button class="btn btn-default btn-xs dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
                 html += '<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>';
                 html += '<li><a href ng-click="removeItem(data.' + oSchema.id + ', $index)"><span class="glyphicon glyphicon-trash"></span> 删除</a></li>';
                 html += '<li><a href ng-click="editItem(data.' + oSchema.id + ', $index)"><span class="glyphicon glyphicon-edit"></span> 编辑</a></li>';
@@ -418,7 +418,7 @@ define([], function() {
                 html += '<li ng-repeat="file in data.' + oSchema.id + '" class="list-group-item">';
                 html += '<div wrap="file" class="top-bar tms-flex-row">';
                 html += '<div class="tms-flex-grow" ng-bind="file.name"></div>';
-                html += '<div class="btn-group" uib-dropdown><button class="btn btn-default dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
+                html += '<div class="btn-group" uib-dropdown><button class="btn btn-default btn-xs dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
                 html += '<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>';
                 html += '<li><a href ng-click="clickFile(\'' + oSchema.id + '\',$index)"><span class="glyphicon glyphicon-trash"></span> 删除</a></li>';
                 html += '</ul></div>';
@@ -435,7 +435,7 @@ define([], function() {
                 html += '<li ng-repeat="voice in data.' + oSchema.id + '" class="list-group-item">';
                 html += '<div wrap="voice" class="top-bar tms-flex-row">';
                 html += '<div class="tms-flex-grow voice-name" ng-bind="voice.name"></div>';
-                html += '<div class="btn-group" uib-dropdown><button class="btn btn-default dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
+                html += '<div class="btn-group" uib-dropdown><button class="btn btn-default btn-xs dropdown-toggle" uib-dropdown-toggle><span class="glyphicon glyphicon-option-vertical"></span></button>';
                 html += '<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>';
                 html += '<li><a href ng-click="clickFile(\'' + oSchema.id + '\',$index)"><span class="glyphicon glyphicon-trash"></span> 删除</a></li>';
                 html += '</ul></div>';
@@ -488,16 +488,6 @@ define([], function() {
             } else {
                 $label = $dom.children('label');
                 $label.html(oSchema.title);
-                $label.toggleClass('hide', !!oConfig.hidename);
-                if (oSchema.description && oSchema.description.length) {
-                    if (!$dom.find('[class="description"]').length) {
-                        $('<div class="description">' + oSchema.description + '</div>').insertAfter($dom.find('label')[0])
-                    } else {
-                        $dom.find('[class="description"]').html(oSchema.description);
-                    }
-                } else {
-                    $dom.find('[class="description"]').remove();
-                }
                 if (/shorttext|longtext|member|date|location|url/.test(oSchema.type)) {
                     $input = $dom.find('input,textarea');
                     if (oConfig.placeholder) {
@@ -608,6 +598,16 @@ define([], function() {
                         _htmlSupplement($dom, oSchema);
                         _htmlTag($dom, oSchema);
                     })(this);
+                }
+                $label.toggleClass('hide', !!oConfig.hidename);
+                if (oSchema.description && oSchema.description.length) {
+                    if (!$dom.find('[class="description"]').length) {
+                        $('<div class="description">' + oSchema.description + '</div>').insertAfter($dom.find('label')[0])
+                    } else {
+                        $dom.find('[class="description"]').html(oSchema.description);
+                    }
+                } else {
+                    $dom.find('[class="description"]').remove();
                 }
             }
         } else if (/radio|checkbox/.test(dataWrap.type)) {
@@ -930,7 +930,7 @@ define([], function() {
         if (oSchema.supplement === 'Y') {
             $supplement = $dom.find('.supplement');
             if ($supplement.length === 0) {
-                $dom.append('<p class="supplement" ng-bind="Record.current.supplement.' + oSchema.id + '"></p>');
+                $dom.append('<p class="supplement" ng-bind-html="Record.current.supplement.' + oSchema.id + '"></p>');
             }
         } else {
             $supplement = $dom.find('.supplement');
@@ -1039,7 +1039,7 @@ define([], function() {
                 break;
         }
         if (oSchema.supplement && oSchema.supplement === 'Y') {
-            html += '<p class="supplement" ng-bind="r.supplement.' + oSchema.id + '"></p>';
+            html += '<p class="supplement" ng-bind-html="r.supplement.' + oSchema.id + '"></p>';
         }
         html += '</div>';
 

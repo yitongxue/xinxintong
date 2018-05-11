@@ -536,25 +536,12 @@ class record_model extends record_base {
 			$oOptions = (object) $oOptions;
 		}
 
-		$bRequireScore = false; // 数值型的填空题需要计算分值
 		$oSchemasById = new \stdClass; // 方便查找题目
-		$visibilitySchemas = []; // 设置了可见性规则的题目
 		if (!empty($oApp->dataSchemas)) {
 			foreach ($oApp->dataSchemas as $oSchema) {
 				$oSchemasById->{$oSchema->id} = $oSchema;
-				if ($oSchema->type == 'shorttext' && isset($oSchema->format) && $oSchema->format === 'number') {
-					$bRequireScore = true;
-					break;
-				}
-				if (!empty($oSchema->visibility->rules)) {
-					$visibilitySchemas[] = $oSchema;
-				}
 			}
 		}
-
-		$oResult = new \stdClass; // 返回的结果
-		$oResult->total = 0;
-
 		// 指定登记活动下的登记记录
 		$w = "r.state=1 and r.aid='{$oApp->id}'";
 
@@ -595,7 +582,6 @@ class record_model extends record_base {
 		if (!empty($oCriteria->record->userid)) {
 			$w .= " and r.userid='{$oCriteria->record->userid}'";
 		}
-
 		// 记录是否通过审核
 		if (!empty($oCriteria->record->verified)) {
 			$w .= " and r.verified='{$oCriteria->record->verified}'";
@@ -612,6 +598,11 @@ class record_model extends record_base {
 		}
 		// 讨论状态的记录仅提交人，同组用户或超级用户可见
 		if (isset($oUser)) {
+			// 当前用户收藏的
+			if (!empty($oUser->unionid) && !empty($oCriteria->record->favored)) {
+				$w .= " and exists(select 1 from xxt_enroll_record_favor f where r.id=f.record_id and f.favor_unionid='{$oUser->unionid}' and f.state=1)";
+			}
+			// 当前用户角色
 			if (empty($oUser->is_leader) || $oUser->is_leader !== 'S') {
 				if (!empty($oUser->uid)) {
 					$w .= " and (";
@@ -632,6 +623,11 @@ class record_model extends record_base {
 			}
 		}
 
+		// 指定了专题的
+		if (!empty($oCriteria->record->topic)) {
+			$w .= " and exists(select 1 from xxt_enroll_topic_record t where r.id=t.record_id and t.topic_id='{$oCriteria->record->topic}')";
+		}
+
 		// 预制条件：指定分组或赞同数大于
 		if (isset($oCriteria->GroupOrLikeNum) && is_object($oCriteria->GroupOrLikeNum)) {
 			if (!empty($oCriteria->GroupOrLikeNum->group_id) && isset($oCriteria->GroupOrLikeNum->like_num)) {
@@ -640,12 +636,14 @@ class record_model extends record_base {
 		}
 
 		// 指定了记录标签
-		if (!empty($oCriteria->tags)) {
-			$whereByTag = '';
-			foreach ($oCriteria->tags as $tag) {
-				$whereByTag .= " and concat(',',r.tags,',') like '%,$tag,%'";
+		if (!empty($oCriteria->record->tags)) {
+			if (is_array($oCriteria->record->tags)) {
+				foreach ($oCriteria->record->tags as $tagId) {
+					$w .= " and exists(select 1 from xxt_enroll_tag_target tt where tt.target_id=r.id and tt.target_type=1 and tt.tag_id=" . $tagId . ")";
+				}
+			} else {
+				$w .= " and exists(select 1 from xxt_enroll_tag_target tt where tt.target_id=r.id and tt.target_type=1 and tt.tag_id=" . $oCriteria->record->tags . ")";
 			}
-			$w .= $whereByTag;
 		}
 
 		// 指定了登记数据过滤条件
@@ -703,18 +701,12 @@ class record_model extends record_base {
 
 		// 查询参数
 		$q = [
-			'r.enroll_key,r.rid,r.enroll_at,r.tags,r.userid,r.group_id,r.nickname,r.wx_openid,r.yx_openid,r.qy_openid,r.headimgurl,r.verified,r.comment,r.data,r.supplement,r.data_tag,r.agreed,r.like_num,r.like_log,remark_num',
+			'id,enroll_key,rid,enroll_at,userid,group_id,nickname,wx_openid,yx_openid,qy_openid,headimgurl,verified,comment,data,score,supplement,agreed,like_num,like_log,remark_num,favor_num',
 			"xxt_enroll_record r",
 			$w,
 		];
 
-		//测验场景或数值填空题共用score字段
-		if (isset($oApp->scenario) && ($oApp->scenario === 'quiz' || $bRequireScore)) {
-			$q[0] .= ',r.score';
-		}
-
 		$q2 = [];
-
 		// 查询结果分页
 		if (!empty($oOptions->page) && !empty($oOptions->size)) {
 			$q2['r'] = ['o' => ($oOptions->page - 1) * $oOptions->size, 'l' => $oOptions->size];
@@ -761,138 +753,10 @@ class record_model extends record_base {
 		/**
 		 * 处理获得的数据
 		 */
-		$aGroupsById = []; // 缓存分组数据
-		$aRoundsById = []; // 缓存轮次数据
+		$oResult = new \stdClass; // 返回的结果
 		if ($records = $this->query_objs_ss($q, $q2)) {
 			/* 检查题目是否可见 */
-			$fnCheckSchemaVisibility = function ($oSchemas, &$oRecordData) {
-				foreach ($oSchemas as $oSchema) {
-					foreach ($oSchema->visibility->rules as $oRule) {
-						if (strpos($oSchema->id, 'member.extattr') === 0) {
-							$memberSchemaId = str_replace('member.extattr.', '', $oSchema->id);
-							if (!isset($oRecordData->member->extattr->{$memberSchemaId}) || ($oRecordData->member->extattr->{$memberSchemaId} !== $oRule->op && empty($oRecordData->member->extattr->{$memberSchemaId}))) {
-								unset($oRecordData->{$oSchema->id});
-								break;
-							}
-						} else if (!isset($oRecordData->{$oRule->schema}) || ($oRecordData->{$oRule->schema} !== $oRule->op && empty($oRecordData->{$oRule->schema}->{$oRule->op}))) {
-							unset($oRecordData->{$oSchema->id});
-							break;
-						}
-					}
-				}
-			};
-			foreach ($records as $oRec) {
-				if (property_exists($oRec, 'like_log')) {
-					$oRec->like_log = empty($oRec->like_log) ? new \stdClass : json_decode($oRec->like_log);
-				}
-				if (property_exists($oRec, 'data_tag')) {
-					$oRec->data_tag = empty($oRec->data_tag) ? new \stdClass : json_decode($oRec->data_tag);
-				}
-				//测验场景或数值填空题共用score字段
-				if (isset($oApp->scenario)) {
-					if (($oApp->scenario === 'quiz' || $bRequireScore) && !empty($oRec->score)) {
-						$score = str_replace("\n", ' ', $oRec->score);
-						$score = json_decode($score);
-
-						if ($score === null) {
-							$oRec->score = 'json error(' . json_last_error_msg() . '):' . $oRec->score;
-						} else {
-							$oRec->score = $score;
-						}
-					}
-				}
-				//附加说明
-				if (!empty($oRec->supplement)) {
-					$supplement = str_replace("\n", ' ', $oRec->supplement);
-					$supplement = json_decode($supplement);
-
-					if ($supplement === null) {
-						$oRec->supplement = 'json error(' . json_last_error_msg() . '):' . $oRec->supplement;
-					} else {
-						$oRec->supplement = $supplement;
-					}
-				}
-				if (!empty($oRec->data)) {
-					$data = str_replace("\n", ' ', $oRec->data);
-					$data = json_decode($data);
-					if ($data === null) {
-						$oRec->data = 'json error(' . json_last_error_msg() . '):' . $oRec->data;
-					} else {
-						$oRec->data = $data;
-						/* 处理提交数据后分组的问题 */
-						if (!empty($oRec->group_id) && !isset($oRec->data->_round_id)) {
-							$oRec->data->_round_id = $oRec->group_id;
-						}
-						/* 处理提交数据后指定昵称题的问题 */
-						if ($oRec->nickname && isset($oApp->assignedNickname->valid) && $oApp->assignedNickname->valid === 'Y') {
-							if (isset($oApp->assignedNickname->schema->id)) {
-								$nicknameSchemaId = $oApp->assignedNickname->schema->id;
-								if (0 === strpos($nicknameSchemaId, 'member.')) {
-									$nicknameSchemaId = explode('.', $nicknameSchemaId);
-									if (!isset($oRec->data->member)) {
-										$oRec->data->member = new \stdClass;
-									}
-									if (!isset($oRec->data->member->{$nicknameSchemaId[1]})) {
-										$oRec->data->member->{$nicknameSchemaId[1]} = $oRec->nickname;
-									}
-								} else {
-									if (!isset($oRec->data->{$nicknameSchemaId})) {
-										$oRec->data->{$nicknameSchemaId} = $oRec->nickname;
-									}
-								}
-							}
-						}
-						/* 根据题目的可见性处理数据 */
-						if (count($visibilitySchemas)) {
-							$fnCheckSchemaVisibility($visibilitySchemas, $oRec->data);
-						}
-					}
-				} else {
-					$oRec->data = new \stdClass;
-				}
-				// 记录的分组
-				if (!empty($oRec->group_id)) {
-					if (!isset($aGroupsById[$oRec->group_id])) {
-						if (!isset($modelGrpRnd)) {
-							$modelGrpRnd = $this->model('matter\group\round');
-						}
-						$oGroup = $modelGrpRnd->byId($oRec->group_id, ['fields' => 'title']);
-						$aGroupsById[$oRec->group_id] = $oGroup;
-					} else {
-						$oGroup = $aGroupsById[$oRec->group_id];
-					}
-					if ($oGroup) {
-						$oRec->group = $oGroup;
-					}
-				}
-				// 记录的登记轮次
-				if (!empty($oRec->rid)) {
-					if (!isset($aRoundsById[$oRec->rid])) {
-						if (!isset($modelRnd)) {
-							$modelRnd = $this->model('matter\enroll\round');
-						}
-						$round = $modelRnd->byId($oRec->rid, ['fields' => 'title']);
-						$aRoundsById[$oRec->rid] = $round;
-					} else {
-						$round = $aRoundsById[$oRec->rid];
-					}
-					if ($round) {
-						$oRec->round = $round;
-					}
-				}
-				// 记录的分数
-				if (isset($oApp->scenario)) {
-					if ($oApp->scenario === 'voting' || $oApp->scenario === 'common') {
-						if (!isset($scoreSchemas)) {
-							$scoreSchemas = $this->_mapOfScoreSchema($oApp);
-							$countScoreSchemas = count(array_keys((array) $scoreSchemas));
-						}
-						$oRec->_score = $this->_calcVotingScore($scoreSchemas, $data);
-						$oRec->_average = $countScoreSchemas === 0 ? 0 : $oRec->_score / $countScoreSchemas;
-					}
-				}
-			}
-			$oResult->records = $records;
+			$oResult->records = $this->parse($oApp, $records);
 		}
 		// 符合条件的数据总数
 		$q[0] = 'count(*)';
@@ -900,6 +764,157 @@ class record_model extends record_base {
 		$oResult->total = $total;
 
 		return $oResult;
+	}
+	/**
+	 * 解析记录的内容，将数据库中的格式转换为应用格式
+	 */
+	public function parse($oApp, &$records) {
+		$bRequireScore = false; // 数值型的填空题需要计算分值
+		$visibilitySchemas = []; // 设置了可见性规则的题目
+		if (!empty($oApp->dataSchemas)) {
+			foreach ($oApp->dataSchemas as $oSchema) {
+				if ($oSchema->type == 'shorttext' && isset($oSchema->format) && $oSchema->format === 'number') {
+					$bRequireScore = true;
+					break;
+				}
+				if (!empty($oSchema->visibility->rules)) {
+					$visibilitySchemas[] = $oSchema;
+				}
+			}
+		}
+
+		$aGroupsById = []; // 缓存分组数据
+		$aRoundsById = []; // 缓存轮次数据
+
+		$fnCheckSchemaVisibility = function ($oSchemas, &$oRecordData) {
+			foreach ($oSchemas as $oSchema) {
+				foreach ($oSchema->visibility->rules as $oRule) {
+					if (strpos($oSchema->id, 'member.extattr') === 0) {
+						$memberSchemaId = str_replace('member.extattr.', '', $oSchema->id);
+						if (!isset($oRecordData->member->extattr->{$memberSchemaId}) || ($oRecordData->member->extattr->{$memberSchemaId} !== $oRule->op && empty($oRecordData->member->extattr->{$memberSchemaId}))) {
+							unset($oRecordData->{$oSchema->id});
+							break;
+						}
+					} else if (!isset($oRecordData->{$oRule->schema}) || ($oRecordData->{$oRule->schema} !== $oRule->op && empty($oRecordData->{$oRule->schema}->{$oRule->op}))) {
+						unset($oRecordData->{$oSchema->id});
+						break;
+					}
+				}
+			}
+		};
+		foreach ($records as $oRec) {
+			if (property_exists($oRec, 'like_log')) {
+				$oRec->like_log = empty($oRec->like_log) ? new \stdClass : json_decode($oRec->like_log);
+			}
+			//if (property_exists($oRec, 'data_tag')) {
+			//	$oRec->data_tag = empty($oRec->data_tag) ? new \stdClass : json_decode($oRec->data_tag);
+			//}
+			//测验场景或数值填空题共用score字段
+			if (isset($oApp->scenario)) {
+				if (($oApp->scenario === 'quiz' || $bRequireScore) && !empty($oRec->score)) {
+					$score = str_replace("\n", ' ', $oRec->score);
+					$score = json_decode($score);
+
+					if ($score === null) {
+						$oRec->score = 'json error(' . json_last_error_msg() . '):' . $oRec->score;
+					} else {
+						$oRec->score = $score;
+					}
+				}
+			}
+			//附加说明
+			if (!empty($oRec->supplement)) {
+				$supplement = str_replace("\n", ' ', $oRec->supplement);
+				$supplement = json_decode($supplement);
+
+				if ($supplement === null) {
+					$oRec->supplement = 'json error(' . json_last_error_msg() . '):' . $oRec->supplement;
+				} else {
+					$oRec->supplement = $supplement;
+				}
+			}
+			if (!empty($oRec->data)) {
+				$data = str_replace("\n", ' ', $oRec->data);
+				$data = json_decode($data);
+				if ($data === null) {
+					$oRec->data = 'json error(' . json_last_error_msg() . '):' . $oRec->data;
+				} else {
+					$oRec->data = $data;
+					/* 处理提交数据后分组的问题 */
+					if (!empty($oRec->group_id) && !isset($oRec->data->_round_id)) {
+						$oRec->data->_round_id = $oRec->group_id;
+					}
+					/* 处理提交数据后指定昵称题的问题 */
+					if ($oRec->nickname && isset($oApp->assignedNickname->valid) && $oApp->assignedNickname->valid === 'Y') {
+						if (isset($oApp->assignedNickname->schema->id)) {
+							$nicknameSchemaId = $oApp->assignedNickname->schema->id;
+							if (0 === strpos($nicknameSchemaId, 'member.')) {
+								$nicknameSchemaId = explode('.', $nicknameSchemaId);
+								if (!isset($oRec->data->member)) {
+									$oRec->data->member = new \stdClass;
+								}
+								if (!isset($oRec->data->member->{$nicknameSchemaId[1]})) {
+									$oRec->data->member->{$nicknameSchemaId[1]} = $oRec->nickname;
+								}
+							} else {
+								if (!isset($oRec->data->{$nicknameSchemaId})) {
+									$oRec->data->{$nicknameSchemaId} = $oRec->nickname;
+								}
+							}
+						}
+					}
+					/* 根据题目的可见性处理数据 */
+					if (count($visibilitySchemas)) {
+						$fnCheckSchemaVisibility($visibilitySchemas, $oRec->data);
+					}
+				}
+			} else {
+				$oRec->data = new \stdClass;
+			}
+			// 记录的分组
+			if (!empty($oRec->group_id)) {
+				if (!isset($aGroupsById[$oRec->group_id])) {
+					if (!isset($modelGrpRnd)) {
+						$modelGrpRnd = $this->model('matter\group\round');
+					}
+					$oGroup = $modelGrpRnd->byId($oRec->group_id, ['fields' => 'title']);
+					$aGroupsById[$oRec->group_id] = $oGroup;
+				} else {
+					$oGroup = $aGroupsById[$oRec->group_id];
+				}
+				if ($oGroup) {
+					$oRec->group = $oGroup;
+				}
+			}
+			// 记录的登记轮次
+			if (!empty($oRec->rid)) {
+				if (!isset($aRoundsById[$oRec->rid])) {
+					if (!isset($modelRnd)) {
+						$modelRnd = $this->model('matter\enroll\round');
+					}
+					$round = $modelRnd->byId($oRec->rid, ['fields' => 'title']);
+					$aRoundsById[$oRec->rid] = $round;
+				} else {
+					$round = $aRoundsById[$oRec->rid];
+				}
+				if ($round) {
+					$oRec->round = $round;
+				}
+			}
+			// 记录的分数
+			if (isset($oApp->scenario)) {
+				if ($oApp->scenario === 'voting' || $oApp->scenario === 'common') {
+					if (!isset($scoreSchemas)) {
+						$scoreSchemas = $this->_mapOfScoreSchema($oApp);
+						$countScoreSchemas = count(array_keys((array) $scoreSchemas));
+					}
+					$oRec->_score = $this->_calcVotingScore($scoreSchemas, $data);
+					$oRec->_average = $countScoreSchemas === 0 ? 0 : $oRec->_score / $countScoreSchemas;
+				}
+			}
+		}
+
+		return $records;
 	}
 	/**
 	 * 活动登记人名单

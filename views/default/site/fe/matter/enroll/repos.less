@@ -13,10 +13,6 @@ img {
     max-width: 100%
 }
 
-.dropdown-menu {
-    min-width: auto;
-}
-
 .navbar-header {
     .page-title {
         display: inline-block;
@@ -52,6 +48,38 @@ img {
             font-size: 8px;
             vertical-align: middle;
             margin-left: 4px;
+        }
+
+    }
+
+}
+
+.bottom-bar {
+    display: flex;
+    font-size: .9em;
+    color: #777;
+
+    &>*+* {
+        margin-left: 16px;
+
+        .like {
+            color: @brand-primary;
+        }
+
+    }
+
+    &>:first-child {
+        flex: 1;
+    }
+
+    a {
+        text-decoration: none;
+        color: #777;
+    }
+
+    .dropdown {
+        button {
+            border: 0;
         }
 
     }
@@ -116,6 +144,10 @@ img {
 
     }
 
+    &>*+* {
+        margin-left: 4px;
+    }
+
 }
 
 /* record */
@@ -144,6 +176,10 @@ img {
                 flex-grow: 1;
                 text-align: left;
                 font-size: .9em;
+            }
+
+            &>*+* {
+                padding-left: 8px;
             }
 
         }
@@ -177,27 +213,9 @@ img {
 
         }
 
-        .bottom-bar {
-            display: flex;
-            font-size: .9em;
-            color: #777;
-
-            &>*+* {
-                margin-left: 16px;
-
-                .like {
-                    color: @brand-primary;
-                }
-
-            }
-
-            .datetime {
-                flex: 1;
-            }
-
-            a {
-                text-decoration: none;
-                color: #777;
+        .tags {
+            &>button+button {
+                margin-left: 4px;
             }
 
         }
@@ -248,6 +266,28 @@ img {
 
 }
 
+#favorGuide {
+    position: fixed;
+    align-items: center;
+    z-index: 1051;
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    border: 1px solid #bce8f1;
+    background: #d9edf7;
+    padding: 8px 16px;
+    color: #31708f;
+
+    &>:first-child {
+        flex-grow: 1;
+    }
+
+    &>:last-child {
+        margin-left: 4px;
+    }
+
+}
+
 @media screen and (max-width:768px) {
     .site-navbar-default {
         margin-bottom: 0;
@@ -269,7 +309,7 @@ img {
 
     #advCriteria {
         position: absolute;
-        top: 0;
+        top: 34px;
         right: 0;
         margin-top: 1px;
         width: 300px;
