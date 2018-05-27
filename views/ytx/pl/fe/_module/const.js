@@ -4,7 +4,7 @@ constant('CstNaming', {
         doc: {
             'article': '项目资料',
             'link': '链接',
-            'channel': '频道',
+            'channel': '频道'
         },
         docOrder: ['article', 'link', 'channel'],
         app: {
@@ -12,7 +12,7 @@ constant('CstNaming', {
             'signin': '签到',
             'group': '分组',
             'plan': '计划任务',
-            'memberschema': '通讯录',
+            'memberschema': '通讯录'
         },
         appOrder: ['enroll', 'signin', 'group', 'plan', 'memberschema']
     },
@@ -24,8 +24,9 @@ constant('CstNaming', {
             'quiz': '测验',
             'discuss': '萃取记录',
             'score_sheet': '记分表',
+            'mis_user_score': '用户计分表'
         },
-        enrollIndex: ['common', 'registration', 'voting', 'quiz', 'discuss', 'score_sheet'],
+        enrollIndex: ['common', 'registration', 'voting', 'quiz', 'discuss', 'score_sheet', 'mis_user_score'],
         group: {
             'split': '分组',
             'extract': '抓阄'

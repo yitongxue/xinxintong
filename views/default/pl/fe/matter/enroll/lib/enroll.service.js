@@ -398,6 +398,7 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                     http2.get(_fnMakeApiUrl('quitMission'), function(rsp) {
                         delete _oApp.mission;
                         _oApp.mission_id = 0;
+                        _oApp.sync_mission_round = 'N';
                         defer.resolve(rsp.data);
                     });
                     return defer.promise;
@@ -1168,87 +1169,6 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                             defer.resolve();
                         });
                     });
-                });
-                return defer.promise;
-            };
-            _ins.createAppByRecords = function(rows) {
-                var defer = $q.defer();
-                var eks;
-                if (rows) {
-                    eks = [];
-                    for (var p in rows.selected) {
-                        if (rows.selected[p] === true) {
-                            eks.push(_ins._aRecords[p].enroll_key);
-                        }
-                    }
-                    if (eks.length === 0) {
-                        defer.reject();
-                        return defer.promise;
-                    }
-                }
-                $uibModal.open({
-                    templateUrl: '/views/default/pl/fe/matter/enroll/component/createAppByRecords.html?_=5',
-                    controller: ['$scope', '$uibModalInstance', function($scope2, $mi) {
-                        var canUseSchemas = {},
-                            config;
-                        _ins._oApp.dataSchemas.forEach(function(schema) {
-                            if (/shorttext|longtext/.test(schema.type)) {
-                                canUseSchemas[schema.id] = schema;
-                            }
-                        });
-                        $scope2.schemas = canUseSchemas;
-                        $scope2.config = config = { protoSchema: { type: 'score', range: [1, 5] } };
-                        $scope2.ok = function() {
-                            var schemas = [];
-                            for (var id in config.schemas) {
-                                if (config.schemas[id]) {
-                                    schemas.push(canUseSchemas[id]);
-                                }
-                            }
-                            $mi.close({ schemas: schemas, protoSchema: config.protoSchema });
-                        };
-                        $scope2.cancel = function() {
-                            $mi.dismiss('cancel');
-                        };
-                        $scope2.changeSchemaType = function() {
-                            switch (config.protoSchema.type) {
-                                case 'score':
-                                    config.protoSchema = { type: 'score', range: [1, 5] };
-                                    break;
-                                case 'single':
-                                    config.protoSchema = { type: 'single' };
-                                    break;
-                                case 'multiple':
-                                    config.protoSchema = { type: 'multiple' };
-                                    break;
-                            }
-                        };
-                    }],
-                    backdrop: 'static',
-                }).result.then(function(config) {
-                    if (config.schemas.length) {
-                        var url = '/rest/pl/fe/matter/enroll/createByRecords?site=' + _siteId + '&app=' + _appId;
-                        if (_ins._oApp.mission_id) {
-                            url += '&mission=' + _ins._oApp.mission_id;
-                        }
-                        http2.post(url, {
-                            proto: {
-                                scenario: 'voting',
-                                schema: {
-                                    type: config.protoSchema.type,
-                                    range: config.protoSchema.range,
-                                    unique: 'N',
-                                    _ver: 1
-                                }
-                            },
-                            record: {
-                                schemas: config.schemas,
-                                eks: eks
-                            }
-                        }, function(rsp) {
-                            defer.resolve(rsp.data);
-                        });
-                    }
                 });
                 return defer.promise;
             };
@@ -2101,21 +2021,21 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
             $mi.dismiss('cancel');
         };
         $scope.doSearchRound = function() {
-            srvEnlRnd.list().then(function(result) {
+            srvEnlRnd.list().then(function(oResult) {
                 var oCriteria = $scope.criteria;
-                $scope.activeRound = result.active;
+                $scope.activeRound = oResult.active;
                 if ($scope.activeRound) {
                     var otherRounds = [];
-                    result.rounds.forEach(function(oRound) {
+                    oResult.rounds.forEach(function(oRound) {
                         if (oRound.rid !== $scope.activeRound.rid) {
                             otherRounds.push(oRound);
                         }
                     });
                     $scope.rounds = otherRounds;
                 } else {
-                    $scope.rounds = result.rounds;
+                    $scope.rounds = oResult.rounds;
                 }
-                $scope.pageOfRound = result.page;
+                $scope.pageOfRound = oResult.page;
                 if (!oCriteria.record) {
                     oCriteria.record = { rid: [] };
                 }

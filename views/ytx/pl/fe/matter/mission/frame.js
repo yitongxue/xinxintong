@@ -1,7 +1,7 @@
 define(['missionService', 'enrollService', 'signinService'], function() {
     'use strict';
     var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'tinymce.ui.xxt', 'schema.ui.xxt', 'pl.const', 'service.matter', 'service.mission', 'service.enroll', 'service.signin']);
-    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvMissionProvider', 'srvQuickEntryProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvMissionProvider, srvQuickEntryProvider, srvTagProvider) {
+    ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvMissionProvider', 'srvMissionRoundProvider', 'srvQuickEntryProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvMissionProvider, srvMissionRoundProvider, srvQuickEntryProvider, srvTagProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/mission/';
             this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
@@ -24,6 +24,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             .when('/rest/pl/fe/matter/mission/main', new RouteParam('main', '/views/ytx/pl/fe/matter/mission/'))
             .when('/rest/pl/fe/matter/mission/entry', new RouteParam('entry'))
             .when('/rest/pl/fe/matter/mission/coworker', new RouteParam('coworker'))
+            .when('/rest/pl/fe/matter/mission/time', new RouteParam('time'))
             .when('/rest/pl/fe/matter/mission/app', new RouteParam('app'))
             .when('/rest/pl/fe/matter/mission/doc', new RouteParam('doc'))
             .when('/rest/pl/fe/matter/mission/mschema', new RouteParam('mschema'))
@@ -49,6 +50,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             srvTagProvider.config(siteId);
             srvQuickEntryProvider.setSiteId(siteId);
             srvMissionProvider.config(siteId, missionId);
+            srvMissionRoundProvider.config(siteId, missionId);
         })();
     }]);
     ngApp.controller('ctrlFrame', ['$scope', '$location', 'CstNaming', 'srvSite', 'srvMission', function($scope, $location, CstNaming, srvSite, srvMission) {
@@ -84,6 +86,7 @@ define(['missionService', 'enrollService', 'signinService'], function() {
             switch ($scope.subView) {
                 case 'main':
                 case 'coworker':
+                case 'time':
                     $scope.opened = 'rule';
                     break;
                 case 'app':
