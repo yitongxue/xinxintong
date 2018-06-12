@@ -25,6 +25,15 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
         },
         naming: {}
     });
+    ngApp.filter('filterTime', function() {
+        return function(e) {
+            var result, h, m, s, time = e * 1;
+            h = Math.floor(time / 3600);
+            m = Math.floor((time / 60 % 6));
+            s = Math.floor((time % 60));
+            return result = h + ":" + m + ":" + s;
+        }
+    });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvEnrollAppProvider', 'srvEnrollRoundProvider', 'srvEnrollPageProvider', 'srvEnrollRecordProvider', 'srvTagProvider', 'srvEnrollLogProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvEnrollAppProvider, srvEnrollRoundProvider, srvEnrollPageProvider, srvEnrollRecordProvider, srvTagProvider, srvEnrollLogProvider) {
         var RouteParam = function(name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/enroll/';
