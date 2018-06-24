@@ -215,9 +215,7 @@ define(['frame'], function(ngApp) {
                     bRequireScore = true;
                 }
                 if (oSchema.format && oSchema.format === 'number') {
-                    recordSchemasExt.push({ type: 'calcScore', title: '得分', id: oSchema.id });
                     bRequireSum = true;
-                    bRequireScore = true;
                 }
             });
 
