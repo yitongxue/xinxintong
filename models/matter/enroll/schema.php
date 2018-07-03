@@ -57,12 +57,16 @@ class schema_model extends \TMS_MODEL {
 			switch ($oSchema->type) {
 			case 'multiple':
 				if (!empty($oSchema->answer)) {
-					$answers = $oSchema->answer;
-					$allOptionValues = [];
-					foreach ($oSchema->ops as $op) {
-						$allOptionValues[] = $op->v;
+					if (is_array($oSchema->answer)) {
+						$answers = $oSchema->answer;
+						$allOptionValues = [];
+						foreach ($oSchema->ops as $op) {
+							$allOptionValues[] = $op->v;
+						}
+						$oSchema->answer = array_intersect($answers, $allOptionValues);
+					} else {
+						$oSchema->answer = [];
 					}
-					$oSchema->answer = array_intersect($answers, $allOptionValues);
 				}
 				break;
 			case 'single':
