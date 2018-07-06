@@ -722,18 +722,16 @@ class record_model extends \matter\enroll\record_base {
 			$oUsers2[$oUser->id] = $oUser->userid;
 		}
 		$aAbsentUsrs = [];
-		if (isset($oApp->entryRule->scope->member) && $oApp->entryRule->scope->member === 'Y') {
-			if ($oApp->entryRule->scope === 'member' && isset($oApp->entryRule->member)) {
-				$modelMem = $this->model('site\user\member');
-				foreach ($oApp->entryRule->member as $mschemaId => $rule) {
-					$members = $modelMem->byMschema($mschemaId);
-					foreach ($members as $oMember) {
-						if (false === in_array($oMember->userid, $oUsers2)) {
-							$oUser = new \stdClass;
-							$oUser->userid = $oMember->userid;
-							$oUser->nickname = $oMember->name;
-							$aAbsentUsrs[] = $oUser;
-						}
+		if (isset($oApp->entryRule->scope->member) && $oApp->entryRule->scope->member === 'Y' && !empty($oApp->entryRule->member)) {
+			$modelMem = $this->model('site\user\member');
+			foreach ($oApp->entryRule->member as $mschemaId => $rule) {
+				$members = $modelMem->byMschema($mschemaId);
+				foreach ($members as $oMember) {
+					if (false === in_array($oMember->userid, $oUsers2)) {
+						$oUser = new \stdClass;
+						$oUser->userid = $oMember->userid;
+						$oUser->nickname = $oMember->name;
+						$aAbsentUsrs[] = $oUser;
 					}
 				}
 			}
