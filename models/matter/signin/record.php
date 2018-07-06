@@ -741,20 +741,7 @@ class record_model extends \matter\enroll\record_base {
 			}
 		}
 		$aAllUsrs = [];
-		if (isset($oApp->entryRule->scope->member) && $oApp->entryRule->scope->member === 'Y' && !empty($oApp->entryRule->member)) {
-			$modelMem = $this->model('site\user\member');
-			foreach ($oApp->entryRule->member as $mschemaId => $rule) {
-				$members = $modelMem->byMschema($mschemaId);
-				foreach ($members as $oMember) {
-					if (false === in_array($oMember->userid, $oSigninedUsers)) {
-						$oUser = new \stdClass;
-						$oUser->userid = $oMember->userid;
-						$oUser->nickname = $oMember->name;
-						$aAllUsrs[] = $oUser;
-					}
-				}
-			}
-		} else if (!empty($oApp->group_app_id)) {
+		if (!empty($oApp->group_app_id)) {
 			$modelGrpUsr = $this->model('matter\group\player');
 			$aGrpUsrs = $modelGrpUsr->byApp($oApp->group_app_id, ['fields' => 'userid,nickname,wx_openid,yx_openid,qy_openid,is_leader,round_id,round_title']);
 			foreach ($aGrpUsrs->players as $oGrpUsr) {
@@ -769,6 +756,19 @@ class record_model extends \matter\enroll\record_base {
 				foreach ($result->records as $oRec) {
 					if (false === in_array($oRec->userid, $oSigninedUsers)) {
 						$aAllUsrs[] = $oRec;
+					}
+				}
+			}
+		} else if (isset($oApp->entryRule->scope->member) && $oApp->entryRule->scope->member === 'Y' && !empty($oApp->entryRule->member)) {
+			$modelMem = $this->model('site\user\member');
+			foreach ($oApp->entryRule->member as $mschemaId => $rule) {
+				$members = $modelMem->byMschema($mschemaId);
+				foreach ($members as $oMember) {
+					if (false === in_array($oMember->userid, $oSigninedUsers)) {
+						$oUser = new \stdClass;
+						$oUser->userid = $oMember->userid;
+						$oUser->nickname = $oMember->name;
+						$aAllUsrs[] = $oUser;
 					}
 				}
 			}
