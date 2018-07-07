@@ -1338,10 +1338,11 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                             }
                         };
                         $scope2.result = oResult = {
+                            votingSchemas: [],
                             limit: { scope: 'top', num: 3 }
                         };
                         $scope2.votingSchemas = [];
-                        oApp.dataSchemas.forEach(function(oSchema) {
+                        oApp.dynaDataSchemas.forEach(function(oSchema) {
                             if (/single|multiple/.test(oSchema.type)) {
                                 $scope2.votingSchemas.push(angular.copy(oSchema));
                             }
@@ -1350,7 +1351,6 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                         $scope2.selectApp = function() {
                             oResult.questionSchemas = [];
                             oResult.answerSchemas = [];
-                            oResult.votingSchemas = [];
                             if (angular.isString(oResult.fromApp.data_schemas) && oResult.fromApp.data_schemas) {
                                 oResult.fromApp.dataSchemas = JSON.parse(oResult.fromApp.data_schemas);
                                 oResult.fromApp.dataSchemas.forEach(function(oSchema) {
@@ -1392,9 +1392,18 @@ define(['require', 'schema', 'page'], function(require, schemaLib, pageLib) {
                                 oPage.total = rsp.data.total;
                             });
                         };
+                        $scope2.disabled = true; // 选择的参数是否完整
+                        $scope2.$watch('result', function() {
+                            $scope2.disabled = false;
+                            if (!oResult.votingSchemas || oResult.votingSchemas.length === 0) $scope2.disabled = true;
+                            if (!oResult.fromApp) $scope2.disabled = true;
+                            if (!oResult.answerSchema) $scope2.disabled = true;
+                            if (!oResult.questionSchema) $scope2.disabled = true;
+                        }, true);
                         $scope2.doSearch();
                     }],
                     backdrop: 'static',
+                    windowClass: 'auto-height',
                     size: 'lg'
                 }).result.then(function(oResult) {
                     var url;

@@ -46,10 +46,13 @@ class schema_model extends \TMS_MODEL {
 	 * 支持的类型
 	 * type
 	 * title
+	 * dsSchema 题目定义的来源
+	 * dynamic 是否为动态生成的题目
+	 * prototype 动态题目的原始定义
 	 * dsOps 动态选项来源
 	 */
 	public function purify($aAppSchemas) {
-		$validProps = ['id', 'type', 'title', 'content', 'description', 'format', 'limitChoice', 'range', 'required', 'unique', 'remarkable', 'shareable', 'supplement', 'history', 'count', 'requireScore', 'scoreMode', 'score', 'answer', 'weight', 'fromApp', 'requireCheck', 'ds', 'dsOps', 'showOpNickname', 'showOpDsLink', 'dsSchemas', 'visibility', 'cowork', 'filterWhiteSpace', 'ops'];
+		$validProps = ['id', 'type', 'title', 'content', 'description', 'format', 'limitChoice', 'range', 'required', 'unique', 'remarkable', 'shareable', 'supplement', 'history', 'count', 'requireScore', 'scoreMode', 'score', 'answer', 'weight', 'fromApp', 'requireCheck', 'ds', 'dsOps', 'showOpNickname', 'showOpDsLink', 'dsSchema', 'visibility', 'cowork', 'filterWhiteSpace', 'ops'];
 
 		$purified = [];
 		foreach ($aAppSchemas as $oSchema) {
@@ -153,7 +156,7 @@ class schema_model extends \TMS_MODEL {
 						$oNewOp = new \stdClass;
 						$oNewOp->v = 'v' . ($index + 1);
 						$oNewOp->l = $oRecData->value;
-						$oNewOp->ds = (object) ['ek' => $oRecData->enroll_key, 'user' => $oRecData->userid, 'nickname' => $oRecData->nickname];
+						$oNewOp->ds = (object) ['ek' => $oRecData->enroll_key, 'user' => $oRecData->userid, 'nickname' => $oRecData->nickname, 'schema_id' => $oSchema->dsOps->schema->id];
 						$oSchema->ops[] = $oNewOp;
 					}
 				}
@@ -183,21 +186,21 @@ class schema_model extends \TMS_MODEL {
 			$q = [
 				'id,enroll_key,value,userid,nickname',
 				"xxt_enroll_record_data t0",
-				['state' => 1, 'aid' => $oSchema->dsSchemas->app->id, 'schema_id' => $oSchema->dsSchemas->schema->id],
+				['state' => 1, 'aid' => $oSchema->dsSchema->app->id, 'schema_id' => $oSchema->dsSchema->schema->id],
 			];
 			/* 设置轮次条件 */
 			if (!empty($oDsAppRnd)) {
 				$q[2]['rid'] = $oDsAppRnd->rid;
 			}
 			/* 设置过滤条件 */
-			if (!empty($oSchema->dsSchemas->filters)) {
-				foreach ($oSchema->dsSchemas->filters as $index => $oFilter) {
+			if (!empty($oSchema->dsSchema->filters)) {
+				foreach ($oSchema->dsSchema->filters as $index => $oFilter) {
 					if (!empty($oFilter->schema->id) && !empty($oFilter->schema->type)) {
 						switch ($oFilter->schema->type) {
 						case 'single':
 							if (!empty($oFilter->schema->op->v)) {
 								$tbl = 't' . ($index + 1);
-								$sql = "select 1 from xxt_enroll_record_data {$tbl} where state=1 and aid='{$oSchema->dsSchemas->app->id}'and schema_id='{$oFilter->schema->id}' and value='{$oFilter->schema->op->v}' and t0.enroll_key={$tbl}.enroll_key";
+								$sql = "select 1 from xxt_enroll_record_data {$tbl} where state=1 and aid='{$oSchema->dsSchema->app->id}'and schema_id='{$oFilter->schema->id}' and value='{$oFilter->schema->op->v}' and t0.enroll_key={$tbl}.enroll_key";
 								$q[2]['enroll_key'] = (object) ['op' => 'exists', 'pat' => $sql];
 							}
 							break;
@@ -223,7 +226,7 @@ class schema_model extends \TMS_MODEL {
 		/* 根据打分题获得的分数生成题目 */
 		$fnMakeDynaSchemaByScore = function ($oSchema, $oDsAppRnd, $schemaIndex, &$dynaSchemasByIndex) use ($oApp) {
 			$modelEnl = $this->model('matter\enroll');
-			$oTargetApp = $modelEnl->byId($oSchema->dsSchemas->app->id, ['fields' => 'siteid,state,mission_id,data_schemas,sync_mission_round']);
+			$oTargetApp = $modelEnl->byId($oSchema->dsSchema->app->id, ['fields' => 'siteid,state,mission_id,data_schemas,sync_mission_round']);
 			if (false === $oTargetApp || $oTargetApp->state !== '1') {
 				return [false, '指定的目标活动不可用'];
 			}
@@ -236,7 +239,7 @@ class schema_model extends \TMS_MODEL {
 				if (empty($oSchema2->dynamic) || $oSchema2->dynamic !== 'Y' || empty($oSchema2->prototype->schema->id)) {
 					continue;
 				}
-				if ($oSchema->dsSchemas->schema->id === $oSchema2->prototype->schema->id) {
+				if ($oSchema->dsSchema->schema->id === $oSchema2->prototype->schema->id) {
 					$targetSchemas[$oSchema2->id] = $oSchema2;
 				}
 			}
@@ -278,7 +281,7 @@ class schema_model extends \TMS_MODEL {
 		$fnMakeDynaSchemaByOption = function ($oSchema, $oDsAppRnd, $schemaIndex, &$dynaSchemasByIndex) use ($oApp) {
 			$modelEnl = $this->model('matter\enroll');
 
-			$oTargetApp = $modelEnl->byId($oSchema->dsSchemas->app->id, ['fields' => 'siteid,state,mission_id,data_schemas,sync_mission_round']);
+			$oTargetApp = $modelEnl->byId($oSchema->dsSchema->app->id, ['fields' => 'siteid,state,mission_id,data_schemas,sync_mission_round']);
 			if (false === $oTargetApp || $oTargetApp->state !== '1') {
 				return [false, '指定的目标活动不可用'];
 			}
@@ -288,7 +291,7 @@ class schema_model extends \TMS_MODEL {
 
 			$targetSchemas = []; // 目标应用中选择的题目
 			foreach ($oTargetApp->dataSchemas as $oSchema2) {
-				if ($oSchema->dsSchemas->schema->id === $oSchema2->id) {
+				if ($oSchema->dsSchema->schema->id === $oSchema2->id) {
 					$targetSchemas[] = $oSchema2;
 					break;
 				}
@@ -335,14 +338,23 @@ class schema_model extends \TMS_MODEL {
 					break;
 				}
 			}
+			/* 原型题目中设置了动态选项 */
 			if (isset($oSchema->dsOps->app->id)) {
-				$oApp3 = $modelEnl->byId($oSchema->dsOps->app->id, ['cascaded' => 'N']);
-				foreach ($newSchemas as $oNewDynaSchema1) {
-					if (isset($oNewDynaSchema1->ds->ek) && isset($oNewDynaSchema1->dsOps->schema)) {
-						foreach ($oApp3->dynaDataSchemas as $oDynaSchema2) {
-							if (isset($oDynaSchema2->ds->ek) && $oDynaSchema2->ds->ek === $oNewDynaSchema1->ds->ek) {
-								$oNewDynaSchema1->dsOps->schema->id = $oDynaSchema2->id;
-								$oNewDynaSchema1->dsOps->schema->title = $oDynaSchema2->title;
+				$oDynaOptionsApp = $modelEnl->byId($oSchema->dsOps->app->id, ['cascaded' => 'N']);
+				if ($oDynaOptionsApp && $oDynaOptionsApp->state === '1') {
+					foreach ($newSchemas as $oNewDynaSchema) {
+						if (isset($oNewDynaSchema->dsOps)) {
+							foreach ($oDynaOptionsApp->dynaDataSchemas as $oDynaOptionSchema) {
+								if ($oNewDynaSchema->id === $oDynaOptionSchema->id) {
+									/* 修改为新的动态选项源 */
+									$oNewDsOps = new \stdClass;
+									$oNewDsOps->app = $oNewDynaSchema->dsOps->app; // 指向的应用不改变
+									$oNewDsOps->schema = new \stdClass; // 指向的题目变为应用中的动态题目
+									$oNewDsOps->schema->id = $oDynaOptionSchema->id;
+									$oNewDsOps->schema->title = $oDynaOptionSchema->title;
+									$oNewDynaSchema->dsOps = $oNewDsOps;
+									break;
+								}
 							}
 						}
 					}
@@ -353,8 +365,8 @@ class schema_model extends \TMS_MODEL {
 
 		$dynaSchemasByIndex = []; // 动态创建的题目
 		foreach ($oApp->dataSchemas as $schemaIndex => $oSchema) {
-			if (!empty($oSchema->dsSchemas->mode) && !empty($oSchema->dsSchemas->app->id) && !empty($oSchema->dsSchemas->schema->id)) {
-				$oDsSchemas = $oSchema->dsSchemas;
+			if (!empty($oSchema->dsSchema->mode) && !empty($oSchema->dsSchema->app->id) && !empty($oSchema->dsSchema->schema->id)) {
+				$oDsSchemas = $oSchema->dsSchema;
 				if (!empty($oAppRound->mission_rid)) {
 					if (!isset($modelRnd)) {
 						$modelRnd = $this->model('matter\enroll\round');
@@ -402,6 +414,7 @@ class schema_model extends \TMS_MODEL {
 		for ($i = 0; $i < $limitNum; $i++) {
 			$oOption = $votingOptions[$i];
 			if (isset($originalOptionsByValue[$oOption->v])) {
+				$oOriginalOption = $originalOptionsByValue[$oOption->v];
 				if (empty($oProtoSchema)) {
 					$oNewSchema = new \stdClass;
 					$oNewSchema->type = 'longtext';
@@ -410,9 +423,13 @@ class schema_model extends \TMS_MODEL {
 				}
 				$oNewSchema->id = $oTargetSchema->id . $oOption->v;
 				$oNewSchema->title = $oOption->l;
-				if (isset($originalOptionsByValue[$oOption->v]->ds)) {
-					$oNewSchema->ds = $originalOptionsByValue[$oOption->v]->ds;
+				/* 题目定义的来源 */
+				if (!isset($oNewSchema->dsSchema)) {
+					$oNewSchema->dsSchema = new \stdClass;
 				}
+				$oNewSchema->dsSchema->op = clone $oOriginalOption;
+				$oNewSchema->dsSchema->op->schema_id = $oTargetSchema->id;
+
 				$newSchemas[] = $oNewSchema;
 			}
 		}
@@ -439,6 +456,7 @@ class schema_model extends \TMS_MODEL {
 				$oNewSchema->type = 'longtext';
 				if (isset($originalOptionsByValue[$oOption->v]->ds)) {
 					$oNewSchema->ds = $originalOptionsByValue[$oOption->v]->ds;
+					//$oNewSchema->ds->schema_id = $oTargetSchema->dsOps->schema->id;
 				}
 				$newSchemas[] = $oNewSchema;
 			}
