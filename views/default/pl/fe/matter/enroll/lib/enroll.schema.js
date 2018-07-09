@@ -569,6 +569,13 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                             }
                                         });
                                         break;
+                                    case 'inputByOption':
+                                        dataSchemas.forEach(function(oSchema) {
+                                            if (/single|multiple/.test(oSchema.type)) {
+                                                $scope2.dataSchemas.push(oSchema);
+                                            }
+                                        });
+                                        break;
                                 }
                             }
                         };
@@ -609,10 +616,14 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                             if (oNew.purpose !== oOld.purpose) {
                                 $scope2.selectApp();
                             }
-                            if (oResult.purpose === 'optionByInput') {
-                                if (!oResult.target || !oResult.target.type) {
-                                    $scope2.disabled = true;
-                                }
+                            switch (oResult.purpose) {
+                                case 'optionByInput':
+                                    if (!oResult.target || !oResult.target.type) {
+                                        $scope2.disabled = true;
+                                    }
+                                    break;
+                                case 'inputByOption':
+                                    break;
                             }
                         }, true);
                         $scope2.doSearch();
@@ -655,6 +666,9 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                         oNewSchema.dsOps = {
                                             app: { id: oResult.fromApp.id, title: oResult.fromApp.title },
                                             schema: { id: oProtoSchema.id, title: oProtoSchema.title },
+                                        };
+                                        if (oProtoSchema.dsSchema) {
+                                            oNewSchema.dsSchema = oProtoSchema.dsSchema;
                                         }
                                         if (oNewSchema.type === 'multiple') {
                                             if (oResult.limitChoice && oResult.limitChoice === 'Y') {
@@ -669,6 +683,19 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                         return oNewSchema;
                                     };
                                 }
+                                break;
+                            case 'inputByOption':
+                                fnGenNewSchema = function(oProtoSchema) {
+                                    var oNewSchema;
+                                    oNewSchema = schemaLib.newSchema('longtext', _oApp);
+                                    oNewSchema.title = oProtoSchema.title;
+                                    oNewSchema.dsSchema = {
+                                        app: { id: oResult.fromApp.id, title: oResult.fromApp.title },
+                                        schema: { id: oProtoSchema.id, title: oProtoSchema.title, type: oProtoSchema.type },
+                                        mode: 'fromOption'
+                                    }
+                                    return oNewSchema;
+                                };
                                 break;
                         }
                         if (fnGenNewSchema) {
@@ -742,6 +769,7 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                         $scope2.doSearch();
                     }],
                     backdrop: 'static',
+                    windowClass: 'auto-height',
                     size: 'lg'
                 }).result.then(function(oResult) {
                     var targetSchemas, url, oConfig;
@@ -1300,6 +1328,7 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                 return 'page=' + this.at + '&size=' + this.size;
                             }
                         };
+                        $scope2.schema = oSchema;
                         $scope2.result = oResult = {};
                         $scope2.appFilter = oAppFilter = {};
                         $scope2.dsSchemas = [];
@@ -1332,14 +1361,18 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                         $scope2.ok = function() {
                             var fromApp;
                             if ((fromApp = oResult.fromApp) && oResult.selected !== undefined) {
-                                $mi.close({ app: { id: fromApp.id, title: fromApp.title }, schema: $scope2.dsSchemas[parseInt(oResult.selected)], filters: oResult.filters });
+                                $mi.close({ action: 'ok', app: { id: fromApp.id, title: fromApp.title }, schema: $scope2.dsSchemas[parseInt(oResult.selected)], filters: oResult.filters });
                             } else {
                                 $mi.dismiss();
                             }
                         };
+                        $scope2.clean = function() {
+                            $mi.close({ action: 'clean' });
+                        };
                         $scope2.cancel = function() {
                             $mi.dismiss();
                         };
+
                         $scope2.doSearch = function(pageAt) {
                             var url = '/rest/pl/fe/matter/enroll/list?site=' + _oApp.siteid + '&' + oPage.j();
                             if (_oApp.mission) {
@@ -1357,42 +1390,58 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                 oPage.total = rsp.data.total;
                             });
                         };
+                        $scope2.disabled = true;
+                        $scope2.$watch('result', function() {
+                            $scope2.disabled = false;
+                            if (!oResult.selected) $scope2.disabled = true;
+                        }, true);
                         $scope2.doSearch();
                     }],
                     backdrop: 'static',
                     windowClass: 'auto-height',
                     size: 'lg'
                 }).result.then(function(oResult) {
-                    if (oResult.app && oResult.schema) {
-                        oSchema.dsOps = {
-                            app: { id: oResult.app.id, title: oResult.app.title },
-                            schema: { id: oResult.schema.id, title: oResult.schema.title },
-                        }
-                        if (oResult.filters && oResult.filters.length) {
-                            oSchema.dsOps.filters = [];
-                            oResult.filters.forEach(function(oFilter) {
-                                var oNewFilter;
-                                if (oFilter.schema && oFilter.op) {
-                                    oNewFilter = {
-                                        schema: {
-                                            id: oFilter.schema.id,
-                                            type: oFilter.schema.type,
-                                            op: { v: oFilter.op.v, l: oFilter.op.l }
-                                        }
-                                    };
-                                    oSchema.dsOps.filters.push(oNewFilter);
+                    switch (oResult.action) {
+                        case 'ok':
+                            if (oResult.app && oResult.schema) {
+                                oSchema.dsOps = {
+                                    app: { id: oResult.app.id, title: oResult.app.title },
+                                    schema: { id: oResult.schema.id, title: oResult.schema.title },
                                 }
-                            });
-                        }
-                        $scope.updSchema(oSchema);
+                                if (oResult.filters && oResult.filters.length) {
+                                    oSchema.dsOps.filters = [];
+                                    oResult.filters.forEach(function(oFilter) {
+                                        var oNewFilter;
+                                        if (oFilter.schema && oFilter.op) {
+                                            oNewFilter = {
+                                                schema: {
+                                                    id: oFilter.schema.id,
+                                                    type: oFilter.schema.type,
+                                                    op: { v: oFilter.op.v, l: oFilter.op.l }
+                                                }
+                                            };
+                                            oSchema.dsOps.filters.push(oNewFilter);
+                                        }
+                                    });
+                                }
+                                $scope.updSchema(oSchema);
+                            }
+                            break;
+                        case 'clean':
+                            delete oSchema.dsOps;
+                            $scope.updSchema(oSchema);
+                            break;
                     }
-                });;
+                });
             };
+            /**
+             * 动态题目设置
+             */
             $scope.setSchemaSource = function(oSchema) {
                 var _oApp;
                 _oApp = $scope.app;
                 $uibModal.open({
-                    templateUrl: '/views/default/pl/fe/matter/enroll/component/setSchemaSource.html?_=1',
+                    templateUrl: '/views/default/pl/fe/matter/enroll/component/schema/setSchemaSource.html?_=1',
                     controller: ['$scope', '$uibModalInstance', function($scope2, $mi) {
                         var oPage, oResult, oAppFilter;
                         $scope2.page = oPage = {
@@ -1402,6 +1451,7 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                 return 'page=' + this.at + '&size=' + this.size;
                             }
                         };
+                        $scope2.schema = oSchema;
                         $scope2.result = oResult = {
                             mode: 'fromData'
                         };
@@ -1461,6 +1511,7 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                             var fromApp;
                             if ((fromApp = oResult.fromApp) && oResult.selected !== undefined) {
                                 $mi.close({
+                                    action: 'ok',
                                     mode: oResult.mode,
                                     app: { id: fromApp.id, title: fromApp.title },
                                     schema: $scope2.dsSchemas[parseInt(oResult.selected)],
@@ -1469,6 +1520,9 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                             } else {
                                 $mi.dismiss();
                             }
+                        };
+                        $scope2.clean = function() {
+                            $mi.close({ action: 'clean' });
                         };
                         $scope2.cancel = function() {
                             $mi.dismiss();
@@ -1490,42 +1544,53 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                 oPage.total = rsp.data.total;
                             });
                         };
-                        $scope2.doSearch();
+                        $scope2.disabled = true;
                         $scope2.$watch('result', function(oNew, oOld) {
+                            $scope2.disabled = false;
+                            if (!oResult.selected) $scope2.disabled = true;
                             if (oNew && oOld) {
                                 if (oNew.mode !== oOld.mode) {
                                     $scope2.selectApp();
                                 }
                             }
                         }, true);
+                        $scope2.doSearch();
                     }],
                     backdrop: 'static',
                     windowClass: 'auto-height',
                     size: 'lg'
                 }).result.then(function(oResult) {
-                    if (oResult.app && oResult.schema) {
-                        oSchema.dsSchema = {
-                            app: { id: oResult.app.id, title: oResult.app.title },
-                            schema: { id: oResult.schema.id, title: oResult.schema.title, type: oResult.schema.type },
-                            mode: oResult.mode
-                        }
-                        if (oResult.filters && oResult.filters.length) {
-                            oSchema.dsSchema.filters = [];
-                            oResult.filters.forEach(function(oFilter) {
-                                var oNewFilter;
-                                if (oFilter.schema && oFilter.op) {
-                                    oNewFilter = {
-                                        schema: {
-                                            id: oFilter.schema.id,
-                                            type: oFilter.schema.type,
-                                            op: { v: oFilter.op.v, l: oFilter.op.l }
-                                        }
-                                    };
-                                    oSchema.dsSchema.filters.push(oNewFilter);
+                    switch (oResult.action) {
+                        case 'ok':
+                            if (oResult.app && oResult.schema) {
+                                oSchema.dsSchema = {
+                                    app: { id: oResult.app.id, title: oResult.app.title },
+                                    schema: { id: oResult.schema.id, title: oResult.schema.title, type: oResult.schema.type },
+                                    mode: oResult.mode
                                 }
-                            });
-                        }
-                        $scope.updSchema(oSchema);
+                                if (oResult.filters && oResult.filters.length) {
+                                    oSchema.dsSchema.filters = [];
+                                    oResult.filters.forEach(function(oFilter) {
+                                        var oNewFilter;
+                                        if (oFilter.schema && oFilter.op) {
+                                            oNewFilter = {
+                                                schema: {
+                                                    id: oFilter.schema.id,
+                                                    type: oFilter.schema.type,
+                                                    op: { v: oFilter.op.v, l: oFilter.op.l }
+                                                }
+                                            };
+                                            oSchema.dsSchema.filters.push(oNewFilter);
+                                        }
+                                    });
+                                }
+                                $scope.updSchema(oSchema);
+                            }
+                            break;
+                        case 'clean':
+                            delete oSchema.dsSchema;
+                            $scope.updSchema(oSchema);
+                            break;
                     }
                 });;
             };

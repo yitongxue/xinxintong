@@ -301,7 +301,7 @@ class schema_model extends \TMS_MODEL {
 			}
 
 			$targetSchemas = []; // 目标应用中选择的题目
-			foreach ($oTargetApp->dataSchemas as $oSchema2) {
+			foreach ($oTargetApp->dynaDataSchemas as $oSchema2) {
 				if ($oSchema->dsSchema->schema->id === $oSchema2->id) {
 					$targetSchemas[] = $oSchema2;
 					break;
@@ -377,17 +377,17 @@ class schema_model extends \TMS_MODEL {
 						$modelRnd = $this->model('matter\enroll\round');
 					}
 					$oDsAppRnd = $modelRnd->byMissionRid($oDsSchemas->app, $oAppRound->mission_rid, ['fields' => 'rid,mission_rid']);
-				}
-				switch ($oDsSchemas->mode) {
-				case 'fromData':
-					$fnMakeDynaSchemaByData($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
-					break;
-				case 'fromScore':
-					$fnMakeDynaSchemaByScore($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
-					break;
-				case 'fromOption':
-					$fnMakeDynaSchemaByOption($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
-					break;
+					switch ($oDsSchemas->mode) {
+					case 'fromData':
+						$fnMakeDynaSchemaByData($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
+						break;
+					case 'fromScore':
+						$fnMakeDynaSchemaByScore($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
+						break;
+					case 'fromOption':
+						$fnMakeDynaSchemaByOption($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
+						break;
+					}
 				}
 			}
 		}
