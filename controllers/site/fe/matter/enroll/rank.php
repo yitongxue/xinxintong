@@ -43,37 +43,37 @@ class rank extends base {
 		case 'enroll':
 			$q[0] .= ',sum(u.enroll_num) enroll_num';
 			$q[2] .= ' and u.enroll_num>0';
-			$q2 = ['o' => 'u.enroll_num desc'];
+			$q2 = ['o' => 'enroll_num desc'];
 			break;
 		case 'remark':
 			$q[0] .= ',sum(u.remark_num) remark_num';
 			$q[2] .= ' and u.remark_num>0';
-			$q2 = ['o' => 'u.remark_num desc'];
+			$q2 = ['o' => 'remark_num desc'];
 			break;
 		case 'like':
 			$q[0] .= ',sum(u.like_num) like_num';
 			$q[2] .= ' and u.like_num>0';
-			$q2 = ['o' => 'u.like_num desc'];
+			$q2 = ['o' => 'like_num desc'];
 			break;
 		case 'remark_other':
 			$q[0] .= ',sum(u.do_remark_num) do_remark_num';
 			$q[2] .= ' and u.do_remark_num>0';
-			$q2 = ['o' => 'u.do_remark_num desc'];
+			$q2 = ['o' => 'do_remark_num desc'];
 			break;
 		case 'like_other':
 			$q[0] .= ',sum(u.do_like_num) do_like_num';
 			$q[2] .= ' and u.do_like_num>0';
-			$q2 = ['o' => 'u.do_like_num desc'];
+			$q2 = ['o' => 'do_like_num desc'];
 			break;
 		case 'total_coin':
 			$q[0] .= ',sum(u.user_total_coin) user_total_coin';
 			$q[2] .= ' and u.user_total_coin>0';
-			$q2 = ['o' => 'u.user_total_coin desc'];
+			$q2 = ['o' => 'user_total_coin desc'];
 			break;
 		case 'score':
 			$q[0] .= ',sum(u.score) score';
 			$q[2] .= ' and u.score>0';
-			$q2 = ['o' => 'u.score desc'];
+			$q2 = ['o' => 'score desc'];
 			break;
 		}
 		$q2['r'] = ['o' => ($page - 1) * $size, 'l' => $size];
