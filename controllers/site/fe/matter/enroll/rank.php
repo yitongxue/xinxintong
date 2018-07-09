@@ -77,6 +77,7 @@ class rank extends base {
 			break;
 		}
 		$q2['r'] = ['o' => ($page - 1) * $size, 'l' => $size];
+		$q2['g'] = ['userid'];
 
 		$oResult = new \stdClass;
 		$users = $modelUsr->query_objs_ss($q, $q2);
