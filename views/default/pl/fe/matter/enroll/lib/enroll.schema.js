@@ -549,7 +549,8 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                             }
                         };
                         $scope2.result = oResult = {
-                            purpose: 'copy'
+                            purpose: 'copy',
+                            target: { ops: [], range: {} }
                         };
                         $scope2.filter = oFilter = {};
                         $scope2.selectApp = function() {
@@ -563,6 +564,7 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                         $scope2.dataSchemas = dataSchemas;
                                         break;
                                     case 'optionByInput':
+                                    case 'scoreByInput':
                                         dataSchemas.forEach(function(oSchema) {
                                             if (/shorttext|longtext/.test(oSchema.type)) {
                                                 $scope2.dataSchemas.push(oSchema);
@@ -572,6 +574,13 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                     case 'inputByOption':
                                         dataSchemas.forEach(function(oSchema) {
                                             if (/single|multiple/.test(oSchema.type)) {
+                                                $scope2.dataSchemas.push(oSchema);
+                                            }
+                                        });
+                                        break;
+                                    case 'inputByScore':
+                                        dataSchemas.forEach(function(oSchema) {
+                                            if (/score/.test(oSchema.type)) {
                                                 $scope2.dataSchemas.push(oSchema);
                                             }
                                         });
@@ -622,7 +631,18 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                         $scope2.disabled = true;
                                     }
                                     break;
+                                case 'scoreByInput':
+                                    if (!oResult.target) {
+                                        $scope2.disabled = true;
+                                    } else {
+                                        var oTarget = oResult.target;
+                                        if (!oTarget.ops || oTarget.ops.length === 0) $scope2.disabled = true;
+                                        if (!oTarget.range || !oTarget.range.from || !oTarget.range.to) $scope2.disabled = true;
+                                    }
+                                    break;
                                 case 'inputByOption':
+                                    break;
+                                case 'inputByScore':
                                     break;
                             }
                         }, true);
@@ -684,6 +704,32 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                     };
                                 }
                                 break;
+                            case 'scoreByInput':
+                                if (oResult.target) {
+                                    var oScoreProto;
+                                    oScoreProto = {};
+                                    oScoreProto.range = [oResult.target.range.from, oResult.target.range.to];
+                                    oScoreProto.ops = [];
+                                    oResult.target.ops.forEach(function(op, index) {
+                                        oScoreProto.ops.push({ v: 'v' + (index + 1), l: op.l });
+                                    });
+                                    if (oResult.target.requireScore) oScoreProto.requireScore = 'Y';
+                                    fnGenNewSchema = function(oProtoSchema) {
+                                        if (!/shorttext|longtext/.test(oProtoSchema.type)) {
+                                            return null;
+                                        }
+                                        var oNewSchema;
+                                        oNewSchema = schemaLib.newSchema('score', _oApp, oScoreProto);
+                                        oNewSchema.title = oProtoSchema.title;
+                                        if (oNewSchema.requireScore === 'Y') oNewSchema.scoreMode = 'evaluation';
+                                        oNewSchema.dsSchema = oNewSchema.dsSchema = {
+                                            app: { id: oResult.fromApp.id, title: oResult.fromApp.title },
+                                            schema: { id: oProtoSchema.id, title: oProtoSchema.title, type: oProtoSchema.type }
+                                        };
+                                        return oNewSchema;
+                                    };
+                                }
+                                break;
                             case 'inputByOption':
                                 fnGenNewSchema = function(oProtoSchema) {
                                     var oNewSchema;
@@ -691,9 +737,20 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                                     oNewSchema.title = oProtoSchema.title;
                                     oNewSchema.dsSchema = {
                                         app: { id: oResult.fromApp.id, title: oResult.fromApp.title },
-                                        schema: { id: oProtoSchema.id, title: oProtoSchema.title, type: oProtoSchema.type },
-                                        mode: 'fromOption'
-                                    }
+                                        schema: { id: oProtoSchema.id, title: oProtoSchema.title, type: oProtoSchema.type }
+                                    };
+                                    return oNewSchema;
+                                };
+                                break;
+                            case 'inputByScore':
+                                fnGenNewSchema = function(oProtoSchema) {
+                                    var oNewSchema;
+                                    oNewSchema = schemaLib.newSchema('longtext', _oApp);
+                                    oNewSchema.title = oProtoSchema.title;
+                                    oNewSchema.dsSchema = {
+                                        app: { id: oResult.fromApp.id, title: oResult.fromApp.title },
+                                        schema: { id: oProtoSchema.id, title: oProtoSchema.title, type: oProtoSchema.type }
+                                    };
                                     return oNewSchema;
                                 };
                                 break;
@@ -1565,8 +1622,7 @@ define(['schema', 'wrap'], function(schemaLib, wrapLib) {
                             if (oResult.app && oResult.schema) {
                                 oSchema.dsSchema = {
                                     app: { id: oResult.app.id, title: oResult.app.title },
-                                    schema: { id: oResult.schema.id, title: oResult.schema.title, type: oResult.schema.type },
-                                    mode: oResult.mode
+                                    schema: { id: oResult.schema.id, title: oResult.schema.title, type: oResult.schema.type }
                                 }
                                 if (oResult.filters && oResult.filters.length) {
                                     oSchema.dsSchema.filters = [];

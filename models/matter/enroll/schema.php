@@ -194,6 +194,13 @@ class schema_model extends \TMS_MODEL {
 
 		/* 根据填写数据生成题目 */
 		$fnMakeDynaSchemaByData = function ($oSchema, $oDsAppRnd, $schemaIndex, &$dynaSchemasByIndex) {
+			$modelEnl = $this->model('matter\enroll');
+			//???
+			$oTargetApp = $modelEnl->byId($oSchema->dsSchema->app->id, ['fields' => 'siteid,state,mission_id,data_schemas,sync_mission_round']);
+			if (false === $oTargetApp || $oTargetApp->state !== '1') {
+				return [false, '指定的目标活动不可用'];
+			}
+
 			$q = [
 				'id,enroll_key,value,userid,nickname',
 				"xxt_enroll_record_data t0",
@@ -226,7 +233,7 @@ class schema_model extends \TMS_MODEL {
 				$oNewDynaSchema->id = 'dyna' . $oRecData->id;
 				$oNewDynaSchema->title = $oRecData->value;
 				$oNewDynaSchema->dynamic = 'Y';
-				$oNewDynaSchema->prototype = (object) [
+				$oNewDynaSchema->model = (object) [
 					'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title],
 					'ds' => (object) ['ek' => $oRecData->enroll_key, 'user' => $oRecData->userid, 'nickname' => $oRecData->nickname],
 				];
@@ -247,10 +254,10 @@ class schema_model extends \TMS_MODEL {
 
 			$targetSchemas = []; // 目标应用中选择的题目
 			foreach ($oTargetApp->dynaDataSchemas as $oSchema2) {
-				if (empty($oSchema2->dynamic) || $oSchema2->dynamic !== 'Y' || empty($oSchema2->prototype->schema->id)) {
+				if (empty($oSchema2->dynamic) || $oSchema2->dynamic !== 'Y' || empty($oSchema2->model->schema->id)) {
 					continue;
 				}
-				if ($oSchema->dsSchema->schema->id === $oSchema2->prototype->schema->id) {
+				if ($oSchema->dsSchema->schema->id === $oSchema2->model->schema->id) {
 					$targetSchemas[$oSchema2->id] = $oSchema2;
 				}
 			}
@@ -272,17 +279,20 @@ class schema_model extends \TMS_MODEL {
 			});
 
 			foreach ($aResult as $schemaId => $score) {
+				if (empty($targetSchemas[$schemaId])) {
+					continue;
+				}
 				$oProtoSchema = $targetSchemas[$schemaId];
 				$oNewSchema = new \stdClass;
 				$oNewSchema->id = $oProtoSchema->id;
 				$oNewSchema->title = $oProtoSchema->title;
 				$oNewSchema->type = 'longtext';
 				$oNewSchema->dynamic = 'Y';
-				$oNewSchema->prototype = (object) [
-					'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title],
+				$oNewSchema->model = (object) [
+					'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title, 'type' => $oSchema->type],
 				];
 				if (isset($oProtoSchema->ds)) {
-					$oNewSchema->prototype->ds = $oProtoSchema->ds;
+					$oNewSchema->model->ds = $oProtoSchema->ds;
 				}
 				$dynaSchemasByIndex[$schemaIndex][] = $oNewSchema;
 			}
@@ -335,8 +345,8 @@ class schema_model extends \TMS_MODEL {
 						$this->genSchemaByTopOptions($oTargetSchema, $options, count($options), $newSchemas, $oSchema);
 						foreach ($newSchemas as $oNewDynaSchema) {
 							$oNewDynaSchema->dynamic = 'Y';
-							$oNewDynaSchema->prototype = (object) [
-								'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title],
+							$oNewDynaSchema->model = (object) [
+								'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title, 'type' => $oSchema->type],
 							];
 						}
 					}
@@ -370,21 +380,23 @@ class schema_model extends \TMS_MODEL {
 
 		$dynaSchemasByIndex = []; // 动态创建的题目
 		foreach ($oApp->dataSchemas as $schemaIndex => $oSchema) {
-			if (!empty($oSchema->dsSchema->mode) && !empty($oSchema->dsSchema->app->id) && !empty($oSchema->dsSchema->schema->id)) {
-				$oDsSchemas = $oSchema->dsSchema;
+			if (!empty($oSchema->dsSchema->schema->type) && !empty($oSchema->dsSchema->app->id) && !empty($oSchema->dsSchema->schema->id)) {
+				$oDsSchema = $oSchema->dsSchema;
 				if (!empty($oAppRound->mission_rid)) {
 					if (!isset($modelRnd)) {
 						$modelRnd = $this->model('matter\enroll\round');
 					}
-					$oDsAppRnd = $modelRnd->byMissionRid($oDsSchemas->app, $oAppRound->mission_rid, ['fields' => 'rid,mission_rid']);
-					switch ($oDsSchemas->mode) {
-					case 'fromData':
+					$oDsAppRnd = $modelRnd->byMissionRid($oDsSchema->app, $oAppRound->mission_rid, ['fields' => 'rid,mission_rid']);
+					switch ($oDsSchema->schema->type) {
+					case 'shorttext':
+					case 'longtext':
 						$fnMakeDynaSchemaByData($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
 						break;
-					case 'fromScore':
+					case 'score':
 						$fnMakeDynaSchemaByScore($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
 						break;
-					case 'fromOption':
+					case 'single':
+					case 'multiple':
 						$fnMakeDynaSchemaByOption($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
 						break;
 					}
