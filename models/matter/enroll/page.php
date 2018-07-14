@@ -389,10 +389,11 @@ class page_model extends page_base {
 		}
 
 		foreach ($dataSchemas as $oSchema) {
-			if (empty($oSchema->dynamic) || $oSchema->dynamic !== 'Y' || empty($oSchema->model->schema->id) || empty($pageWrapsById[$oSchema->model->schema->id])) {
+			/* 不是动态题目，不处理 */
+			if (empty($oSchema->dynamic) || $oSchema->dynamic !== 'Y' || empty($oSchema->cloneSchema->id) || empty($pageWrapsById[$oSchema->cloneSchema->id])) {
 				continue;
 			}
-			$oProtoSchema = $oSchema->model->schema;
+			$oProtoSchema = $oSchema->cloneSchema;
 			$protoElem = $dom->find('[schema="' . $oProtoSchema->id . '"]');
 			if (1 === count($protoElem)) {
 				/* html */

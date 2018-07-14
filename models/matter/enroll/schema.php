@@ -5,56 +5,36 @@ namespace matter\enroll;
  */
 class schema_model extends \TMS_MODEL {
 	/**
-	 * 去除题目中的通讯录信息
-	 */
-	public function wipeMschema(&$oSchema, $oMschema) {
-		if ($oSchema->type === 'member' && $oSchema->schema_id === $oMschema->id) {
-			/* 更新题目 */
-			$oSchema->type = 'shorttext';
-			$oSchema->id = str_replace('member.', '', $oSchema->id);
-			if (in_array($oSchema->id, ['name', 'mobile', 'email'])) {
-				$oSchema->format = $oSchema->id;
-			} else {
-				$oSchema->format = '';
-			}
-			unset($oSchema->schema_id);
-
-			return true;
-		}
-
-		return false;
-	}
-	/**
-	 * 去除和其他活动的题目的关联
-	 */
-	public function wipeAssoc(&$oSchema, $aAssocAppIds) {
-		if (isset($oSchema->fromApp) && in_array($oSchema->fromApp, $aAssocAppIds)) {
-			unset($oSchema->fromApp);
-			unset($oSchema->requieCheck);
-
-			return true;
-		}
-
-		return false;
-	}
-	/**
 	 * 去除掉无效的内容
 	 *
 	 * 1、无效的字段
 	 * 2、无效的设置，例如隐藏条件
 	 *
-	 * 支持的类型
+	 * 支持的静态类型
 	 * type
 	 * title
+	 * parent 父题目，表示题目之间的从属关系
 	 * dsSchema 题目定义的来源
+	 *		app 定义来源的应用
+	 *		schema 定义来源的题目
 	 * dynamic 是否为动态生成的题目
 	 * prototype 动态题目的原始定义
 	 * dsOps 动态选项来源
+	 *
+	 * 支持的动态属性
+	 * cloneSchema
+	 * referSchema
+	 * referOption
+	 * referRercord
 	 */
 	public function purify($aAppSchemas) {
-		$validProps = ['id', 'type', 'title', 'content', 'description', 'format', 'limitChoice', 'range', 'required', 'unique', 'remarkable', 'shareable', 'supplement', 'history', 'count', 'requireScore', 'scoreMode', 'score', 'answer', 'weight', 'fromApp', 'requireCheck', 'ds', 'dsOps', 'showOpNickname', 'showOpDsLink', 'dsSchema', 'visibility', 'cowork', 'filterWhiteSpace', 'ops'];
+		$validProps = ['id', 'type', 'parent', 'title', 'content', 'mediaType', 'description', 'format', 'limitChoice', 'range', 'required', 'unique', 'remarkable', 'shareable', 'supplement', 'history', 'count', 'requireScore', 'scoreMode', 'score', 'answer', 'weight', 'fromApp', 'requireCheck', 'ds', 'dsOps', 'showOpNickname', 'showOpDsLink', 'dsSchema', 'visibility', 'cowork', 'filterWhiteSpace', 'ops'];
 
 		$purified = [];
+		$schemasById = [];
+		foreach ($aAppSchemas as $oSchema) {
+			$schemasById[$oSchema->id] = $oSchema;
+		}
 		foreach ($aAppSchemas as $oSchema) {
 			foreach ($oSchema as $prop => $val) {
 				if (!in_array($prop, $validProps)) {
@@ -108,10 +88,67 @@ class schema_model extends \TMS_MODEL {
 			if (empty($oSchema->fromApp)) {
 				unset($oSchema->requireCheck);
 			}
+			/* 题目来源 */
+			if (isset($oSchema->dsSchema)) {
+				foreach ($oSchema->dsSchema as $prop2 => $val2) {
+					if (!in_array($prop2, ['app', 'schema'])) {
+						unset($oSchema->dsSchema->{$prop2});
+					}
+				}
+			}
+			/* 检查父题目是否存在 */
+			if (isset($oSchema->parent)) {
+				if (empty($oSchema->parent->id) || empty($oSchema->parent->type)) {
+					unset($oSchema->parent);
+				} else {
+					if (empty($schemasById[$oSchema->parent->id])) {
+						unset($oSchema->parent);
+					} else {
+						$oParentSchema = $schemasById[$oSchema->parent->id];
+						if ($oSchema->parent->type !== $oParentSchema->type) {
+							unset($oSchema->parent);
+						}
+					}
+				}
+			}
+
 			$purified[] = $oSchema;
 		}
 
 		return $purified;
+	}
+	/**
+	 * 去除题目中的通讯录信息
+	 */
+	public function wipeMschema(&$oSchema, $oMschema) {
+		if ($oSchema->type === 'member' && $oSchema->schema_id === $oMschema->id) {
+			/* 更新题目 */
+			$oSchema->type = 'shorttext';
+			$oSchema->id = str_replace('member.', '', $oSchema->id);
+			if (in_array($oSchema->id, ['name', 'mobile', 'email'])) {
+				$oSchema->format = $oSchema->id;
+			} else {
+				$oSchema->format = '';
+			}
+			unset($oSchema->schema_id);
+
+			return true;
+		}
+
+		return false;
+	}
+	/**
+	 * 去除和其他活动的题目的关联
+	 */
+	public function wipeAssoc(&$oSchema, $aAssocAppIds) {
+		if (isset($oSchema->fromApp) && in_array($oSchema->fromApp, $aAssocAppIds)) {
+			unset($oSchema->fromApp);
+			unset($oSchema->requieCheck);
+
+			return true;
+		}
+
+		return false;
 	}
 	/**
 	 * 设置活动题目的动态选项
@@ -167,7 +204,10 @@ class schema_model extends \TMS_MODEL {
 						$oNewOp = new \stdClass;
 						$oNewOp->v = 'v' . ($index + 1);
 						$oNewOp->l = $oRecData->value;
-						$oNewOp->ds = (object) ['ek' => $oRecData->enroll_key, 'user' => $oRecData->userid, 'nickname' => $oRecData->nickname, 'schema_id' => $oSchema->dsOps->schema->id];
+						$oNewOp->referRecord = (object) [
+							'schema' => (object) ['id' => $oSchema->dsOps->schema->id],
+							'ds' => (object) ['ek' => $oRecData->enroll_key, 'user' => $oRecData->userid, 'nickname' => $oRecData->nickname],
+						];
 						$oSchema->ops[] = $oNewOp;
 					}
 				}
@@ -192,52 +232,116 @@ class schema_model extends \TMS_MODEL {
 			$oAppRound = $oApp->appRound;
 		}
 
-		/* 根据填写数据生成题目 */
-		$fnMakeDynaSchemaByData = function ($oSchema, $oDsAppRnd, $schemaIndex, &$dynaSchemasByIndex) {
+		/* 从题目生成题目 */
+		$fnMakeDynaSchemaBySchema = function ($oSchema, $oDsAppRnd, $schemaIndex, &$dynaSchemasByIndex) use ($oApp) {
 			$modelEnl = $this->model('matter\enroll');
-			//???
 			$oTargetApp = $modelEnl->byId($oSchema->dsSchema->app->id, ['fields' => 'siteid,state,mission_id,data_schemas,sync_mission_round']);
 			if (false === $oTargetApp || $oTargetApp->state !== '1') {
 				return [false, '指定的目标活动不可用'];
 			}
-
-			$q = [
-				'id,enroll_key,value,userid,nickname',
-				"xxt_enroll_record_data t0",
-				['state' => 1, 'aid' => $oSchema->dsSchema->app->id, 'schema_id' => $oSchema->dsSchema->schema->id],
-			];
-			/* 设置轮次条件 */
-			if (!empty($oDsAppRnd)) {
-				$q[2]['rid'] = $oDsAppRnd->rid;
+			if ($oApp->mission_id !== $oTargetApp->mission_id) {
+				return [false, '仅支持在同一个项目的活动间通过记录生成题目'];
 			}
-			/* 设置过滤条件 */
-			if (!empty($oSchema->dsSchema->filters)) {
-				foreach ($oSchema->dsSchema->filters as $index => $oFilter) {
-					if (!empty($oFilter->schema->id) && !empty($oFilter->schema->type)) {
-						switch ($oFilter->schema->type) {
-						case 'single':
-							if (!empty($oFilter->schema->op->v)) {
-								$tbl = 't' . ($index + 1);
-								$sql = "select 1 from xxt_enroll_record_data {$tbl} where state=1 and aid='{$oSchema->dsSchema->app->id}'and schema_id='{$oFilter->schema->id}' and value='{$oFilter->schema->op->v}' and t0.enroll_key={$tbl}.enroll_key";
-								$q[2]['enroll_key'] = (object) ['op' => 'exists', 'pat' => $sql];
-							}
-							break;
-						}
+
+			$targetSchemas = []; // 目标应用中选择的题目
+			foreach ($oTargetApp->dynaDataSchemas as $oTargetSchema) {
+				if (empty($oTargetSchema->dynamic) || $oTargetSchema->dynamic !== 'Y' || empty($oTargetSchema->cloneSchema->id)) {
+					continue;
+				}
+				if ($oSchema->dsSchema->schema->id === $oTargetSchema->cloneSchema->id) {
+					$targetSchemas[$oTargetSchema->id] = $oTargetSchema;
+				}
+			}
+			if (empty($targetSchemas)) {
+				return [false, '指定的题目无效'];
+			}
+
+			foreach ($targetSchemas as $oReferSchema) {
+				$oNewDynaSchema = clone $oSchema;
+				$oNewDynaSchema->cloneSchema = (object) ['id' => $oSchema->id, 'title' => $oSchema->title];
+				$oNewDynaSchema->referSchema = (object) ['id' => $oReferSchema->id, 'title' => $oReferSchema->title, 'type' => $oReferSchema->type];
+				$oNewDynaSchema->id = $oReferSchema->id;
+				$oNewDynaSchema->title = $oReferSchema->title;
+				$oNewDynaSchema->dynamic = 'Y';
+				if (isset($oReferSchema->referRecord)) {
+					$oNewDynaSchema->referRecord = $oReferSchema->referRecord;
+				}
+				$dynaSchemasByIndex[$schemaIndex][] = $oNewDynaSchema;
+
+				/* 原型题目中设置了动态选项，且和题目指向了相同的题目 */
+				if (!empty($oNewDynaSchema->dsOps->app->id) && !empty($oNewDynaSchema->dsOps->schema->id) && $oNewDynaSchema->dsOps->app->id === $oSchema->dsSchema->app->id && $oNewDynaSchema->dsOps->schema->id === $oSchema->dsSchema->schema->id) {
+					$oNewDynaSchema->dsOps->schema->id = $oReferSchema->id;
+					$oNewDynaSchema->dsOps->schema->title = $oReferSchema->title;
+					$oNewDynaSchema->dsOps->schema->type = $oReferSchema->type;
+				}
+			}
+		};
+
+		/* 根据填写数据生成题目 */
+		$fnMakeDynaSchemaByData = function ($oSchema, $oDsAppRnd, $schemaIndex, &$dynaSchemasByIndex) {
+			/* 如果题目本身是动态题目，需要先生成题目 */
+			$targetSchemas = [];
+			if (!empty($oSchema->dsSchema->app->id)) {
+				$modelEnl = $this->model('matter\enroll');
+				$aTargetAppOptions = ['fields' => 'siteid,state,mission_id,data_schemas,sync_mission_round'];
+				/* 设置轮次条件 */
+				if (!empty($oDsAppRnd)) {
+					$aTargetAppOptions['appRid'] = $oDsAppRnd->rid;
+				}
+				$oTargetApp = $modelEnl->byId($oSchema->dsSchema->app->id, $aTargetAppOptions);
+				if (false === $oTargetApp || $oTargetApp->state !== '1') {
+					return [false, '指定的目标活动不可用'];
+				}
+				foreach ($oTargetApp->dynaDataSchemas as $oDynaSchema) {
+					if ($oDynaSchema->id === $oSchema->dsSchema->schema->id) {
+						$targetSchemas[] = $oDynaSchema;
+					} else if (!empty($oDynaSchema->dynamic) && $oDynaSchema->dynamic === 'Y' && !empty($oDynaSchema->cloneSchema->id) && $oDynaSchema->cloneSchema->id === $oSchema->dsSchema->schema->id) {
+						$targetSchemas[] = $oDynaSchema;
 					}
 				}
 			}
-			/* 处理数据 */
-			$datas = $this->query_objs_ss($q);
-			foreach ($datas as $index => $oRecData) {
-				$oNewDynaSchema = clone $oSchema;
-				$oNewDynaSchema->id = 'dyna' . $oRecData->id;
-				$oNewDynaSchema->title = $oRecData->value;
-				$oNewDynaSchema->dynamic = 'Y';
-				$oNewDynaSchema->model = (object) [
-					'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title],
-					'ds' => (object) ['ek' => $oRecData->enroll_key, 'user' => $oRecData->userid, 'nickname' => $oRecData->nickname],
+
+			foreach ($targetSchemas as $oTargetSchema) {
+				$q = [
+					'id,enroll_key,value,userid,nickname',
+					"xxt_enroll_record_data t0",
+					['state' => 1, 'aid' => $oSchema->dsSchema->app->id, 'schema_id' => $oTargetSchema->id],
 				];
-				$dynaSchemasByIndex[$schemaIndex][] = $oNewDynaSchema;
+				/* 设置轮次条件 */
+				if (!empty($oDsAppRnd)) {
+					$q[2]['rid'] = $oDsAppRnd->rid;
+				}
+				/* 设置过滤条件 */
+				if (!empty($oSchema->dsSchema->filters)) {
+					foreach ($oSchema->dsSchema->filters as $index => $oFilter) {
+						if (!empty($oFilter->schema->id) && !empty($oFilter->schema->type)) {
+							switch ($oFilter->schema->type) {
+							case 'single':
+								if (!empty($oFilter->schema->op->v)) {
+									$tbl = 't' . ($index + 1);
+									$sql = "select 1 from xxt_enroll_record_data {$tbl} where state=1 and aid='{$oSchema->dsSchema->app->id}'and schema_id='{$oFilter->schema->id}' and value='{$oFilter->schema->op->v}' and t0.enroll_key={$tbl}.enroll_key";
+									$q[2]['enroll_key'] = (object) ['op' => 'exists', 'pat' => $sql];
+								}
+								break;
+							}
+						}
+					}
+				}
+				/* 处理数据 */
+				$datas = $this->query_objs_ss($q);
+				foreach ($datas as $index => $oRecData) {
+					$oNewDynaSchema = clone $oSchema;
+					$oNewDynaSchema->cloneSchema = (object) ['id' => $oSchema->id, 'title' => $oSchema->title];
+					$oNewDynaSchema->id = 'dyna' . $oRecData->id;
+					$oNewDynaSchema->title = $oRecData->value;
+					$oNewDynaSchema->dynamic = 'Y';
+					/* 记录题目的数据来源 */
+					$oNewDynaSchema->referRecord = (object) [
+						'schema' => (object) ['id' => $oTargetSchema->id, 'type' => $oTargetSchema->type, 'title' => $oTargetSchema->title],
+						'ds' => (object) ['ek' => $oRecData->enroll_key, 'user' => $oRecData->userid, 'nickname' => $oRecData->nickname],
+					];
+					$dynaSchemasByIndex[$schemaIndex][] = $oNewDynaSchema;
+				}
 			}
 		};
 
@@ -253,12 +357,12 @@ class schema_model extends \TMS_MODEL {
 			}
 
 			$targetSchemas = []; // 目标应用中选择的题目
-			foreach ($oTargetApp->dynaDataSchemas as $oSchema2) {
-				if (empty($oSchema2->dynamic) || $oSchema2->dynamic !== 'Y' || empty($oSchema2->model->schema->id)) {
+			foreach ($oTargetApp->dynaDataSchemas as $oTargetSchema) {
+				if (empty($oTargetSchema->dynamic) || $oTargetSchema->dynamic !== 'Y' || empty($oTargetSchema->cloneSchema->id)) {
 					continue;
 				}
-				if ($oSchema->dsSchema->schema->id === $oSchema2->model->schema->id) {
-					$targetSchemas[$oSchema2->id] = $oSchema2;
+				if ($oSchema->dsSchema->schema->id === $oTargetSchema->cloneSchema->id) {
+					$targetSchemas[$oTargetSchema->id] = $oTargetSchema;
 				}
 			}
 			if (empty($targetSchemas)) {
@@ -282,19 +386,17 @@ class schema_model extends \TMS_MODEL {
 				if (empty($targetSchemas[$schemaId])) {
 					continue;
 				}
-				$oProtoSchema = $targetSchemas[$schemaId];
-				$oNewSchema = new \stdClass;
-				$oNewSchema->id = $oProtoSchema->id;
-				$oNewSchema->title = $oProtoSchema->title;
-				$oNewSchema->type = 'longtext';
-				$oNewSchema->dynamic = 'Y';
-				$oNewSchema->model = (object) [
-					'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title, 'type' => $oSchema->type],
-				];
-				if (isset($oProtoSchema->ds)) {
-					$oNewSchema->model->ds = $oProtoSchema->ds;
+				$oReferSchema = $targetSchemas[$schemaId];
+				$oNewDynaSchema = clone $oSchema;
+				$oNewDynaSchema->cloneSchema = (object) ['id' => $oSchema->id, 'title' => $oSchema->title];
+				$oNewDynaSchema->referSchema = (object) ['id' => $oReferSchema->id, 'title' => $oReferSchema->title, 'type' => $oReferSchema->type];
+				$oNewDynaSchema->id = $oReferSchema->id;
+				$oNewDynaSchema->title = $oReferSchema->title;
+				$oNewDynaSchema->dynamic = 'Y';
+				if (isset($oReferSchema->referRecord)) {
+					$oNewDynaSchema->referRecord = $oReferSchema->referRecord;
 				}
-				$dynaSchemasByIndex[$schemaIndex][] = $oNewSchema;
+				$dynaSchemasByIndex[$schemaIndex][] = $oNewDynaSchema;
 			}
 		};
 
@@ -345,9 +447,7 @@ class schema_model extends \TMS_MODEL {
 						$this->genSchemaByTopOptions($oTargetSchema, $options, count($options), $newSchemas, $oSchema);
 						foreach ($newSchemas as $oNewDynaSchema) {
 							$oNewDynaSchema->dynamic = 'Y';
-							$oNewDynaSchema->model = (object) [
-								'schema' => (object) ['id' => $oSchema->id, 'title' => $oSchema->title, 'type' => $oSchema->type],
-							];
+							$oNewDynaSchema->cloneSchema = (object) ['id' => $oSchema->id, 'title' => $oSchema->title];
 						}
 					}
 					break;
@@ -377,10 +477,13 @@ class schema_model extends \TMS_MODEL {
 			}
 			$dynaSchemasByIndex[$schemaIndex] = $newSchemas;
 		};
-
+		/* 生成动态题目 */
 		$dynaSchemasByIndex = []; // 动态创建的题目
 		foreach ($oApp->dataSchemas as $schemaIndex => $oSchema) {
-			if (!empty($oSchema->dsSchema->schema->type) && !empty($oSchema->dsSchema->app->id) && !empty($oSchema->dsSchema->schema->id)) {
+			if (!in_array($oSchema->type, ['single', 'multiple', 'score', 'longtext', 'html'])) {
+				continue;
+			}
+			if (!empty($oSchema->dsSchema->app->id) && !empty($oSchema->dsSchema->schema->id) && !empty($oSchema->dsSchema->schema->type)) {
 				$oDsSchema = $oSchema->dsSchema;
 				if (!empty($oAppRound->mission_rid)) {
 					if (!isset($modelRnd)) {
@@ -390,7 +493,12 @@ class schema_model extends \TMS_MODEL {
 					switch ($oDsSchema->schema->type) {
 					case 'shorttext':
 					case 'longtext':
-						$fnMakeDynaSchemaByData($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
+						if ((!empty($oSchema->dsOps->app->id) && $oSchema->dsOps->app->id === $oSchema->dsSchema->app->id) || $oSchema->type === 'html') {
+							/* 如果动态选项指向了相同的题目，就是直接复制题目 */
+							$fnMakeDynaSchemaBySchema($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
+						} else {
+							$fnMakeDynaSchemaByData($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
+						}
 						break;
 					case 'score':
 						$fnMakeDynaSchemaByScore($oSchema, $oDsAppRnd, $schemaIndex, $dynaSchemasByIndex);
@@ -403,13 +511,32 @@ class schema_model extends \TMS_MODEL {
 				}
 			}
 		}
-
 		/* 加入动态创建的题目 */
 		if (count($dynaSchemasByIndex)) {
 			$protoSchemaOffset = 0;
 			foreach ($dynaSchemasByIndex as $index => $dynaSchemas) {
 				array_splice($oApp->dataSchemas, $index + $protoSchemaOffset, 1, $dynaSchemas);
 				$protoSchemaOffset += count($dynaSchemas) - 1;
+			}
+		}
+		/* 修改对动态创建的父题目的引用 */
+		$schemasByCloneId = [];
+		foreach ($oApp->dataSchemas as $oSchema) {
+			if ($oSchema->type === 'html' && isset($oSchema->cloneSchema->id)) {
+				$schemasByCloneId[$oSchema->cloneSchema->id][] = $oSchema;
+			}
+		}
+		foreach ($oApp->dataSchemas as $oSchema) {
+			if (isset($oSchema->parent->id) && !empty($schemasByCloneId[$oSchema->parent->id])) {
+				if (isset($oSchema->referRecord->schema)) {
+					$oDynaParentSchemas = $schemasByCloneId[$oSchema->parent->id];
+					foreach ($oDynaParentSchemas as $oDynaParentSchema) {
+						if (isset($oDynaParentSchema->referSchema->id) && $oDynaParentSchema->referSchema->id === $oSchema->referRecord->schema->id) {
+							$oSchema->referParent = $oSchema->parent;
+							$oSchema->parent = (object) ['id' => $oDynaParentSchema->id, 'type' => $oDynaParentSchema->type, 'title' => $oDynaParentSchema->title];
+						}
+					}
+				}
 			}
 		}
 
@@ -440,12 +567,10 @@ class schema_model extends \TMS_MODEL {
 				}
 				$oNewSchema->id = $oTargetSchema->id . $oOriginalOption->v;
 				$oNewSchema->title = $oOriginalOption->l;
-				/* 题目定义的来源 */
-				if (!isset($oNewSchema->dsSchema)) {
-					$oNewSchema->dsSchema = new \stdClass;
+				$oNewSchema->referOption = (object) ['l' => $oOriginalOption->l, 'v' => $oOriginalOption->v];
+				if (isset($oOriginalOption->referRecord)) {
+					$oNewSchema->referRecord = $oOriginalOption->referRecord;
 				}
-				$oNewSchema->dsSchema->op = clone $oOriginalOption;
-				$oNewSchema->dsSchema->op->schema_id = $oTargetSchema->id;
 
 				$newSchemas[] = $oNewSchema;
 			}
