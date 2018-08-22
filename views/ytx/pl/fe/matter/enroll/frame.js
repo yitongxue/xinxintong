@@ -112,6 +112,7 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
             $scope.subView = subView[1] === 'enroll' ? 'preview' : subView[1];
             switch ($scope.subView) {
                 case 'main':
+                case 'page':
                 case 'schema':
                     $scope.opened = 'edit';
                     break;

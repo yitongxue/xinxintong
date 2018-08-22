@@ -89,6 +89,7 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
             $scope.subView = subView[1] === 'signin' ? 'publish' : subView[1];
             switch ($scope.subView) {
                 case 'main':
+                case 'page':
                 case 'schema':
                     $scope.opened = 'edit';
                     break;

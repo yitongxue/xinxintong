@@ -28,12 +28,15 @@
             <ul class="nav nav-tabs nav-stacked">
                 <li ng-class="{'opened':opened==='edit'}">
                     <a href='' ng-click="opened=opened==='edit'?false:'edit';switchTo('schema')">制作 <span class="caret"></span></a>
-                    <ul class="nav nav-tabs nav-stacked" ng-style="{'height':opened==='edit'?'82px':'0'}">
+                    <ul class="nav nav-tabs nav-stacked" ng-style="{'height':opened==='edit'?'123px':'0'}">
                         <li ng-class="{'active':subView==='main'}">
                             <a href='' ng-click="switchTo('main')">描述</a>
                         </li>
                         <li ng-class="{'active':subView==='schema'}">
                             <a href='' ng-click="switchTo('schema')">题目</a>
+                        </li>
+                        <li ng-class="{'active':subView==='page'}">
+                            <a href='' ng-click="switchTo('page')">页面</a>
                         </li>
                     </ul>
                 </li>
