@@ -1047,7 +1047,7 @@ class record_model extends record_base {
 					$oRecord->data = new \stdClass;
 					$oRecord->data->{$schemaId} = $oData->{$schemaId};
 					if (!empty($oApp->rpConfig->marks)) {
-						foreach ($oApp->rpConfig->mark as $oMark) {
+						foreach ($oApp->rpConfig->marks as $oMark) {
 							if (isset($oData->{$oMark->id})) {
 								$oRecord->data->{$oMark->id} = $oData->{$oMark->id};
 							}
