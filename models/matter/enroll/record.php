@@ -988,9 +988,6 @@ class record_model extends record_base {
 			"xxt_enroll_record_data d,xxt_enroll_record r",
 			"d.state=1 and d.aid='{$oApp->id}' and d.schema_id='{$schemaId}' and d.value<>'' and d.multitext_seq = 0 and r.aid = d.aid and r.enroll_key = d.enroll_key",
 		];
-		if ($oDataSchema->type === 'date') {
-
-		}
 		/* 指定用户 */
 		if (!empty($options->owner)) {
 			$q[2] .= " and d.userid='" . $options->owner . "'";
@@ -1036,15 +1033,6 @@ class record_model extends record_base {
 				$sum = (int) $this->query_val_ss($p);
 				$oResult->sum = $sum;
 			}
-			/* 补充记录标识 */
-			// if (!isset($oApp->rpConfig) || empty($oApp->rpConfig->marks)) {
-			// 	$defaultMark = new \stdClass;
-			// 	$defaultMark->id = 'nickname';
-			// 	$defaultMark->name = 'nickname';
-			// 	$marks = [$defaultMark];
-			// } else {
-			// 	$marks = $oApp->rpConfig->marks;
-			// }
 			foreach ($records as $oRecord) {
 				// $oRecord->data = new \stdClass;
 				// if (in_array($oDataSchema->type, ['multitext', 'file']) || $schemaId === 'member') {
@@ -1052,7 +1040,20 @@ class record_model extends record_base {
 				// } else {
 				// 	$oRecord->data->{$schemaId} = $oRecord->value;
 				// }
-				$oRecord->data = empty($oRecord->data) ? new \stdClass : json_decode($oRecord->data);
+				if (empty($oRecord->data)) {
+					$oRecord->data = new \stdClass;
+				} else {
+					$oData = json_decode($oRecord->data);
+					$oRecord->data = new \stdClass;
+					$oRecord->data->{$schemaId} = $oData->{$schemaId};
+					if (!empty($oApp->rpConfig->marks)) {
+						foreach ($oApp->rpConfig->mark as $oMark) {
+							if (isset($oData->{$oMark->id})) {
+								$oRecord->data->{$oMark->id} = $oData->{$oMark->id};
+							}
+						}
+					}
+				}
 				$oRecord->like_log = empty($oRecord->like_log) ? new \stdClass : json_decode($oRecord->like_log);
 				$oResult->records[] = $oRecord;
 			}
