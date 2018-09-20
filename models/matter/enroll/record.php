@@ -984,7 +984,7 @@ class record_model extends record_base {
 
 		// 查询参数
 		$q = [
-			'd.enroll_key,d.value,d.like_log,d.like_num,r.nickname,r.rid,r.enroll_at',
+			'd.enroll_key,d.value,d.like_log,d.like_num,r.nickname,r.rid,r.enroll_at,r.data',
 			"xxt_enroll_record_data d,xxt_enroll_record r",
 			"d.state=1 and d.aid='{$oApp->id}' and d.schema_id='{$schemaId}' and d.value<>'' and d.multitext_seq = 0 and r.aid = d.aid and r.enroll_key = d.enroll_key",
 		];
@@ -1037,23 +1037,24 @@ class record_model extends record_base {
 				$oResult->sum = $sum;
 			}
 			/* 补充记录标识 */
-			if (!isset($oApp->rpConfig) || empty($oApp->rpConfig->marks)) {
-				$defaultMark = new \stdClass;
-				$defaultMark->id = 'nickname';
-				$defaultMark->name = 'nickname';
-				$marks = [$defaultMark];
-			} else {
-				$marks = $oApp->rpConfig->marks;
-			}
-			foreach ($records as &$record) {
-				$record->data = new \stdClass;
-				if (in_array($oDataSchema->type, ['multitext', 'file']) || $schemaId === 'member') {
-					$record->data->{$schemaId} = empty($record->value) ? new \stdClass : json_decode($record->value);
-				} else {
-					$record->data->{$schemaId} = $record->value;
-				}
-				$record->like_log = empty($record->like_log) ? new \stdClass : json_decode($record->like_log);
-				$oResult->records[] = $record;
+			// if (!isset($oApp->rpConfig) || empty($oApp->rpConfig->marks)) {
+			// 	$defaultMark = new \stdClass;
+			// 	$defaultMark->id = 'nickname';
+			// 	$defaultMark->name = 'nickname';
+			// 	$marks = [$defaultMark];
+			// } else {
+			// 	$marks = $oApp->rpConfig->marks;
+			// }
+			foreach ($records as $oRecord) {
+				// $oRecord->data = new \stdClass;
+				// if (in_array($oDataSchema->type, ['multitext', 'file']) || $schemaId === 'member') {
+				// 	$oRecord->data->{$schemaId} = empty($oRecord->value) ? new \stdClass : json_decode($oRecord->value);
+				// } else {
+				// 	$oRecord->data->{$schemaId} = $oRecord->value;
+				// }
+				$oRecord->data = empty($oRecord->data) ? new \stdClass : json_decode($oRecord->data);
+				$oRecord->like_log = empty($oRecord->like_log) ? new \stdClass : json_decode($oRecord->like_log);
+				$oResult->records[] = $oRecord;
 			}
 		}
 
