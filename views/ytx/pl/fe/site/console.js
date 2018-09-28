@@ -1,4 +1,4 @@
-var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'tmplshop.ui.xxt']);
+var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'ui.xxt', 'http.ui.xxt', 'tmplshop.ui.xxt']);
 ngApp.config(['$locationProvider', '$uibTooltipProvider', function($lp, $uibTooltipProvider) {
     $lp.html5Mode(true);
     $uibTooltipProvider.setTriggers({
@@ -7,7 +7,7 @@ ngApp.config(['$locationProvider', '$uibTooltipProvider', function($lp, $uibTool
 }]);
 ngApp.controller('ctrlSite', ['$scope', '$location', 'http2', function($scope, $location, http2) {
     $scope.siteId = $location.search().site;
-    http2.get('/rest/pl/fe/site/get?site=' + $scope.siteId, function(rsp) {
+    http2.get('/rest/pl/fe/site/get?site=' + $scope.siteId).then(function(rsp) {
         $scope.site = rsp.data;
     });
 }]);
@@ -30,7 +30,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 break;
         }
         if (/mission/.test($scope.matterType)) {
-            http2.post(url, filter2, function(rsp) {
+            http2.post(url, filter2).then(function(rsp) {
                 if (append) {
                     $scope.matters = $scope.matters.concat(rsp.data.missions);
                 } else {
@@ -39,7 +39,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 page.total = rsp.data.total;
             });
         } else {
-            http2.get(url, function(rsp) {
+            http2.get(url).then(function(rsp) {
                 if (/article/.test($scope.matterType)) {
                     if (append) {
                         $scope.matters = $scope.matters.concat(rsp.data.articles);
@@ -120,11 +120,11 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
     $scope.chooseMatterType = function(matterType) {
         matterType && ($scope.matterType = matterType);
         if ($scope.matterType === 'recent') {
-            http2.get('/rest/pl/fe/site/console/recent?site=' + $scope.siteId + '&_=' + (new Date() * 1), function(rsp) {
+            http2.get('/rest/pl/fe/site/console/recent?site=' + $scope.siteId + '&_=' + (new Date() * 1)).then(function(rsp) {
                 $scope.matters = rsp.data.matters;
             });
         } else if ($scope.matterType === 'recycle') {
-            http2.get('/rest/pl/fe/site/console/recycle?site=' + $scope.siteId + '&_=' + (new Date() * 1), function(rsp) {
+            http2.get('/rest/pl/fe/site/console/recycle?site=' + $scope.siteId + '&_=' + (new Date() * 1)).then(function(rsp) {
                 $scope.matters = rsp.data.matters;
             });
         } else {
@@ -155,7 +155,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 case 'channel':
                     url += type + '/delete?site=' + $scope.siteId + '&id=' + id;
             }
-            http2.get(url, function(rsp) {
+            http2.get(url).then(function(rsp) {
                 $scope.matters.splice($scope.matters.indexOf(matter), 1);
             });
         }
@@ -181,13 +181,13 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 alert('程序错误');
                 return;
         }
-        http2.get(url, function(rsp) {
+        http2.get(url).then(function(rsp) {
             location.href = '/rest/pl/fe/matter/' + type + '?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
     $scope.restoreMatter = function(matter) {
         var url = '/rest/pl/fe/matter/' + matter.matter_type + '/restore' + '?site=' + $scope.siteId + '&id=' + matter.matter_id;
-        http2.get(url, function(rsp) {
+        http2.get(url).then(function(rsp) {
             location.href = '/rest/pl/fe/matter/' + matter.matter_type + '?site=' + $scope.siteId + '&id=' + matter.matter_id;
         });
     };
@@ -203,12 +203,12 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             url += '&mission=' + $scope.selectedMission.mission_id;
             config.proto.title = $scope.selectedMission.title + '-' + config.proto.title;
         }
-        http2.post(url, config, function(rsp) {
+        http2.post(url, config).then(function(rsp) {
             location.href = '/rest/pl/fe/matter/article?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
     $scope.addChannel = function() {
-        http2.get('/rest/pl/fe/matter/channel/create?site=' + $scope.siteId, function(rsp) {
+        http2.get('/rest/pl/fe/matter/channel/create?site=' + $scope.siteId).then(function(rsp) {
             location.href = '/rest/pl/fe/matter/channel?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
@@ -246,7 +246,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 } else if (choice.source === 'file') {
                     var url, data = choice.data;
                     url = '/rest/pl/fe/matter/enroll/createByFile?site=' + $scope.siteId;
-                    http2.post(url, data, function(rsp) {
+                    http2.post(url, data).then(function(rsp) {
                         location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
                     });
                     return;
@@ -260,7 +260,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
                 title = $scope.selectedMission.title + '-' + title;
             }
             config.proto.title = title;
-            http2.post(url, config, function(rsp) {
+            http2.post(url, config).then(function(rsp) {
                 location.href = '/rest/pl/fe/matter/enroll?site=' + $scope.siteId + '&id=' + rsp.data.id;
             });
         });
@@ -277,7 +277,7 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             url += '&mission=' + $scope.selectedMission.mission_id;
             config.proto.title = $scope.selectedMission.title + '-' + config.proto.title;
         }
-        http2.post(url, config, function(rsp) {
+        http2.post(url, config).then(function(rsp) {
             location.href = '/rest/pl/fe/matter/signin?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
@@ -293,16 +293,16 @@ ngApp.controller('ctrlConsole', ['$scope', '$uibModal', 'http2', 'templateShop',
             url += '&mission=' + $scope.selectedMission.mission_id;
             config.proto.title = $scope.selectedMission.title + '-' + config.proto.title;
         }
-        http2.post(url, config, function(rsp) {
+        http2.post(url, config).then(function(rsp) {
             location.href = '/rest/pl/fe/matter/group/main?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
     $scope.addMission = function() {
-        http2.get('/rest/pl/fe/matter/mission/create?site=' + $scope.siteId, function(rsp) {
+        http2.get('/rest/pl/fe/matter/mission/create?site=' + $scope.siteId).then(function(rsp) {
             location.href = '/rest/pl/fe/matter/mission?site=' + $scope.siteId + '&id=' + rsp.data.id;
         });
     };
-    http2.get('/rest/pl/fe/site/console/recent?site=' + $scope.siteId + '&_=' + (new Date() * 1), function(rsp) {
+    http2.get('/rest/pl/fe/site/console/recent?site=' + $scope.siteId + '&_=' + (new Date() * 1)).then(function(rsp) {
         $scope.matters = rsp.data.matters;
     });
 }]);
