@@ -1,6 +1,6 @@
-define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(require) {
+define(['require', 'enrollService', 'enrollSchema', 'enrollPage', 'groupService'], function(require) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'http.ui.xxt', 'tmplshop.ui.xxt', 'schema.ui.xxt', 'pl.const', 'service.matter', 'service.enroll', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'ui.xxt', 'sys.chart']);
+    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'http.ui.xxt', 'tmplshop.ui.xxt', 'schema.ui.xxt', 'pl.const', 'service.matter', 'service.enroll', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'service.group', 'ui.xxt', 'sys.chart']);
     ngApp.constant('cstApp', {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -35,15 +35,20 @@ define(['require', 'enrollService', 'enrollSchema', 'enrollPage'], function(requ
         }
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvEnrollAppProvider', 'srvEnrollRoundProvider', 'srvEnrollPageProvider', 'srvEnrollRecordProvider', 'srvTagProvider', 'srvEnrollLogProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvEnrollAppProvider, srvEnrollRoundProvider, srvEnrollPageProvider, srvEnrollRecordProvider, srvTagProvider, srvEnrollLogProvider) {
-        var RouteParam = function(name, htmlBase, jsBase) {
-            var baseURL = '/views/default/pl/fe/matter/enroll/';
-            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
+        var RouteParam = function(name) {
+            var baseURL;
+            if (window.ScriptTimes && window.ScriptTimes.html && window.ScriptTimes.html[name]) {
+                this.templateUrl = window.ScriptTimes.html[name].path + '.html?_=' + window.ScriptTimes.html[name].time;
+            } else {
+                baseURL = '/views/default/pl/fe/matter/enroll/';
+                this.templateUrl = baseURL + name + '.html?_=' + (new Date * 1);
+            }
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
             this.reloadOnSearch = false;
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
-                    require([(jsBase || baseURL) + name + '.js'], function() {
+                    require([name + 'Ctrl'], function() {
                         defer.resolve();
                     });
                     return defer.promise;
