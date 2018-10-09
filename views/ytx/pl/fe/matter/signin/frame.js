@@ -1,6 +1,6 @@
 define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPage'], function(require, pageLib, schemaLib) {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'http.xxt.ui', 'schema.ui.xxt', 'service.matter', 'service.signin', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'ui.xxt']);
+    var ngApp = angular.module('app', ['ngRoute', 'frapontillo.bootstrap-switch', 'ui.tms', 'http.ui.xxt', 'schema.ui.xxt', 'service.matter', 'service.signin', 'schema.enroll', 'page.enroll', 'tinymce.enroll', 'ui.xxt']);
     ngApp.constant('cstApp', {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -26,14 +26,20 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
         naming: {}
     });
     ngApp.config(['$controllerProvider', '$routeProvider', '$locationProvider', '$compileProvider', '$uibTooltipProvider', 'srvSiteProvider', 'srvQuickEntryProvider', 'srvSigninAppProvider', 'srvSigninRoundProvider', 'srvEnrollPageProvider', 'srvSigninRecordProvider', 'srvTagProvider', function($controllerProvider, $routeProvider, $locationProvider, $compileProvider, $uibTooltipProvider, srvSiteProvider, srvQuickEntryProvider, srvSigninAppProvider, srvSigninRoundProvider, srvSigninPageProvider, srvSigninRecordProvider, srvTagProvider) {
-        var RouteParam = function(name, htmlBase, jsBase) {
-            var baseURL = '/views/default/pl/fe/matter/signin/';
-            this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date() * 1);
+        var RouteParam = function(name) {
+            var baseURL;
+            if (window.ScriptTimes && window.ScriptTimes.html && window.ScriptTimes.html[name]) {
+                this.templateUrl = window.ScriptTimes.html[name].path + '.html?_=' + window.ScriptTimes.html[name].time;
+            } else {
+                baseURL = '/views/default/pl/fe/matter/signin/';
+                this.templateUrl = baseURL + name + '.html?_=' + (new Date * 1);
+            }
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
+            this.reloadOnSearch = false;
             this.resolve = {
                 load: function($q) {
                     var defer = $q.defer();
-                    require([(jsBase || baseURL) + name + '.js'], function() {
+                    require([name + 'Ctrl'], function() {
                         defer.resolve();
                     });
                     return defer.promise;
@@ -86,7 +92,7 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
         $scope.opened = '';
         $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
-            $scope.subView = subView[1] === 'signin' ? 'publish' : subView[1];
+            $scope.subView = subView[1] === 'signin' ? 'entry' : subView[1];
             switch ($scope.subView) {
                 case 'main':
                 case 'page':
@@ -114,6 +120,7 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
         $scope.update = function(props) {
             srvSigninApp.update(props);
         };
+        $scope.mapOfAppSchemas = {};
         srvSite.get().then(function(oSite) {
             $scope.site = oSite;
         });
@@ -124,7 +131,6 @@ define(['require', 'page', 'schema', 'signinService', 'enrollSchema', 'enrollPag
             $scope.sns = oSns;
             $scope.snsNames = Object.keys(oSns);
             $scope.snsCount = Object.keys(oSns).length;
-            $scope.mapOfAppSchemas = {};
             srvSigninApp.get().then(function(oApp) {
                 if (oApp.matter_mg_tag !== '') {
                     oApp.matter_mg_tag.forEach(function(cTag, index) {
