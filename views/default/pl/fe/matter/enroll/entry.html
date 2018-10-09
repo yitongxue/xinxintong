@@ -158,10 +158,9 @@
     <div class='panel panel-default' ng-controller="ctrlTaskRemind">
         <div class='panel-body'>
             <div class='form-group'>
-                <p>
-                    <i class="glyphicon glyphicon-bell"></i> <span>任务提醒</span>
-                </p>
+                <p><i class="glyphicon glyphicon-bell"></i> <span>任务提醒</span></p>
             </div>
+            <hr>
             <!--begin timer-->
             <div class='timer' ng-repeat="timer in timers">
                 <div class='form-group'>
@@ -205,12 +204,67 @@
                         </div>
                     </div>
                 </div>
+                <hr>
                 <div ng-include="'/views/default/pl/fe/_module/timerNotice.html'"></div>
                 <hr>
             </div>
             <!--end timer-->
             <div>
                 <button class='btn btn-default' ng-click="srvTimer.add(app,timers,'remind',{page:'',receiver:{scope:'enroll'}})">添加定时发送规则</button>
+            </div>
+            <div ng-if="timers.length">
+                <hr>
+                <a href ng-click="switchTo('notice')">查看通知发送日志</a>
+            </div>
+        </div>
+    </div>
+    <div class='panel panel-default' ng-controller="ctrlUndoneRemind">
+        <div class='panel-body'>
+            <div class='form-group'>
+                <p><i class="glyphicon glyphicon-bell"></i> 任务提醒【有未完成任务用户时发送】</p>
+            </div>
+            <hr>
+            <!--begin timer-->
+            <div class='timer' ng-repeat="timer in timers">
+                <div tms-array-checkbox model="timer.task.task_arguments.receiver.scope">
+                    <div class='checkbox'>
+                        <label>
+                            <input type='checkbox' value='user'>未完成任务的用户
+                        </label>
+                    </div>
+                    <div class='checkbox' ng-if="app.entryRule.group.id">
+                        <label>
+                            <input type='checkbox' value='leader'>用户在分组活动【<span ng-bind="app.entryRule.group.title"></span>】所属分组的组长
+                        </label>
+                    </div>
+                    <div class='checkbox'>
+                        <label class='checkbox-inline'>
+                            <input type='checkbox' value='group'><span>指定分组活动和分组</span>&nbsp;<a ng-if="timer.task.task_arguments.receiver.scope&&timer.task.task_arguments.receiver.scope.indexOf('group')!==-1" ng-click="assignGroup(timer)">指定</a>
+                        </label>
+                    </div>
+                </div>
+                <div class='form-group' ng-if="timer.task.task_arguments.receiver.scope.indexOf('group')!==-1">
+                    <div class='row'>
+                        <div class='col-md-7'>
+                            <div class='pl-input-group'>
+                                <div class='form-control pl-line' ng-bind="timer.task.task_arguments.receiver.group.title"></div>
+                                <a class='btn btn-default' ng-href="/rest/pl/fe/matter/group?site={{app.siteid}}&id={{timer.task.task_arguments.receiver.group.id}}" target='_blank' title='打开'><i class='glyphicon glyphicon-open'></i></a>
+                            </div>
+                        </div>
+                        <div class='col-md-5'>
+                            <div class='pl-input-group'>
+                                <div class='form-control pl-line' ng-bind="timer.task.task_arguments.receiver.group.round.title"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div ng-include="'/views/default/pl/fe/_module/timerNotice.html'"></div>
+                <hr>
+            </div>
+            <!--end timer-->
+            <div>
+                <button class='btn btn-default' ng-click="srvTimer.add(app,timers,'undone',{receiver:{scope:['user']}})">添加定时发送规则</button>
             </div>
             <div ng-if="timers.length">
                 <hr>
@@ -261,6 +315,52 @@
             </div>
             <div ng-if="!config.submit">
                 <button class='btn btn-default' ng-click="initConfig('submit')">设置提醒规则</button>
+            </div>
+        </div>
+    </div>
+    <div class='panel panel-default' ng-controller="ctrlEventRemind">
+        <div class='panel-body'>
+            <div class='form-group'>
+                <p><i class="glyphicon glyphicon-bell"></i> 事件提醒【用户提交协作填写】</p>
+            </div>
+            <hr>
+            <div ng-if="config.cowork">
+                <div class='form-group'>
+                    <label class='radio-inline'>
+                        <input type='radio' value="cowork" ng-model="config.cowork.page">讨论页</label>
+                </div>
+                <div tms-array-checkbox model="config.cowork.receiver.scope">
+                    <div class='checkbox'>
+                        <label>
+                            <input type='checkbox' value='related'>协作填写所在记录的提交人
+                        </label>
+                    </div>
+                    <div class='checkbox'>
+                        <label class='checkbox-inline'>
+                            <input type='checkbox' value='group'><span>指定分组活动和分组</span>&nbsp;<a ng-if="config.cowork.receiver.scope&&config.cowork.receiver.scope.indexOf('group')!==-1" ng-click="assignGroup(config.cowork.receiver)">指定</a>
+                        </label>
+                    </div>
+                </div>
+                <div class='form-group' ng-if="config.cowork.receiver.scope&&config.cowork.receiver.scope.indexOf('group')!==-1">
+                    <div class='row'>
+                        <div class='col-md-7'>
+                            <input class='form-control' title="{{config.cowork.receiver.group.title}}" value="{{config.cowork.receiver.group.title}}" readonly>
+                        </div>
+                        <div class='col-md-5'>
+                            <input class='form-control' title="{{config.cowork.receiver.group.round.title}}" value="{{config.cowork.receiver.group.round.title}}" readonly>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class='form-inline'>
+                    <div class='checkbox'>
+                        <input type='checkbox' bs-switch data-on-text="启用" data-off-text="停用" ng-model="config.cowork.valid">
+                    </div>
+                    <button class='btn' ng-class="{'btn-default':!modified, 'btn-success':modified}" ng-disabled="!modified" ng-click="save()">保存</button>
+                </div>
+            </div>
+            <div ng-if="!config.cowork">
+                <button class='btn btn-default' ng-click="initConfig('cowork')">设置提醒规则</button>
             </div>
         </div>
     </div>
