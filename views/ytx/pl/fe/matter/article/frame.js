@@ -1,6 +1,6 @@
 define(['require'], function() {
     'use strict';
-    var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'ui.xxt', 'http.ui.xxt', 'member.xxt', 'service.matter', 'service.article', 'thumbnail.ui.xxt']);
+    var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'ui.xxt', 'http.ui.xxt', 'notice.ui.xxt', 'member.xxt', 'service.matter', 'service.article', 'thumbnail.ui.xxt']);
     ngApp.constant('cstApp', {
         innerlink: [{
             value: 'article',
