@@ -1,7 +1,25 @@
+/* 定义应用常量 */
+define("cstApp", {
+    matterNames: {
+        doc: {
+            'article': '项目资料',
+            'channel': '频道',
+        },
+        docOrder: ['article', 'channel'],
+        app: {
+            'enroll': '登记',
+            'signin': '签到',
+            'group': '分组',
+        },
+        appOrder: ['enroll', 'signin', 'group'],
+        'site': '团队',
+        'mission': '项目',
+    },
+});
 var _oRawScripts;
 _oRawScripts = {
     js: {
-        "frame": '/views/ytx/pl/fe/console/frame',
+        "frame": '/views/default/pl/fe/console/frame',
         "mainCtrl": '/views/default/pl/fe/console/main',
         "usersCtrl": '/views/default/pl/fe/console/users',
     },
