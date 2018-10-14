@@ -15,6 +15,23 @@ define("frame/const", {
         'site': '团队',
         'mission': '项目',
     },
+    notifyMatter: [{
+        value: 'tmplmsg',
+        title: '模板消息',
+        url: '/rest/pl/fe/matter'
+    }, {
+        value: 'article',
+        title: '项目资料',
+        url: '/rest/pl/fe/matter'
+    }, {
+        value: 'channel',
+        title: '频道',
+        url: '/rest/pl/fe/matter'
+    }, {
+        value: 'enroll',
+        title: '登记活动',
+        url: '/rest/pl/fe/matter'
+    }]
 });
 var _oRawPathes;
 _oRawPathes = {
