@@ -16,8 +16,8 @@ define("cstApp", {
         'mission': '项目',
     },
 });
-var _oRawScripts;
-_oRawScripts = {
+var _oRawPathes;
+_oRawPathes = {
     js: {
         "frame": '/views/default/pl/fe/console/frame',
         "mainCtrl": '/views/default/pl/fe/console/main',
