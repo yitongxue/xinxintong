@@ -1,5 +1,5 @@
 /* 定义应用常量 */
-define("cstApp", {
+define("frame/const", {
     matterNames: {
         doc: {
             'article': '项目资料',
