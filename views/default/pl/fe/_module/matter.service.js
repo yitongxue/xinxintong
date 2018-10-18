@@ -1147,7 +1147,7 @@ service('tkRoundCron', ['$rootScope', '$q', '$uibModal', 'http2', function($root
     };
     this.choose = function(oMatter) {
         var defer = $q.defer();
-        http2.post('/rest/script/time', { html: { 'picker': '/views/default/pl/fe/_module/chooseRoundCron.html' } }).then(function(oTemplateTimes) {
+        http2.post('/rest/script/time', { html: { 'picker': '/views/default/pl/fe/_module/chooseRoundCron' } }).then(function(oTemplateTimes) {
             $uibModal.open({
                 templateUrl: '/views/default/pl/fe/_module/chooseRoundCron.html?_=' + oTemplateTimes.data.html.picker.time,
                 controller: ['$uibModalInstance', '$scope', function($mi, $scope2) {
@@ -1157,15 +1157,14 @@ service('tkRoundCron', ['$rootScope', '$q', '$uibModal', 'http2', function($root
                         $mi.dismiss();
                     };
                     $scope2.ok = function() {
-                        if ($scope2.data.chosen) {
-                            $mi.close($scope2.data.chosen);
-                        } else {
-                            $mi.dismiss();
-                        }
+                        $mi.close($scope2.data.chosen);
                     };
                 }],
                 backdrop: 'static',
-            }).result.then(function(rst) {});
+            }).result.then(function(oRule) {
+                if (oRule)
+                    defer.resolve(oRule);
+            });
         });
         return defer.promise;
     };
