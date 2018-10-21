@@ -211,6 +211,9 @@ class main extends \site\fe\base {
 	private function _getRegAntsByWxopenid($oAccount) {
 		$accounts = [];
 		if (!empty($oAccount->wx_openid)) {
+			if ($oAccount->wx_openid === 'ocI31w3m3uHfLc_MtPFckoJCYhdQ') {
+				die('sss:'.json_encode($oAccount))
+			}
 			$modelAnt = $this->model('site\user\account');
 			$regAnts = $modelAnt->byOpenid($oAccount->siteid, 'wx', $oAccount->wx_openid, ['fields' => 'uid,nickname,unionid,is_wx_primary,is_reg_primary', 'is_reg_primary' => 'Y', 'has_unionid' => true]);
 			if (count($regAnts)) {
