@@ -61,11 +61,11 @@ class account_model extends \TMS_MODEL {
 		if (isset($aOptions['has_unionid']) && true === $aOptions['has_unionid']) {
 			$q[2]['unionid'] = (object) ['op' => '<>', 'pat' => ''];
 		}
-		if ($openid === 'ocI31w3m3uHfLc_MtPFckoJCYhdQ') {
-			die('xxxxxxxzzzz:' . json_encode($q));
-		}
 		$acts = $this->query_objs_ss($q);
 
+		if ($openid === 'ocI31w3m3uHfLc_MtPFckoJCYhdQ') {
+			die('xxxxxxxzzzz:' . json_encode($acts));
+		}
 		return $acts;
 	}
 	/**
