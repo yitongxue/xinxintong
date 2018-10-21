@@ -63,9 +63,6 @@ class account_model extends \TMS_MODEL {
 		}
 		$acts = $this->query_objs_ss($q);
 
-		if ($openid === 'ocI31w3m3uHfLc_MtPFckoJCYhdQ') {
-			die('xxxxxxxzzzz:' . json_encode($acts));
-		}
 		return $acts;
 	}
 	/**
