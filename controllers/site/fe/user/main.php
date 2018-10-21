@@ -214,9 +214,6 @@ class main extends \site\fe\base {
 			$modelAnt = $this->model('site\user\account');
 			$regAnts = $modelAnt->byOpenid($oAccount->siteid, 'wx', $oAccount->wx_openid, ['fields' => 'uid,nickname,unionid,is_wx_primary,is_reg_primary', 'is_reg_primary' => 'Y', 'has_unionid' => true]);
 			if (count($regAnts) > 1) {
-				if ($oAccount->uid === '58e4c904b2eb6') {
-					die('xxxxxxxzzzz');
-				}
 				$modelReg = $this->model('site\user\registration');
 				foreach ($regAnts as $oRegAnt) {
 					$oReg = $modelReg->byId($oRegAnt->unionid);
