@@ -68,7 +68,7 @@ class main extends base {
 				$this->_pageReadlog($oApp, $page, $rid, $ek, $topic);
 			}
 			\TPL::assign('title', empty($title) ? $oApp->title : ($title . $oApp->title));
-			\TPL::output('/site/fe/matter/enroll/' . $page);
+			$outputUrl = '/site/fe/matter/enroll/' . $page;
 		} else {
 			if (empty($page)) {
 				/* 计算打开哪个页面 */
@@ -83,15 +83,26 @@ class main extends base {
 			}
 			\TPL::assign('title', $oApp->title);
 			if (in_array($oOpenPage->name, ['event', 'rank', 'score', 'votes', 'marks', 'repos', 'favor', 'topic'])) {
-				\TPL::output('/site/fe/matter/enroll/' . $oOpenPage->name);
+				$outputUrl = '/site/fe/matter/enroll/' . $oOpenPage->name;
 			} else if ($oOpenPage->type === 'I') {
-				\TPL::output('/site/fe/matter/enroll/input');
+				$outputUrl = '/site/fe/matter/enroll/input';
 			} else if ($oOpenPage->type === 'V') {
-				\TPL::output('/site/fe/matter/enroll/view');
+				$outputUrl = '/site/fe/matter/enroll/view';
 			} else if ($oOpenPage->type === 'L') {
-				\TPL::output('/site/fe/matter/enroll/list');
+				$outputUrl = '/site/fe/matter/enroll/list';
 			}
 		}
+
+		$user = $this->who;
+		if (isset($user->unionid)) {
+			$oAccount = $this->model('account')->byId($user->unionid, ['cascaded' => ['group']]);
+			if (isset($oAccount->group->view_name) && $oAccount->group->view_name !== TMS_APP_VIEW_NAME) {
+				\TPL::output($outputUrl, ['customViewName' => $oAccount->group->view_name]);
+				exit;
+			}
+		}
+
+		\TPL::output($outputUrl);
 		exit;
 	}
 	/**
@@ -316,8 +327,8 @@ class main extends base {
 		/**
 		 * 获得当前活动的分组和当前用户所属的分组，是否为组长，及同组成员
 		 */
-		if ((isset($oApp->entryRule->scope->group) && $oApp->entryRule->scope->group === 'Y' && !empty($oApp->entryRule->group->id)) || !empty($oApp->group_app_id)) {
-			$assocGroupAppId = (isset($oApp->entryRule->scope->group) && $oApp->entryRule->scope->group === 'Y' && !empty($oApp->entryRule->group->id)) ? $oApp->entryRule->group->id : $oApp->group_app_id;
+		if (!empty($oApp->entryRule->group->id)) {
+			$assocGroupAppId = $oApp->entryRule->group->id;
 			/* 获得的分组信息 */
 			$modelGrpRnd = $this->model('matter\group\round');
 			$groups = $modelGrpRnd->byApp($assocGroupAppId, ['fields' => "round_id,title,round_type"]);
