@@ -21,6 +21,12 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
         alertMsg: {
             'schema.duplicated': '不允许重复添加题目'
         },
+        options: {
+            round: {
+                state: ['新建', '启用', '结束'],
+                purpose: { C: '常规', B: '基线', S: '汇总' }
+            }
+        },
         naming: {}
     });
     var _oRawPathes;
