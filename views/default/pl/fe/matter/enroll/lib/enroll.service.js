@@ -157,23 +157,6 @@ define(['require', 'frame/templates', 'schema', 'page'], function(require, Frame
         }
     };
     var ngModule = angular.module('service.enroll', ['ui.bootstrap', 'ui.xxt', 'service.matter']);
-    /**
-     * app
-     */
-    ngModule.service('tkEnrollApp', ['$q', 'http2', function($q, http2) {
-        function _fnMakeApiUrl(oApp, action) {
-            var url;
-            url = '/rest/pl/fe/matter/enroll/' + action + '?site=' + oApp.siteid + '&app=' + oApp.id;
-            return url;
-        }
-        this.update = function(oApp, oModifiedData) {
-            var defer = $q.defer();
-            http2.post(_fnMakeApiUrl(oApp, 'update'), oModifiedData).then(function(rsp) {
-                defer.resolve(rsp.data);
-            });
-            return defer.promise;
-        };
-    }]);
     ngModule.provider('srvEnrollApp', function() {
         function _fnMapAssocEnrollApp(oApp) {
             var enrollDataSchemas = [];
@@ -361,11 +344,6 @@ define(['require', 'frame/templates', 'schema', 'page'], function(require, Frame
                         nonfan: pages4Nonfan,
                         defaultInput: defaultInput
                     }
-                },
-                changeUserScope: function(ruleScope, oSiteSns, oDefaultInputPage) {
-                    var oEntryRule = _oApp.entryRule;
-                    oEntryRule.scope = ruleScope;
-                    return this.update('entryRule');
                 },
                 assignMission: function() {
                     var defer = $q.defer();
