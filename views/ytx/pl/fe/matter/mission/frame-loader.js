@@ -38,6 +38,7 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
             "report": '/views/default/pl/fe/matter/mission/report',
             "time": '/views/default/pl/fe/matter/mission/time',
             "timerNotice": '/views/default/pl/fe/_module/timerNotice',
+            "entryRule": '/views/default/pl/fe/_module/entryRule',
         }
     }
     tms.bootstrap(_oRawPathes);
