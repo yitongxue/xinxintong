@@ -7,16 +7,15 @@ $schema = $def->schema;
         <?php echo $schema->title;?>
     </label>
     <?php if (in_array($schema->type,['name','email','mobile','shorttext','longtext','member'])) { ?>
-    <div>{{Record.current.data.<?php echo $schema->id?>}}</div>
+    <div>{{Record.current.data.
+        <?php echo $schema->id?>}}</div>
     <?php } else if (in_array($schema->type,['_enrollAt'])) { ?>
     <div>{{Record.current.enroll_at*1000|date:'yy-MM-dd HH:mm'}}</div>
     <?php } else if ($schema->type==='single') { ?>
-    <div>{{value2Label("<?php echo $schema->id;?>")}}</div>
+    <div>{{value2Label("
+        <?php echo $schema->id;?>")}}</div>
     <?php } ?>
 </div>
 <?php } ?>
 <!-- end: generate by schema -->
 <div wrap="text" class="form-group">签到成功！</div>
-<div id="act2" class="form-group" wrap="button" ng-controller="ctrlRecord">
-    <button class="btn btn-primary btn-block btn-lg" ng-click="editRecord($event,'signin')"><span>修改签到信息</span></button>
-</div>

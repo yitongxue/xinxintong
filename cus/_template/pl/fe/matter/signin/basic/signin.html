@@ -1,38 +1,35 @@
 <!-- begin: generate by schema -->
-<?php foreach ($this->schema as $def) { 
-$schema = $def->schema;
+<?php foreach ($this->schema as $oWrap) { 
+$oSchema = $oWrap->schema;
 ?>
-<?php if (in_array($schema->type,['shorttext'])) { ?>
-<div class="form-group form-group-lg" wrap="input" schema="<?php echo $schema->id;?>" schema-type="<?php echo $schema->type;?>">
+<?php if (in_array($oSchema->type,['shorttext'])) { ?>
+<div class="form-group form-group-lg" wrap="input" schema="<?php echo $oSchema->id;?>" schema-type="<?php echo $oSchema->type;?>">
     <label>
-        <?php echo $schema->title;?>
+        <?php echo $oSchema->title;?>
     </label>
-    <input ng-model="data.<?php echo $schema->id;?>" title="<?php echo $schema->title;?>" class="form-control input-lg" type="text" />
+    <?php if (empty($oSchema->mschema_id)) { ?>
+    <input ng-model="data.<?php echo $oSchema->id;?>" title="<?php echo $oSchema->title;?>" class="form-control input-lg" type="text" />
+    <?php } else { ?>
+    <input ng-model="data.<?php echo $oSchema->id;?>" title="<?php echo $oSchema->title;?>" class="form-control input-lg" type="text" ng-init="data.member.schema_id=<?php echo $oSchema->mschema_id;?>" />
+    <?php } ?>
 </div>
-<?php } else if ($schema->type==='member') { ?>
-<div class="form-group form-group-lg" wrap="input" schema="<?php echo $schema->id;?>" schema-type="<?php echo $schema->type;?>">
+<?php } else if ($oSchema->type==='longtext') { ?>
+<div class="form-group form-group-lg" wrap="input" schema="<?php echo $oSchema->id;?>" schema-type="<?php echo $oSchema->type;?>">
     <label>
-        <?php echo $schema->title;?>
+        <?php echo $oSchema->title;?>
     </label>
-    <input ng-model="data.<?php echo $schema->id;?>" title="<?php echo $schema->title;?>" class="form-control input-lg" type="text" ng-init="data.member.schema_id=<?php echo $schema->schema_id;?>" />
+    <textarea style="height:auto;" ng-model="data.<?php echo $oSchema->id;?>" title="<?php echo $oSchema->title;?>" class="form-control input-lg" rows="3"></textarea>
 </div>
-<?php } else if ($schema->type==='longtext') { ?>
-<div class="form-group form-group-lg" wrap="input" schema="<?php echo $schema->id;?>" schema-type="<?php echo $schema->type;?>">
+<?php } else if ($oSchema->type==='single') { ?>
+<div wrap="input" class="form-group form-group-lg" schema="<?php echo $oSchema->id;?>" schema-type="<?php echo $oSchema->type;?>">
     <label>
-        <?php echo $schema->title;?>
-    </label>
-    <textarea style="height:auto;" ng-model="data.<?php echo $schema->id;?>" title="<?php echo $schema->title;?>" class="form-control input-lg" rows="3"></textarea>
-</div>
-<?php } else if ($schema->type==='single') { ?>
-<div wrap="input" class="form-group form-group-lg" schema="<?php echo $schema->id;?>" schema-type="<?php echo $schema->type;?>">
-    <label>
-        <?php echo $schema->title; ?>
+        <?php echo $oSchema->title; ?>
     </label>
     <ul>
-        <?php foreach ($schema->ops as $op) {?>
+        <?php foreach ($oSchema->ops as $op) {?>
         <li class="radio" wrap="radio">
             <label>
-                <input type="radio" name="<?php echo $schema->id;?>" value="<?php echo $op->v;?>" ng-model="data.<?php echo $schema->id;?>"><span><?php echo $op->l;?></span></label>
+                <input type="radio" name="<?php echo $oSchema->id;?>" value="<?php echo $op->v;?>" ng-model="data.<?php echo $oSchema->id;?>"><span><?php echo $op->l;?></span></label>
         </li>
         <?php } ?>
     </ul>
@@ -40,6 +37,3 @@ $schema = $def->schema;
 <?php } ?>
 <?php } ?>
 <!-- end: generate by schema -->
-<div id="btnSubmit" class="form-group" wrap="button">
-    <button class="btn btn-primary btn-block btn-lg" ng-click="submit($event,'_autoForward')"><span>签到</span></button>
-</div>
