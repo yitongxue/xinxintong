@@ -359,7 +359,7 @@ abstract class enroll_base extends app_base {
 			/* 和分组活动解除关联 */
 			if (isset($oSchema->fromApp) && (empty($aAssocAppIds) || in_array($oSchema->fromApp, $aAssocAppIds))) {
 				unset($oSchema->fromApp);
-				unset($oSchema->requieCheck);
+				unset($oSchema->requireCheck);
 			}
 		}
 

@@ -393,7 +393,7 @@ class schema_model extends \TMS_MODEL {
 	public function wipeAssoc(&$oSchema, $aAssocAppIds) {
 		if (isset($oSchema->fromApp) && in_array($oSchema->fromApp, $aAssocAppIds)) {
 			unset($oSchema->fromApp);
-			unset($oSchema->requieCheck);
+			unset($oSchema->requireCheck);
 
 			return true;
 		}
