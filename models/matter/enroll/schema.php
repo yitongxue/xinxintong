@@ -1030,4 +1030,34 @@ class schema_model extends \TMS_MODEL {
 
 		return $aResult;
 	}
+	/**
+	 * 需要进行投票的题目
+	 */
+	public function setCanVote($oApp, $bModifyOriginal = true) {
+		if (!isset($oApp->dynaDataSchemas) || !isset($oApp->voteConfig)) {
+			$oApp = $this->model('matter\enroll')->byId($oApp->id, ['cascaded' => 'N', 'fields' => 'id,data_schemas,vote_config']);
+		}
+		$fnValidConfig = function ($oVoteConfig) {
+			if (empty($oVoteConfig->schemas)) {
+				return false;
+			}
+			return true;
+		};
+		$aVoteSchemas = [];
+		foreach ($oApp->voteConfig as $oVoteConfig) {
+			if (!$fnValidConfig($oVoteConfig)) {
+				continue;
+			}
+			foreach ($oApp->dynaDataSchemas as $oSchema) {
+				if (in_array($oSchema->id, $oVoteConfig->schemas)) {
+					if ($bModifyOriginal) {
+						$oSchema->canVote = 'Y';
+					}
+					$aVoteSchemas[$oSchema->id] = $oSchema;
+				}
+			}
+		}
+
+		return $aVoteSchemas;
+	}
 }
