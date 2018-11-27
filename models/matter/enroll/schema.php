@@ -271,18 +271,20 @@ class schema_model extends \TMS_MODEL {
 	 * 去除题目中的通讯录信息
 	 */
 	public function wipeMschema(&$oSchema, $oMschema) {
-		if ($oSchema->mschema_id === $oMschema->id) {
-			/* 更新题目 */
-			$oSchema->type = 'shorttext';
-			$oSchema->id = str_replace('member.', '', $oSchema->id);
-			if (in_array($oSchema->id, ['name', 'mobile', 'email'])) {
-				$oSchema->format = $oSchema->id;
-			} else {
-				$oSchema->format = '';
-			}
-			unset($oSchema->mschema_id);
+		if (isset($oSchema->mschema_id)) {
+			if ($oSchema->mschema_id === $oMschema->id) {
+				/* 更新题目 */
+				$oSchema->type = 'shorttext';
+				$oSchema->id = str_replace('member.', '', $oSchema->id);
+				if (in_array($oSchema->id, ['name', 'mobile', 'email'])) {
+					$oSchema->format = $oSchema->id;
+				} else {
+					$oSchema->format = '';
+				}
+				unset($oSchema->mschema_id);
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;
