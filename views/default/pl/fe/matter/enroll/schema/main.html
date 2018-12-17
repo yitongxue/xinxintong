@@ -214,6 +214,19 @@
             <input type='checkbox' ng-true-value="'Y'" ng-false-value="'N'" ng-model='activeSchema.showOpDsLink' ng-change="updSchema(activeSchema)"> 填写时跳转到选项来源记录</label>
     </div>
     <div class='form-group' ng-if="['single','multiple','score','longtext','html'].indexOf(activeSchema.type)!==-1">
-        <button class='btn btn-default' ng-click="setSchemaSource(activeSchema)">数量和标题从其它活动生成 <span ng-if="activeSchema.dsSchema" class='glyphicon glyphicon-check'></span></button>
+        <button class='btn btn-default' ng-click="setSchemaSource(activeSchema)">题目数量和标题从其它活动生成 <span ng-if="activeSchema.dsSchema" class='glyphicon glyphicon-check'></span></button>
+    </div>
+    <div class='form-group' ng-if="['multitext'].indexOf(activeSchema.type)!==-1">
+        <div class="input-group-btn">
+            <button class='btn btn-default' ng-click="setScoreApp(activeSchema)">设置打分活动</button>
+            <button ng-if="activeSchema.scoreApp" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href='/rest/pl/fe/matter/enroll?id={{activeSchema.scoreApp.id}}&site={{app.siteid}}' target='_blank'>查看活动</a></li>
+                <li><a href ng-click="unlinkScoreApp(activeSchema)">解除关联</a></li>
+            </ul>
+        </div>
     </div>
 </div>
