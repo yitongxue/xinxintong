@@ -20,6 +20,7 @@ $sql .= ",mission_id int not null default 0"; // 所属项目
 $sql .= ",scenario varchar(255) not null default ''"; // 记录活动场景
 $sql .= ",scenario_config text null"; // 记录活动场景的配置参数
 $sql .= ",vote_config text null"; // 记录活动投票设置
+$sql .= ",score_config text null"; // 记录活动打分设置
 $sql .= ",transmit_config text null"; // 记录转发设置
 $sql .= ",round_cron text null"; // 定时创建轮次规则
 $sql .= ",sync_mission_round char(1) not null default 'N'"; // 和项目轮次同步
@@ -468,6 +469,7 @@ $sql .= ",summary varchar(240) not null default ''"; // 分享或生成链接时
 $sql .= ",state tinyint not null default 1"; //0:clean,1:normal;
 $sql .= ",rec_num int not null default 0";
 $sql .= ",share_in_group char(1) not null default 'N'";
+$sql .= ",is_public char(1) not null default 'N'"; // 是否为公共专题
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');

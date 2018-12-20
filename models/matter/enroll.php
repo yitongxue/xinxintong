@@ -169,6 +169,14 @@ class enroll_model extends enroll_base {
 				}
 				unset($oApp->vote_config);
 			}
+			if ($fields === '*' || false !== strpos($fields, 'score_config')) {
+				if (!empty($oApp->score_config)) {
+					$oApp->scoreConfig = json_decode($oApp->score_config);
+				} else {
+					$oApp->scoreConfig = [];
+				}
+				unset($oApp->score_config);
+			}
 			if ($fields === '*' || false !== strpos($fields, 'transmit_config')) {
 				if (!empty($oApp->transmit_config)) {
 					$oApp->transmitConfig = json_decode($oApp->transmit_config);
@@ -188,6 +196,7 @@ class enroll_model extends enroll_base {
 				} else {
 					$oApp->roundCron = [];
 				}
+				unset($oApp->round_cron);
 			}
 			if ($fields === '*' || false !== strpos($fields, 'notify_config')) {
 				if (!empty($oApp->notify_config)) {
@@ -203,6 +212,7 @@ class enroll_model extends enroll_base {
 				} else {
 					$oApp->rpConfig = new \stdClass;
 				}
+				unset($oApp->rp_config);
 			}
 			if ($fields === '*' || false !== strpos($fields, 'repos_config')) {
 				if (!empty($oApp->repos_config)) {

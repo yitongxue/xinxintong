@@ -1156,6 +1156,67 @@ class schema_model extends \TMS_MODEL {
 		return $aVoteSchemas;
 	}
 	/**
+	 * 需要进行打分的题目
+	 */
+	public function getCanScore($oApp, $oRound = null) {
+		if (!isset($oApp->dynaDataSchemas) || !isset($oApp->scoreConfig)) {
+			$oApp = $this->model('matter\enroll')->byId($oApp->id, ['cascaded' => 'N', 'fields' => 'id,data_schemas,score_config']);
+		}
+		if (empty($oRound)) {
+			$oRound = $oApp->appRound;
+		}
+
+		$fnValidConfig = function ($oScoreConfig) use ($oRound) {
+			if (empty($oScoreConfig->schemas)) {
+				return [false];
+			}
+			$current = time();
+			if ($oStartRule = $this->getDeepValue($oScoreConfig, 'start.time')) {
+				if ($this->getDeepValue($oStartRule, 'mode') === 'after_round_start_at') {
+					if ($this->getDeepValue($oStartRule, 'unit') === 'hour') {
+						$afterHours = (int) $this->getDeepValue($oStartRule, 'value');
+						if (empty($oRound->start_at) || ($current < $oRound->start_at + ($afterHours * 3600))) {
+							return [true, 'BS'];
+						}
+					}
+				}
+			}
+			if ($oEndRule = $this->getDeepValue($oScoreConfig, 'end.time')) {
+				if ($this->getDeepValue($oEndRule, 'mode') === 'after_round_start_at') {
+					if ($this->getDeepValue($oEndRule, 'unit') === 'hour') {
+						$afterHours = (int) $this->getDeepValue($oEndRule, 'value');
+						if (empty($oRound->start_at) || ($current > $oRound->start_at + ($afterHours * 3600))) {
+							return [true, 'AE'];
+						}
+					}
+				}
+			}
+
+			return [true, 'IP'];
+		};
+		$configs = [];
+		foreach ($oApp->scoreConfig as $oScoreConfig) {
+			$aValid = $fnValidConfig($oScoreConfig);
+			if (false === $aValid[0]) {
+				continue;
+			}
+			$oScoreConfig->state = $aValid[1];
+			// foreach ($oApp->dynaDataSchemas as $oSchema) {
+			// 	if (in_array($oSchema->id, $oScoreConfig->schemas)) {
+			// 		$oScoreRule = new \stdClass;
+			// 		$oScoreRule->state = $aValid[1];
+			// 		$oScoreRule->scoreApp = $this->getDeepValue($oScoreConfig, 'scoreApp');
+			// 		$oScoreRule->groups = $this->getDeepValue($oScoreConfig, 'role.groups');
+			// 		$oSchema->task = $oScoreRule;
+			// 		$aScoreSchemas[$oSchema->id] = $oSchema;
+			// 	}
+			// }
+			$configs[] = $oScoreConfig;
+		}
+
+		return $configs;
+	}
+	/**
 	 * 转换为关联数组的形式
 	 */
 	public function asAssoc($schemas, $aOptions = [], $bOnlyFirst = false) {
