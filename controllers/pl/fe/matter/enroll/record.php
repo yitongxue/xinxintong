@@ -189,27 +189,30 @@ class record extends main_base {
 			$q[2]['rid'] = $rid;
 		}
 		$records = $modelApp->query_objs_ss($q);
-		foreach ($records as $oRecord) {
-			if (!empty($oRecord->data)) {
-				$dbData = json_decode($oRecord->data);
-				/* 题目的得分 */
-				$oRecordScore = $modelRecData->socreRecordData($oApp, $oRecord, $schemasById, $dbData);
-				if ($modelApp->update('xxt_enroll_record', ['score' => json_encode($oRecordScore)], ['id' => $oRecord->id])) {
-					unset($oRecordScore->sum);
-					foreach ($oRecordScore as $schemaId => $dataScore) {
-						$modelApp->update(
-							'xxt_enroll_record_data',
-							['score' => $dataScore],
-							['enroll_key' => $oRecord->enroll_key, 'schema_id' => $schemaId]
-						);
+		if (count($records)) {
+			$aOptimizedFormulas = []; // 保存优化后的得分计算公式
+			foreach ($records as $oRecord) {
+				if (!empty($oRecord->data)) {
+					$dbData = json_decode($oRecord->data);
+					/* 题目的得分 */
+					$oRecordScore = $modelRecData->socreRecordData($oApp, $oRecord, $schemasById, $dbData, null, $aOptimizedFormulas);
+					if ($modelApp->update('xxt_enroll_record', ['score' => json_encode($oRecordScore)], ['id' => $oRecord->id])) {
+						unset($oRecordScore->sum);
+						foreach ($oRecordScore as $schemaId => $dataScore) {
+							$modelApp->update(
+								'xxt_enroll_record_data',
+								['score' => $dataScore],
+								['enroll_key' => $oRecord->enroll_key, 'schema_id' => $schemaId]
+							);
+						}
+						$renewCount++;
 					}
-					$renewCount++;
 				}
 			}
-		}
 
-		$modelUsr = $this->model('matter\enroll\user');
-		$aUpdatedResult = $modelUsr->renew($oApp);
+			$modelUsr = $this->model('matter\enroll\user');
+			$aUpdatedResult = $modelUsr->renew($oApp);
+		}
 
 		// 记录操作日志
 		$this->model('matter\log')->matterOp($oApp->siteid, $oUser, $oApp, 'renewScore');
@@ -236,24 +239,26 @@ class record extends main_base {
 		$modelRecDat = $this->model('matter\enroll\data');
 		$q = ['id,enroll_key,userid,data,score', 'xxt_enroll_record', ['aid' => $oApp->id, 'enroll_key' => $ek]];
 		$oRecord = $modelApp->query_obj_ss($q);
-		if (!empty($oRecord->data)) {
-			$dbData = json_decode($oRecord->data);
-			/* 题目的得分 */
-			$oRecordScore = $modelRecDat->socreRecordData($oApp, $oRecord, $schemasById, $dbData);
-			if ($modelApp->update('xxt_enroll_record', ['score' => json_encode($oRecordScore)], ['id' => $oRecord->id])) {
-				unset($oRecordScore->sum);
-				foreach ($oRecordScore as $schemaId => $dataScore) {
-					$modelApp->update(
-						'xxt_enroll_record_data',
-						['score' => $dataScore],
-						['enroll_key' => $oRecord->enroll_key, 'schema_id' => $schemaId]
-					);
+		if ($oRecord) {
+			if (!empty($oRecord->data)) {
+				$dbData = json_decode($oRecord->data);
+				/* 题目的得分 */
+				$oRecordScore = $modelRecDat->socreRecordData($oApp, $oRecord, $schemasById, $dbData, null, null);
+				if ($modelApp->update('xxt_enroll_record', ['score' => json_encode($oRecordScore)], ['id' => $oRecord->id])) {
+					unset($oRecordScore->sum);
+					foreach ($oRecordScore as $schemaId => $dataScore) {
+						$modelApp->update(
+							'xxt_enroll_record_data',
+							['score' => $dataScore],
+							['enroll_key' => $oRecord->enroll_key, 'schema_id' => $schemaId]
+						);
+					}
 				}
 			}
-		}
 
-		$modelUsr = $this->model('matter\enroll\user');
-		$aUpdatedResult = $modelUsr->renew($oApp, '', $oRecord->userid);
+			$modelUsr = $this->model('matter\enroll\user');
+			$aUpdatedResult = $modelUsr->renew($oApp, '', $oRecord->userid);
+		}
 
 		// 记录操作日志
 		//$this->model('matter\log')->matterOp($oApp->siteid, $oUser, $oApp, 'renewScore');
@@ -2319,21 +2324,18 @@ class record extends main_base {
 	 * 从指定的数据源同步数据
 	 */
 	public function syncWithDataSource_action($app, $round = null) {
-		if (false === ($oUser = $this->accountUser())) {
+		if (false === ($oOperator = $this->accountUser())) {
 			return new \ResponseTimeout();
 		}
 
 		$modelApp = $this->model('matter\enroll');
-		if (false === ($oApp = $modelApp->byId($app, ['fields' => 'id,data_schemas,scenario,mission_id,sync_mission_round,round_cron', 'cascaded' => 'N']))) {
+		if (false === ($oApp = $modelApp->byId($app, ['fields' => 'id,data_schemas,scenario,mission_id,sync_mission_round,round_cron', 'appRid' => $round, 'cascaded' => 'N']))) {
 			return new \ObjectNotFoundError();
 		}
-		$modelRnd = $this->model('matter\enroll\round');
-		if (empty($round)) {
-			$oAssignedRnd = $modelRnd->getActive($oApp, ['fields' => 'id,rid,mission_rid']);
-		} else {
-			$oAssignedRnd = $modelRnd->byId($round, ['fields' => 'id,rid,mission_rid']);
-		}
 		if (!empty($oApp->dataSchemas)) {
+			$modelRnd = $this->model('matter\enroll\round');
+			$oAssignedRnd = $oApp->appRound;
+
 			foreach ($oApp->dataSchemas as $oSchema) {
 				if (!empty($oSchema->ds->app->id) && !empty($oSchema->ds->type)) {
 					$oDsApp = $modelApp->byId($oSchema->ds->app->id, ['fields' => 'id,data_schemas', 'cascaded' => 'N']);
@@ -2354,6 +2356,25 @@ class record extends main_base {
 								break;
 							}
 						}
+						break;
+					case 'score':
+						if (!empty($oSchema->ds->schema) && is_array($oSchema->ds->schem)) {
+							$dsSchemaIds = [];
+							foreach ($oDsApp->dataSchemas as $oDsSchema) {
+								if (in_array($oDsSchema->id, $oSchema->ds->schema)) {
+									if ($this->getDeepValue($oDsSchema, 'requireScore') === 'Y') {
+										$dsSchemaIds[] = $oDsSchema->id;
+									}
+								}
+								if (count($oSchema->ds->schema) === count($dsSchemaIds)) {
+									break;
+								}
+							}
+							if (count($dsSchemaIds)) {
+								$this->_syncNumberWithScore($oApp, $oSchema, $oDsApp, $dsSchemaIds, $oDsAssignedRnd);
+							}
+						}
+						break;
 					case 'option':
 						if (!empty($oSchema->ds->schema->id) && !empty($oDsApp->dataSchemas)) {
 							foreach ($oDsApp->dataSchemas as $oDsSchema) {
@@ -2481,6 +2502,46 @@ class record extends main_base {
 		}
 
 		return count($oUserRecords);
+	}
+	/**
+	 * 从题目指定的数据源中同步题目
+	 * 题目的数据
+	 */
+	private function _syncNumberWithScore($oApp, $oSchema, $oDsApp, $dsSchemaIds, $oAssignedRnd) {
+		$modelRec = $this->model('matter\enroll\record');
+		$q = [
+			'id,enroll_key,data,userid,group_id',
+			'xxt_enroll_record',
+			['aid' => $oApp->id, 'state' => 1],
+		];
+		/* 限制汇总数据的轮次 */
+		if (!empty($oAssignedRnd->rid)) {
+			$q[2]['rid'] = $oAssignedRnd;
+		}
+		$userRecords = $modelRec->query_objs_ss($q);
+		if (count($userRecords)) {
+			$oRecUser = new \stdClass;
+			$q = [
+				'sum(score)',
+				'xxt_enroll_record_data',
+				['aid' => $oDsApp->id, 'state' => 1, 'schema_id' => $dsSchemaIds],
+			];
+			/* 限制数据源的轮次 */
+			if (!empty($oDsAssignedRnd->rid)) {
+				$q[2]['rid'] = $oDsAssignedRnd->rid;
+			}
+			foreach ($userRecords as $oUserRec) {
+				$oRecUser->uid = $oUserRec->userid;
+				$oRecUser->group_id = $oUserRec->group_id;
+				$oRecData = empty($oUserRec->data) ? new \stdClass : json_decode($oUserRec->data);
+				$q[2]['userid'] = $oUserRec->userid;
+				$score = $modelRec->query_val_ss($q);
+				$oRecData->{$oSchema->id} = $score;
+				$modelRec->setData($oRecUser, $oApp, $oUserRec->enroll_key, $oRecData);
+			}
+		}
+
+		return count($userRecords);
 	}
 	/**
 	 * 从题目指定的数据源中同步题目
