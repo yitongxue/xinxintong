@@ -8,7 +8,7 @@ constant('CstNaming', {
         },
         docOrder: ['article', 'link', 'channel'],
         app: {
-            'enroll': '登记',
+            'enroll': '记录',
             'signin': '签到',
             'group': '分组',
             'plan': '计划任务',
