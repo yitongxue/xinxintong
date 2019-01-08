@@ -37,6 +37,7 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
             "overview": '/views/default/pl/fe/matter/mission/overview',
             "report": '/views/default/pl/fe/matter/mission/report',
             "time": '/views/default/pl/fe/matter/mission/time',
+            "pagelet": '/views/default/pl/fe/matter/mission/pagelet',
             "timerNotice": '/views/default/pl/fe/_module/timerNotice',
             "entryRule": '/views/default/pl/fe/_module/entryRule',
         }
