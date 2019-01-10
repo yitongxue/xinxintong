@@ -1992,6 +1992,9 @@ class record extends main_base {
 				if (empty($oDsAssignedRids)) {
 					continue;
 				}
+				if ($oApp->id === '5c1a3c5c9377e') {
+					die('rid:' . json_encode($oDsAssignedRids));
+				}
 
 				$syncRecordNum = 0;
 				switch ($oSchema->ds->type) {
