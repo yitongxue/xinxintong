@@ -367,9 +367,6 @@ class round_model extends \TMS_MODEL {
 		if ($sumEndEndAt > 0) {
 			$q[2]['start_at'] = (object) ['op' => '<=', 'pat' => $sumEndEndAt];
 		}
-		if ($oApp->id === '5c230a04b76b3') {
-			die('rid:' . json_encode($q));
-		}
 		$includeRounds = $this->query_objs_ss($q);
 
 		return $includeRounds;

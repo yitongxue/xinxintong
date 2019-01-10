@@ -1955,6 +1955,9 @@ class record extends main_base {
 			$oRndResult = $modelRnd->byApp($oDsApp, ['start_at' => $oAssignedRnd->start_at, 'end_at' => $oAssignedRnd->end_at, 'purpose' => $oAssignedRnd->purpose, 'fields' => 'rid,start_at', 'withoutActive' => 'Y']);
 			if (count($oRndResult->rounds) === 1) {
 				$rounds = $oRndResult->rounds;
+				if ($oApp->id === '5c230a04b76b3') {
+					die('rid:' . json_encode($rounds));
+				}
 			}
 			// 源活动中，根据开始时间，停止时间获得的被汇总轮次
 			if ($oAssignedRnd->purpose === 'S') {
@@ -1991,9 +1994,6 @@ class record extends main_base {
 				}
 				if (empty($oDsAssignedRids)) {
 					continue;
-				}
-				if ($oApp->id === '5c230a04b76b3') {
-					die('rid:' . json_encode($oDsAssignedRids));
 				}
 
 				$syncRecordNum = 0;
