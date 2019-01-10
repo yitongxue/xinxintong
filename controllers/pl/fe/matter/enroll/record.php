@@ -1992,7 +1992,7 @@ class record extends main_base {
 				if (empty($oDsAssignedRids)) {
 					continue;
 				}
-				if ($oApp->id === '5c1a3c5c9377e') {
+				if ($oApp->id === '5c230a04b76b3') {
 					die('rid:' . json_encode($oDsAssignedRids));
 				}
 
