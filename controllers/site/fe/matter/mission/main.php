@@ -84,19 +84,19 @@ class main extends \site\fe\matter\base {
 			 * 3、当前用户是分组的组长；
 			 * 4、只能查看指定为这个分组用户参与的活动。
 			 */
-			if ($oMission->user_app_type !== 'group') {
-				return new \ParameterError('只有指定了分组活动作为用户名单的项目才能查看同组成员的数据');
-			}
-			$modelGrpUsr = $this->model('matter\group\player');
-			$oGrpApp = (object) ['id' => $oMission->user_app_id];
-			$oGrpLeader = $modelGrpUsr->byUser($oGrpApp, $this->who->uid, ['fields' => 'is_leader,round_id', 'onlyOne' => true]);
-			if (false === $oGrpLeader || $oGrpLeader->is_leader !== 'Y') {
-				return new \ParameterError('只有组长才能查看组内成员的数据');
-			}
-			$oGrpUser = $modelGrpUsr->byUser($oGrpApp, $user, ['fields' => 'round_id', 'onlyOne' => true]);
-			if (false === $oGrpUser || $oGrpLeader->round_id !== $oGrpUser->round_id) {
-				return new \ParameterError('只能查看同组内成员的数据');
-			}
+			// if ($oMission->user_app_type !== 'group') {
+			// 	return new \ParameterError('只有指定了分组活动作为用户名单的项目才能查看同组成员的数据');
+			// }
+			// $modelGrpUsr = $this->model('matter\group\player');
+			// $oGrpApp = (object) ['id' => $oMission->user_app_id];
+			// $oGrpLeader = $modelGrpUsr->byUser($oGrpApp, $this->who->uid, ['fields' => 'is_leader,round_id', 'onlyOne' => true]);
+			// if (false === $oGrpLeader || $oGrpLeader->is_leader !== 'Y') {
+			// 	return new \ParameterError('只有组长才能查看组内成员的数据');
+			// }
+			// $oGrpUser = $modelGrpUsr->byUser($oGrpApp, $user, ['fields' => 'round_id', 'onlyOne' => true]);
+			// if (false === $oGrpUser || $oGrpLeader->round_id !== $oGrpUser->round_id) {
+			// 	return new \ParameterError('只能查看同组内成员的数据');
+			// }
 			$oUser = (object) ['uid' => $user];
 		}
 		$modelMisMat = $this->model('matter\mission\matter');
