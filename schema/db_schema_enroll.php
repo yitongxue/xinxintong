@@ -106,6 +106,7 @@ $sql .= ",summary varchar(240)"; // 分享或生成链接时的摘要
 $sql .= ",state tinyint not null default 0"; // 0:新建|1:启用|2:停用|100:删除
 $sql .= ",purpose char(1) not null default 'C'"; // Common:填写的|Baseline:目标的|Summary:汇总的
 $sql .= ",mission_rid varchar(13) not null default ''"; // 关联的项目轮次
+$sql .= ",task_id int not null default 0"; // 活动任务
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');
@@ -116,6 +117,7 @@ if (!$mysqli->query($sql)) {
  */
 $sql = "create table if not exists xxt_enroll_task(";
 $sql .= "id int not null auto_increment";
+$sql .= ",state tinyint not null default 1";
 $sql .= ",aid varchar(40) not null";
 $sql .= ",siteid varchar(32) not null default ''";
 $sql .= ",rid varchar(13) not null default ''";
@@ -182,6 +184,7 @@ $sql .= ",aid varchar(40) not null";
 $sql .= ",rid varchar(13) not null default ''";
 $sql .= ",purpose char(1) not null default 'C'"; // Common:填写的|Baseline:目标的|Summary:汇总的
 $sql .= ",group_id varchar(32) not null default ''"; // 用户分组id
+$sql .= ",record_id int not null"; // 记录的id
 $sql .= ",enroll_key varchar(32) not null";
 $sql .= ",submit_at int not null default 0"; // 数据的提交时间，和modify_log中的数据对应
 $sql .= ",userid varchar(40) not null default ''";
@@ -491,6 +494,7 @@ $sql .= ",state tinyint not null default 1"; //0:clean,1:normal;
 $sql .= ",rec_num int not null default 0";
 $sql .= ",share_in_group char(1) not null default 'N'";
 $sql .= ",is_public char(1) not null default 'N'"; // 是否为公共专题
+$sql .= ",task_id int not null default 0"; // 关联的活动任务
 $sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');
@@ -874,6 +878,42 @@ $sql .= ",name varchar(40) not null";
 $sql .= ",value text";
 $sql .= ",state tinyint not null default 1"; //0:remove,1:normal
 $sql .= ",primary key(aid,enroll_key,name,state)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+if (!$mysqli->query($sql)) {
+	header('HTTP/1.0 500 Internal Server Error');
+	echo 'database error: ' . $mysqli->error;
+}
+/**
+ * 
+ */
+$sql = "create table if not exists xxt_enroll_search(";
+$sql .= "id int not null auto_increment";
+$sql .= ",siteid varchar(32) not null";
+$sql .= ",aid varchar(40) not null";
+$sql .= ",keyword varchar(255) not null";
+$sql .= ",user_num int not null default 0"; // 使用人数
+$sql .= ",used_num int not null default 0"; // 使用总数
+$sql .= ",agreed char(1) not null default ''"; // 是否推荐（Y：推荐）
+$sql .= ",state tinyint not null default 1"; //0:remove,1:normal
+$sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+if (!$mysqli->query($sql)) {
+	header('HTTP/1.0 500 Internal Server Error');
+	echo 'database error: ' . $mysqli->error;
+}
+/**
+ *
+ */
+$sql = "create table if not exists xxt_enroll_user_search(";
+$sql .= "id int not null auto_increment";
+$sql .= ",siteid varchar(32) not null";
+$sql .= ",aid varchar(40) not null";
+$sql .= ",userid varchar(40) not null default ''";
+$sql .= ",nickname varchar(255) not null default ''";
+$sql .= ",create_at int not null default 0"; 
+$sql .= ",last_use_at int not null default 0"; // 最后使用时间
+$sql .= ",search_id int not null default 0"; //
+$sql .= ",used_num int not null default 0"; // 使用总数
+$sql .= ",state tinyint not null default 1"; //0:remove,1:normal
+$sql .= ",primary key(id)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 if (!$mysqli->query($sql)) {
 	header('HTTP/1.0 500 Internal Server Error');
 	echo 'database error: ' . $mysqli->error;
