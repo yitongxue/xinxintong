@@ -10,7 +10,8 @@ ngMod.directive('tmsReposRecordData', ['$templateCache', function($templateCache
         scope: {
             schemas: '=',
             rec: '=record',
-            task: '=task'
+            task: '=task',
+            currentTab: '='
         },
         controller: ['$scope', '$sce', '$location', 'tmsLocation', 'http2', 'noticebox', 'tmsSchema', function($scope, $sce, $location, LS, http2, noticebox, tmsSchema) {
             $scope.coworkRecord = function(oRecord) {
@@ -21,7 +22,10 @@ ngMod.directive('tmsReposRecordData', ['$templateCache', function($templateCache
                 url += '#cowork';
                 location.href = url;
             };
-            $scope.vote = function(oRecData) {
+            $scope.vote = function(oRecData, event) {
+                event.preventDefault();
+                event.stopPropagation();
+
                 if ($scope.task) {
                     http2.get(LS.j('task/vote', 'site') + '&data=' + oRecData.id + '&task=' + $scope.task.id).then(function(rsp) {
                         if (oRecData.voteResult) {
@@ -40,7 +44,10 @@ ngMod.directive('tmsReposRecordData', ['$templateCache', function($templateCache
                     });
                 }
             };
-            $scope.unvote = function(oRecData) {
+            $scope.unvote = function(oRecData, event) {
+                event.preventDefault();
+                event.stopPropagation();
+                
                 if ($scope.task) {
                     http2.get(LS.j('task/unvote', 'site') + '&data=' + oRecData.id + '&task=' + $scope.task.id).then(function(rsp) {
                         if (oRecData.voteResult) {
@@ -90,7 +97,7 @@ ngMod.directive('tmsReposRecordData', ['$templateCache', function($templateCache
                                 case 'file':
                                 case 'voice':
                                     schemaData.forEach(function(oFile) {
-                                        if (oFile.url) {
+                                        if (oFile.url && !angular.isObject(oFile.url)) {
                                             oFile.oUrl = oFile.url;
                                             oFile.url = $sce.trustAsResourceUrl(oFile.url);
                                         }
@@ -99,7 +106,8 @@ ngMod.directive('tmsReposRecordData', ['$templateCache', function($templateCache
                                 case 'single':
                                 case 'multiple':
                                 case 'score':
-                                    oRecord.data[oSchema.id] = $sce.trustAsHtml(tmsSchema.optionsSubstitute(oSchema, schemaData));
+                                    var _result = tmsSchema.optionsSubstitute(oSchema, schemaData);
+                                    oRecord.data[oSchema.id] = angular.isObject(_result) ? _result : $sce.trustAsHtml(_result);
                                     break;
                             }
                         }
