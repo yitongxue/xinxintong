@@ -682,9 +682,9 @@ class record_model extends record_base {
 		}
 
 		// 指定了记录数据过滤条件
-		if (isset($oCriteria->record->data)) {
+		if (isset($oCriteria->data)) {
 			$whereByData = '';
-			foreach ($oCriteria->record->data as $k => $v) {
+			foreach ($oCriteria->data as $k => $v) {
 				if (!empty($v) && isset($oSchemasById->{$k})) {
 					$oSchema = $oSchemasById->{$k};
 					$whereByData .= ' and (';
@@ -727,8 +727,10 @@ class record_model extends record_base {
 				}
 			}
 			$w .= $whereByData;
+			if ($oApp->id === '5c1a3c5c9377e') {
+				die('www:' . $w);
+			}
 		}
-
 		// 指定了按关键字过滤
 		if (!empty($oOptions->keyword)) {
 			$w .= ' and (data like \'%' . $oOptions->keyword . '%\')';
