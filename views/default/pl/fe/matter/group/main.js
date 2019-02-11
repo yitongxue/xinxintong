@@ -17,7 +17,7 @@ define(['frame'], function(ngApp) {
         });
         $scope.remove = function() {
             if (window.confirm('确定删除？')) {
-                http2.get('/rest/pl/fe/matter/group/remove?site=' + $scope.app.siteid + '&app=' + $scope.app.id).then(function(rsp) {
+                http2.get('/rest/pl/fe/matter/group/remove?app=' + $scope.app.id).then(function(rsp) {
                     if ($scope.app.mission) {
                         location = "/rest/pl/fe/matter/mission?site=" + $scope.app.siteid + "&id=" + $scope.app.mission.id;
                     } else {

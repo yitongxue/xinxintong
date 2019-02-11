@@ -1647,42 +1647,21 @@ class record extends main_base {
 		if (false === $oEnlApp || empty($oEnlApp->dataSchemas)) {
 			return new \ObjectNotFoundError();
 		}
-
 		if (empty($oEnlApp->entryRule->group->id)) {
-			return new \ParameterError('没有关联分组活动');
+			return new \ParameterError('没有关联的分组活动');
 		}
+		$matchedGroupId = $oEnlApp->entryRule->group->id;
 
 		$oEnlRecord = $this->getPostJson();
 
-		// 匹配规则
-		$bEmpty = true;
-		$oMatchCriteria = new \stdClass;
-		foreach ($oEnlApp->dataSchemas as $oSchema) {
-			if (isset($oSchema->requireCheck) && $oSchema->requireCheck === 'Y') {
-				if (isset($oSchema->fromApp) && $oSchema->fromApp === $oEnlApp->entryRule->group->id) {
-					if (!empty($oEnlRecord->{$oSchema->id})) {
-						$oMatchCriteria->{$oSchema->id} = $oEnlRecord->{$oSchema->id};
-						$bEmpty = false;
-					}
-				}
-			}
+		$modelGrpUser = $this->model('matter\group\record');
+		$aMatchResult = $modelGrpUser->matchByData($matchedGroupId, $oEnlApp, $oEnlRecord);
+		if (false === $aMatchResult[0]) {
+			return new \ParameterError($aMatchResult[1]);
 		}
+		$oMatchedGrpRec = $aMatchResult[1];
 
-		$aResult = [];
-		if (!$bEmpty) {
-			// 查找匹配的数据
-			$oGroupApp = $this->model('matter\group')->byId($oEnlApp->entryRule->group->id, ['cascaded' => 'N']);
-			$modelGrpRec = $this->model('matter\group\player');
-			$matchedRecords = $modelGrpRec->byData($oGroupApp, $oMatchCriteria);
-			foreach ($matchedRecords as $matchedRec) {
-				if (isset($matchedRec->round_id)) {
-					$matchedRec->data->_round_id = $matchedRec->round_id;
-				}
-				$aResult[] = $matchedRec->data;
-			}
-		}
-
-		return new \ResponseData($aResult);
+		return new \ResponseData($oMatchedGrpRec);
 	}
 	/**
 	 * 根据记录的userid更新关联分组活动题目的数据
@@ -1692,41 +1671,33 @@ class record extends main_base {
 			return [false, '当前活动没有关联分组活动'];
 		}
 
-		$aGrpSchemas = [];
-		if (!empty($oEnlApp->dynaDataSchemas)) {
-			foreach ($oEnlApp->dynaDataSchemas as $oSchema) {
-				if (isset($oSchema->requireCheck) && $oSchema->requireCheck === 'Y') {
-					if (isset($oSchema->fromApp) && $oSchema->fromApp === $oEnlApp->entryRule->group->id) {
-						$aGrpSchemas[] = $oSchema;
-					}
-				}
-			}
-		}
-		//if (empty($aGrpSchemas)) {
+		$aAssocGrpSchemas = $this->model('matter\enroll\schema')->getAssocSchemasByGroup($oEnlApp->dynaDataSchemas, $oEnlApp->entryRule->group->id);
+		//if (empty($aAssocGrpSchemas)) {
 		//	return [false ,'当前活动没有指定和分组活动关联的题目'];
 		//}
+		$oAssocGrpTeamSchema = $this->model('matter\enroll\schema')->getAssocGroupTeamSchema($oEnlApp);
 
 		$updatedCount = 0;
 		$modelRec = $this->model('matter\enroll\record');
 		$oResult = $modelRec->byApp($oEnlApp, null, (object) ['record' => (object) ['rid' => $rid]]);
 		if (count($oResult->records)) {
 			$oGrpApp = (object) ['id' => $oEnlApp->entryRule->group->id];
-			$modelGrpUsr = $this->model('matter\group\user');
+			$modelGrpUsr = $this->model('matter\group\record');
 			$oMocker = new \stdClass;
 			foreach ($oResult->records as $oRec) {
 				$oUpdatedData = $oRec->data;
-				$oGrpUsr = $modelGrpUsr->byUser($oGrpApp, $oRec->userid, ['onlyOne' => true, 'fields' => 'round_id,data']);
+				$oGrpUsr = $modelGrpUsr->byUser($oGrpApp, $oRec->userid, ['onlyOne' => true, 'fields' => 'team_id,data']);
 				if (false === $oGrpUsr) {
 					continue;
 				}
-				$bModified = ($oRec->group_id !== $oGrpUsr->round_id);
-				foreach ($aGrpSchemas as $oGrpSchema) {
+				$bModified = ($oRec->group_id !== $oGrpUsr->team_id);
+				foreach ($aAssocGrpSchemas as $oGrpSchema) {
 					$enlVal = $this->getDeepValue($oUpdatedData, $oGrpSchema->id);
 					if ($overwrite === 'N' && !empty($enlVal)) {
 						continue;
 					}
-					if ($oGrpSchema->id === '_round_id') {
-						$grpVal = $oGrpUsr->round_id;
+					if ($this->getDeepValue($oAssocGrpTeamSchema, 'id') === $oGrpSchema->id) {
+						$grpVal = $oGrpUsr->team_id;
 					} else {
 						$grpVal = $this->getDeepValue($oGrpUsr->data, $oGrpSchema->id);
 					}
@@ -1739,7 +1710,7 @@ class record extends main_base {
 					continue;
 				}
 				$oMocker->uid = $oRec->userid;
-				$oMocker->group_id = $oGrpUsr->round_id;
+				$oMocker->group_id = $oGrpUsr->team_id;
 				$modelRec->setData($oMocker, $oEnlApp, $oRec->enroll_key, $oUpdatedData);
 				$modelRec->update('xxt_enroll_record', ['group_id' => $oMocker->group_id], ['enroll_key' => $oRec->enroll_key]);
 
@@ -2335,8 +2306,8 @@ class record extends main_base {
 			switch ($oUserSource->type) {
 			case 'group':
 				$oGrpApp = $this->model('matter\group')->byId($oUserSource->id, ['fields' => 'assigned_nickname', 'cascaded' => 'N']);
-				$users = $this->model('matter\group\player')->byApp($oUserSource, (object) ['fields' => 'userid,nickname']);
-				$misUsers = isset($users->players) ? $users->players : [];
+				$oResult = $this->model('matter\group\record')->byApp($oUserSource, (object) ['fields' => 'userid,nickname']);
+				$misUsers = isset($oResult->users) ? $oResult->users : [];
 				break;
 			case 'enroll':
 				$misUsers = $this->model('matter\enroll\user')->enrolleeByApp($oUserSource, '', '', ['fields' => 'userid,nickname', 'cascaded' => 'N']);
@@ -2399,7 +2370,7 @@ class record extends main_base {
 		// 加入关联活动的题目
 		$modelSch->getUnionSchemas($oApp, $schemas);
 		// 关联的分组题目
-		$oAssocGrpSchema = $modelSch->getAssocGroupSchema($oApp);
+		$oAssocGrpTeamSchema = $modelSch->getAssocGroupTeamSchema($oApp);
 
 		/* 获得所有有效的填写记录 */
 		$modelRec = $this->model('matter\enroll\record');
@@ -2410,8 +2381,8 @@ class record extends main_base {
 		$rid = empty($oCriteria->record->rid) ? '' : $oCriteria->record->rid;
 		if (!empty($oCriteria->record->group_id)) {
 			$gid = $oCriteria->record->group_id;
-		} else if (!empty($oCriteria->data->_round_id)) {
-			$gid = $oCriteria->data->_round_id;
+		} else if (isset($oAssocGrpTeamSchema) && !empty($oCriteria->data->{$oAssocGrpTeamSchema->id})) {
+			$gid = $oCriteria->data->{$oAssocGrpTeamSchema->id};
 		} else {
 			$gid = '';
 		}
@@ -2481,7 +2452,7 @@ class record extends main_base {
 		if ($bRequireNickname) {
 			$objActiveSheet->setCellValueByColumnAndRow($columnNum4++, 1, '昵称');
 		}
-		if (null === $oAssocGrpSchema) {
+		if (null === $oAssocGrpTeamSchema) {
 			$objActiveSheet->setCellValueByColumnAndRow($columnNum4++, 1, '分组');
 		}
 		$objActiveSheet->setCellValueByColumnAndRow($columnNum4++, 1, '备注');
@@ -2636,7 +2607,7 @@ class record extends main_base {
 				$objActiveSheet->setCellValueByColumnAndRow($recColNum++, $rowIndex, $oRecord->nickname);
 			}
 			// 分组
-			if (null === $oAssocGrpSchema) {
+			if (null === $oAssocGrpTeamSchema) {
 				$objActiveSheet->setCellValueByColumnAndRow($recColNum++, $rowIndex, isset($oRecord->group->title) ? $oRecord->group->title : '');
 			}
 			// 备注
