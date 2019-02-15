@@ -1987,7 +1987,7 @@ class record extends main_base {
 			$oSyncResult->step = (int) $step;
 			$oSyncResult->left = count($dsSchemas) - $step + 1;
 			$oSyncResult->total = 0;
-
+			die('1:' . json_encode($dsSchemas));
 			$oSchema = $dsSchemas[$step - 1];
 			$oDsApp = $modelApp->byId($oSchema->ds->app->id, ['fields' => 'id,data_schemas', 'cascaded' => 'N']);
 			if (false === $oDsApp) {
