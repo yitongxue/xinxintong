@@ -10,7 +10,7 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
             url: '/rest/pl/fe/matter'
         }, {
             value: 'enroll',
-            title: '登记活动',
+            title: '记录活动',
             url: '/rest/pl/fe/matter'
         }],
         innerlink: [{
@@ -35,13 +35,13 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
             "mainCtrl": '/views/default/pl/fe/matter/group/main',
             "noticeCtrl": '/views/default/pl/fe/matter/group/notice',
             "roundCtrl": '/views/default/pl/fe/matter/group/round',
-            "userCtrl": '/views/default/pl/fe/matter/group/user',
+            "recordCtrl": '/views/default/pl/fe/matter/group/record',
         },
         html: {
             "main": '/views/default/pl/fe/matter/group/main',
             "notice": '/views/default/pl/fe/matter/group/notice',
             "round": '/views/default/pl/fe/matter/group/round',
-            "user": '/views/default/pl/fe/matter/group/user',
+            "record": '/views/default/pl/fe/matter/group/record',
             "compUsers": '/views/default/pl/fe/matter/group/component/users',
         }
     }
