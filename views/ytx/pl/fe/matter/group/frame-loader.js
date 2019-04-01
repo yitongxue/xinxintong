@@ -34,13 +34,13 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
             "frame": '/views/default/pl/fe/matter/group/frame',
             "mainCtrl": '/views/default/pl/fe/matter/group/main',
             "noticeCtrl": '/views/default/pl/fe/matter/group/notice',
-            "roundCtrl": '/views/default/pl/fe/matter/group/round',
+            "teamCtrl": '/views/default/pl/fe/matter/group/team',
             "recordCtrl": '/views/default/pl/fe/matter/group/record',
         },
         html: {
             "main": '/views/default/pl/fe/matter/group/main',
             "notice": '/views/default/pl/fe/matter/group/notice',
-            "round": '/views/default/pl/fe/matter/group/round',
+            "team": '/views/default/pl/fe/matter/group/team',
             "record": '/views/default/pl/fe/matter/group/record',
             "compUsers": '/views/default/pl/fe/matter/group/component/users',
         }
