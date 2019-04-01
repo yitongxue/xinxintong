@@ -8,7 +8,7 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
             },
             docOrder: ['article', 'channel'],
             app: {
-                'enroll': '登记',
+                'enroll': '记录',
                 'signin': '签到',
                 'group': '分组',
             },
