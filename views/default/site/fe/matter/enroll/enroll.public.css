@@ -403,14 +403,22 @@ body.enroll-repos .app .row .topic-view.wrapper {
 }
 .topic {
   background: #fff;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 8px solid #ddd;
   padding: 8px 16px;
   cursor: pointer;
 }
+.topic:last-child,
+.topic:nth-last-child(2) {
+  border-bottom: 0;
+}
 .record {
   background: #fff;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 8px solid #ddd;
   padding: 8px 16px;
+}
+.record:last-child,
+.record:nth-last-child(2) {
+  border-bottom: 0;
 }
 .record > * {
   margin: 8px 0;
@@ -605,6 +613,7 @@ body.enroll-repos .app .row .topic-view.wrapper {
 #remarks {
   padding: 16px;
   background: #fff;
+  border-bottom: 0;
 }
 #record .title {
   margin: 0 -1rem 0.5rem -1rem;
@@ -734,7 +743,10 @@ body.enroll-repos .app .row .topic-view.wrapper {
   width: 100%;
   border: 0;
 }
-.modal-md {
+.modal {
+  z-index: 1051;
+}
+.modal .modal-md {
   width: 284px;
   height: 450px;
   top: 50%;
@@ -742,44 +754,48 @@ body.enroll-repos .app .row .topic-view.wrapper {
   margin-top: -225px;
   margin-left: -142px;
 }
-.modal-md .modal-content {
+.modal .modal-content {
   border: 0;
   border-radius: 16px;
   background-color: #0084FF;
 }
-.modal-md .close {
+.modal .cancle {
   position: absolute;
-  top: -30px;
+  top: -34px;
   right: 10px;
   color: #fff;
-  opacity: 1;
   z-index: 10;
-  border-radius: 12px 8px;
+  width: 25px;
+  height: 25px;
+  font-size: 25px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 50%;
   border: 1px solid #fff;
 }
-.modal-md .current-task {
+.modal .current-task {
   padding-left: 15px;
   padding-right: 15px;
   display: flex;
 }
-.modal-md .current-task .info > p {
+.modal .current-task .info > p {
   color: #fff;
   letter-spacing: 4px;
   line-height: 1;
 }
-.modal-md .current-task .info > p:nth-child(1) {
+.modal .current-task .info > p:nth-child(1) {
   font-weight: 600;
   font-size: 24px;
   text-shadow: 4px 0px 2px rgba(255, 255, 255, 0.3);
 }
-.modal-md .current-task .info > p:nth-child(2) {
+.modal .current-task .info > p:nth-child(2) {
   position: relative;
   font-weight: 600;
   height: 18px;
   font-size: 18px;
   margin-left: -10px;
 }
-.modal-md .current-task .info > p:nth-child(3) {
+.modal .current-task .info > p:nth-child(3) {
   width: 154px;
   font-size: 12px;
   height: 22px;
@@ -790,25 +806,25 @@ body.enroll-repos .app .row .topic-view.wrapper {
   letter-spacing: 1px;
   margin-bottom: 0;
 }
-.modal-md .current-task .img {
+.modal .current-task .img {
   width: 100%;
   height: 84px;
   background-image: url('/static/img/site_fe_task.png');
   background-repeat: no-repeat;
 }
-.modal-md .current-task .img-question {
+.modal .current-task .img-question {
   background-position: -44px -72px;
 }
-.modal-md .current-task .img-answer {
+.modal .current-task .img-answer {
   background-position: -57px -230px;
 }
-.modal-md .current-task .img-vote {
+.modal .current-task .img-vote {
   background-position: -53px -382px;
 }
-.modal-md .current-task .img-score {
+.modal .current-task .img-score {
   background-position: -55px -515px;
 }
-.modal-md .main {
+.modal .main {
   height: 270px;
   margin-top: 30px;
   padding-top: 20px;
@@ -816,7 +832,7 @@ body.enroll-repos .app .row .topic-view.wrapper {
   border-radius: 16px;
   position: relative;
 }
-.modal-md .main .title {
+.modal .main .title {
   width: 60%;
   position: absolute;
   top: -6%;
@@ -829,19 +845,19 @@ body.enroll-repos .app .row .topic-view.wrapper {
   margin-bottom: 0;
   border-radius: 5px;
 }
-.modal-md .main .content {
+.modal .main .content {
   padding: 30px 27px 0 27px;
   height: 100%;
   overflow: hidden;
   overflow-y: auto;
 }
-.modal-md .main .content .timeline {
+.modal .main .content .timeline {
   padding: 40px 0;
   margin-top: -50px;
   position: relative;
   z-index: 1;
 }
-.modal-md .main .content .timeline:nth-child(odd) .timeline-front {
+.modal .main .content .timeline:nth-child(odd) .timeline-front {
   height: calc(35%);
   width: calc(38%);
   border-radius: 50px 0 0 50px;
@@ -852,7 +868,7 @@ body.enroll-repos .app .row .topic-view.wrapper {
   top: 35px;
   z-index: -1;
 }
-.modal-md .main .content .timeline:nth-child(odd) .timeline-back {
+.modal .main .content .timeline:nth-child(odd) .timeline-back {
   height: calc(35%);
   width: calc(38%);
   border-radius: 0 100px 100px 0;
@@ -863,30 +879,30 @@ body.enroll-repos .app .row .topic-view.wrapper {
   top: 78px;
   z-index: -1;
 }
-.modal-md .main .content .timeline:nth-child(odd) .timeline-state.state-BS {
+.modal .main .content .timeline:nth-child(odd) .timeline-state.state-BS {
   left: 50px;
 }
-.modal-md .main .content .timeline:nth-child(odd) .timeline-state.state-BS .glyphicon.glyphicon-lock {
-  left: -20px;
+.modal .main .content .timeline:nth-child(odd) .timeline-state.state-BS .lock {
+  left: -22px;
 }
-.modal-md .main .content .timeline:nth-child(odd) .timeline-state.state-IP {
+.modal .main .content .timeline:nth-child(odd) .timeline-state.state-IP {
   left: 45px;
 }
-.modal-md .main .content .timeline:nth-child(odd) .timeline-arrow {
+.modal .main .content .timeline:nth-child(odd) .timeline-arrow {
   position: absolute;
   top: 63%;
   left: 50%;
 }
-.modal-md .main .content .timeline:nth-child(odd) .timeline-arrow .arrow {
+.modal .main .content .timeline:nth-child(odd) .timeline-arrow .arrow {
   width: 0;
   height: 0;
   border: 10px solid;
   border-color: transparent transparent transparent #FFD36D;
 }
-.modal-md .main .content .timeline:nth-child(even) {
+.modal .main .content .timeline:nth-child(even) {
   text-align: right;
 }
-.modal-md .main .content .timeline:nth-child(even) .timeline-front {
+.modal .main .content .timeline:nth-child(even) .timeline-front {
   height: calc(35%);
   width: calc(38%);
   border-radius: 50px 0 0 50px;
@@ -897,7 +913,7 @@ body.enroll-repos .app .row .topic-view.wrapper {
   top: 78px;
   z-index: -1;
 }
-.modal-md .main .content .timeline:nth-child(even) .timeline-back {
+.modal .main .content .timeline:nth-child(even) .timeline-back {
   height: calc(35%);
   width: calc(38%);
   border-radius: 0 100px 100px 0;
@@ -908,34 +924,34 @@ body.enroll-repos .app .row .topic-view.wrapper {
   top: 35px;
   z-index: -1;
 }
-.modal-md .main .content .timeline:nth-child(even) .timeline-state.state-BS {
-  left: 10px;
+.modal .main .content .timeline:nth-child(even) .timeline-state.state-BS {
+  left: 15px;
 }
-.modal-md .main .content .timeline:nth-child(even) .timeline-state.state-BS .glyphicon.glyphicon-lock {
-  left: 180px;
+.modal .main .content .timeline:nth-child(even) .timeline-state.state-BS .lock {
+  left: 175px;
 }
-.modal-md .main .content .timeline:nth-child(even) .timeline-state.state-IP {
-  right: 45px;
+.modal .main .content .timeline:nth-child(even) .timeline-state.state-IP {
+  right: 70px;
 }
-.modal-md .main .content .timeline:nth-child(even) .timeline-arrow {
+.modal .main .content .timeline:nth-child(even) .timeline-arrow {
   position: absolute;
   top: 63%;
   right: 50%;
 }
-.modal-md .main .content .timeline:nth-child(even) .timeline-arrow .arrow {
+.modal .main .content .timeline:nth-child(even) .timeline-arrow .arrow {
   width: 0;
   height: 0;
   border: 10px solid;
   border-color: transparent #FFD36D transparent transparent;
 }
-.modal-md .main .content .timeline:last-child .timeline-front,
-.modal-md .main .content .timeline:last-child .timeline-back {
+.modal .main .content .timeline:last-child .timeline-front,
+.modal .main .content .timeline:last-child .timeline-back {
   border: none;
 }
-.modal-md .main .content .timeline:last-child .timeline-arrow {
+.modal .main .content .timeline:last-child .timeline-arrow {
   display: none;
 }
-.modal-md .main .content .timeline .timeline-content {
+.modal .main .content .timeline .timeline-content {
   display: inline-block;
   width: 38px;
   height: 38px;
@@ -946,7 +962,7 @@ body.enroll-repos .app .row .topic-view.wrapper {
   margin-top: -10px;
   position: relative;
 }
-.modal-md .main .content .timeline .timeline-content .timeline-name {
+.modal .main .content .timeline .timeline-content .timeline-name {
   position: absolute;
   top: 0;
   left: 0;
@@ -955,10 +971,10 @@ body.enroll-repos .app .row .topic-view.wrapper {
   font-size: 12px;
   line-height: 34px;
 }
-.modal-md .main .content .timeline .timeline-content .timeline-name.lh {
+.modal .main .content .timeline .timeline-content .timeline-name.lh {
   line-height: 26px;
 }
-.modal-md .main .content .timeline .timeline-content .timeline-ribbon {
+.modal .main .content .timeline .timeline-content .timeline-ribbon {
   position: absolute;
   width: 38px;
   height: 12px;
@@ -967,13 +983,37 @@ body.enroll-repos .app .row .topic-view.wrapper {
   line-height: 12px;
   text-align: center;
 }
-.modal-md .main .content .timeline .timeline-state {
+.modal .main .content .timeline .timeline-state {
   color: #fff;
   position: absolute;
 }
-.modal-md .main .content .timeline .timeline-state.state-IP {
+.modal .main .content .timeline .timeline-state .site-icon {
+  display: inline-block;
+  position: absolute;
+  background: url("/static/img/site_fe_task.png") no-repeat;
+}
+.modal .main .content .timeline .timeline-state .map-marker-top {
+  width: 12px;
+  height: 15px;
+  left: 8px;
+  background-position: -314px -93px;
+}
+.modal .main .content .timeline .timeline-state .map-marker-bottom {
+  width: 27px;
+  height: 16px;
+  top: 8px;
+  background-position: -306px -167px;
+}
+.modal .main .content .timeline .timeline-state .lock {
+  width: 15px;
+  height: 19px;
+  bottom: 0;
+  background-position: -311px -245px;
+}
+.modal .main .content .timeline .timeline-state.state-IP {
   top: 40px;
-  font-size: 18px;
+}
+.modal .main .content .timeline .timeline-state.state-IP .map-marker-top {
   animation: living 2s linear infinite;
 }
 @keyframes living {
@@ -990,55 +1030,50 @@ body.enroll-repos .app .row .topic-view.wrapper {
     opacity: 1;
   }
 }
-.modal-md .main .content .timeline .timeline-state.state-BS {
+.modal .main .content .timeline .timeline-state.state-BS {
   width: 100%;
   font-size: 12px;
-  top: 15px;
+  top: 35px;
   text-align: left;
 }
-.modal-md .main .content .timeline .timeline-state.state-BS .glyphicon.glyphicon-lock {
-  top: 40px;
-  font-size: 14px;
-}
-.modal-md .main .content .timeline .timeline-state.state-BS .time {
+.modal .main .content .timeline .timeline-state.state-BS .time {
   display: flex;
   letter-spacing: 1px;
 }
-.modal-md .main .content .timeline .timeline-state.state-BS .time .thread {
+.modal .main .content .timeline .timeline-state.state-BS .time .thread {
   margin: 0 5px;
   border-left: 1px solid #fff;
-  position: relative;
 }
-.modal-md .main .content .timeline.state-AE:nth-child(odd) .timeline-front,
-.modal-md .main .content .timeline.state-AE:nth-child(even) .timeline-front,
-.modal-md .main .content .timeline.state-AE:nth-child(odd) .timeline-back,
-.modal-md .main .content .timeline.state-AE:nth-child(even) .timeline-back {
+.modal .main .content .timeline.state-AE:nth-child(odd) .timeline-front,
+.modal .main .content .timeline.state-AE:nth-child(even) .timeline-front,
+.modal .main .content .timeline.state-AE:nth-child(odd) .timeline-back,
+.modal .main .content .timeline.state-AE:nth-child(even) .timeline-back {
   border-color: #87C5FF;
 }
-.modal-md .main .content .timeline.state-AE:nth-child(odd) .arrow,
-.modal-md .main .content .timeline.state-AE:nth-child(even) .arrow {
+.modal .main .content .timeline.state-AE:nth-child(odd) .arrow,
+.modal .main .content .timeline.state-AE:nth-child(even) .arrow {
   border-color: transparent;
 }
-.modal-md .main .content .timeline.state-AE:last-child .timeline-front,
-.modal-md .main .content .timeline.state-AE:last-child .timeline-back {
+.modal .main .content .timeline.state-AE:last-child .timeline-front,
+.modal .main .content .timeline.state-AE:last-child .timeline-back {
   border: none;
 }
-.modal-md .main .content .timeline.state-AE:last-child .timeline-arrow {
+.modal .main .content .timeline.state-AE:last-child .timeline-arrow {
   display: none;
 }
-.modal-md .main .content .timeline.state-AE .timeline-content {
+.modal .main .content .timeline.state-AE .timeline-content {
   color: #CEE7FF;
   border-color: #87C5FF;
   background-color: #9FD1FF;
 }
-.modal-md .site-ribbon {
+.modal .site-ribbon {
   position: relative;
 }
-.modal-md .site-ribbon > .site-ribbon-text {
+.modal .site-ribbon > .site-ribbon-text {
   font-size: 8px;
   color: #fff;
 }
-.modal-md .site-ribbon:before {
+.modal .site-ribbon:before {
   content: "";
   border: 4px solid;
   border-left-color: transparent !important;
@@ -1046,7 +1081,7 @@ body.enroll-repos .app .row .topic-view.wrapper {
   top: 3px;
   left: -8px;
 }
-.modal-md .site-ribbon:after {
+.modal .site-ribbon:after {
   content: "";
   border: 4px solid;
   border-right-color: transparent !important;
@@ -1054,45 +1089,45 @@ body.enroll-repos .app .row .topic-view.wrapper {
   top: 3px;
   right: -8px;
 }
-.modal-md .site-ribbon-fail {
+.modal .site-ribbon-fail {
   background-color: #ccc;
 }
-.modal-md .site-ribbon-fail:before,
-.modal-md .site-ribbon-fail:after {
+.modal .site-ribbon-fail:before,
+.modal .site-ribbon-fail:after {
   border-color: #ccc;
 }
-.modal-md .site-ribbon-win {
+.modal .site-ribbon-win {
   background-color: #E0434A;
 }
-.modal-md .site-ribbon-win:before,
-.modal-md .site-ribbon-win:after {
+.modal .site-ribbon-win:before,
+.modal .site-ribbon-win:after {
   border-color: #E0434A;
 }
-.modal-md .site-btn-group {
+.modal .site-btn-group {
   display: flex;
   z-index: 10;
 }
-.modal-md .site-btn-group > .btn {
+.modal .site-btn-group > .btn {
   flex: 1;
   letter-spacing: 1px;
   border-radius: 0 0 16px 16px;
 }
-.modal-md .site-btn-group > .btn:hover {
+.modal .site-btn-group > .btn:hover {
   z-index: 0;
 }
-.modal-md .site-btn-group > .btn:first-child:not(:last-child) {
+.modal .site-btn-group > .btn:first-child:not(:last-child) {
   border-top-left-radius: 0;
 }
-.modal-md .site-btn-group > .btn:last-child:not(:first-child) {
-  border-top: 1px solid #fff;
+.modal .site-btn-group > .btn:last-child:not(:first-child) {
+  border-top: 1px solid #59AFFF;
   border-top-right-radius: 0;
 }
-.modal-md .site-btn-light {
+.modal .site-btn-light {
   color: #000;
   background-color: #fff;
   border-color: #fff;
 }
-.modal-md .site-btn-blue {
+.modal .site-btn-blue {
   color: #fff;
   background-color: #0084FF;
   border-color: #0084FF;
