@@ -70,17 +70,17 @@ ngApp.controller('ctrlSummaryRank', ['$scope', '$q', '$sce', 'tmsLocation', 'htt
         switch (oAppState.dimension) {
             case 'user':
                 http2.post('/rest/site/fe/matter/enroll/rank/userByApp?site=' + oApp.siteid + '&app=' + oApp.id, oAppState.criteria).then(function (rsp) {
-                    defer.resolve(rsp.data)
+                    defer.resolve(rsp.data);
                 });
                 break;
             case 'group':
                 http2.post('/rest/site/fe/matter/enroll/rank/groupByApp?site=' + oApp.siteid + '&app=' + oApp.id, oAppState.criteria).then(function (rsp) {
-                    defer.resolve(rsp.data)
+                    defer.resolve(rsp.data);
                 });
                 break;
             case 'schema':
                 http2.post('/rest/site/fe/matter/enroll/rank/schemaByApp?site=' + oApp.siteid + '&app=' + oApp.id + '&schema=' + oAppState.criteria.obj, oAppState.criteria).then(function (rsp) {
-                    defer.resolve(rsp.data)
+                    defer.resolve(rsp.data);
                 });
                 break;
         }
@@ -167,19 +167,19 @@ ngApp.controller('ctrlSummaryRank', ['$scope', '$q', '$sce', 'tmsLocation', 'htt
             oConfig[item] = true;
         });
         if (oRankConfig = oApp.rankConfig) {
-            if (oRankConfig.scope) {
-                rankItems.forEach(function (item) {
-                    oConfig[item] = !!oRankConfig.scope[item];
-                });
-            }
             if (oRankConfig.schemas && oRankConfig.schemas.length)
                 $scope.rankSchemas = dataSchemas.filter(function (oSchema) {
                     return oSchema.type === 'single' && oRankConfig.schemas.indexOf(oSchema.id) !== -1;
                 });
             if (oRankConfig.scopeSchemas && oRankConfig.scopeSchemas.length)
                 $scope.scopeSchemas = dataSchemas.filter(function (oSchema) {
-                    return oSchema.type === 'shorttext' && oSchema.format === 'number' && oRankConfig.scopeSchemas.indexOf(oSchema.id) !== -1;
+                    return oSchema.type === 'shorttext' && /number|calculate/.test(oSchema.format) && oRankConfig.scopeSchemas.indexOf(oSchema.id) !== -1;
                 });
+            if (oRankConfig.scope || ($scope.scopeSchemas && $scope.scopeSchemas.length)) {
+                rankItems.forEach(function (item) {
+                    oConfig[item] = !!oRankConfig.scope[item];
+                });
+            }
         }
         $scope.config = oConfig;
         /* 恢复上一次访问的状态 */
