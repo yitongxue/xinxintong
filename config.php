@@ -22,7 +22,7 @@ error_reporting(E_ERROR); // 控制系统的报错信息，否则数据库连接
 /**
  * 加载本地化设置
  */
-file_exists(dirname(__FILE__) . '/cus/app.php') && include_once dirname(__FILE__) . '/cus/app.php';
+file_exists(dirname(__FILE__) . '/cus/config.php') && include_once dirname(__FILE__) . '/cus/config.php';
 /*********************************************
  * 常量定义不允许被覆盖，需要检查常量是否已经被定义
  *********************************************/
@@ -82,9 +82,13 @@ define('TMS_APP_TEMPLATE_DEFAULT', dirname(__FILE__) . '/_template');
  */
 !defined('TMS_APP_URI') && define('TMS_APP_URI', '');
 /**
- * 校验密码强度，0 不校验，1 校验
+ * 校验密码强度，0 不校验，1 校验，9 禁止注册
  */
 !defined('TMS_APP_PASSWORD_STRENGTH_CHECK') && define('TMS_APP_PASSWORD_STRENGTH_CHECK', 1);
+/**
+ * 登录检查标准
+ */
+!defined('TMS_APP_LOGIN_STRENGTH_CHECK') && define('TMS_APP_LOGIN_STRENGTH_CHECK', 1);
 /**
  * prefix for rest.
  * 需要和web服务器的配置一致

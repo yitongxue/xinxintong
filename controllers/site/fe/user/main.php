@@ -34,6 +34,12 @@ class main extends \site\fe\base {
 	 * @param string $urlEncryptKey   如果来源地址加密，需传入解密算子
 	 */
 	public function access_action($originUrl = null, $urlEncryptKey = null) {
+		if (TMS_APP_LOGIN_STRENGTH_CHECK !== 0) {
+			if (tms_get_httpsOrHttp() !== 'https') {
+				$url = 'https://' . APP_HTTP_HOST . $_SERVER['REQUEST_URI'];
+				$this->redirect($url);
+            }
+		}
 		/* 整理cookie中的数据，便于后续处理 */
 		$modelWay = $this->model('site\fe\way');
 		$modelWay->resetAllCookieUser();
@@ -56,6 +62,22 @@ class main extends \site\fe\base {
 
 		\TPL::output('/site/fe/user/access');
 		exit;
+	}
+	/**
+	 * 返回平台定制的安全级别
+	 */
+	public function getSafetyLevel_action() {
+		$data = new \stdClass;
+		switch (TMS_APP_PASSWORD_STRENGTH_CHECK) {
+			case 9:
+				$data->register = false;
+				break;
+			default :
+				$data->register = true;
+				break;
+		}
+		
+		return new \ResponseData($data);
 	}
 	/**
 	 * 当前用户信息
@@ -185,7 +207,7 @@ class main extends \site\fe\base {
 			$modelReg = $this->model('site\user\registration');
 			if ($registration = $modelReg->byId($oAccount->unionid)) {
 				// 校验密码安全
-				$rst = tms_pwd_check($data->password, ['account' => $registration->uname]);
+				$rst = tms_pwd_check($data->password, ['account' => $registration->uname], true);
 				if ($rst[0] === false) {
 					return new \ResponseError($rst[1]);
 				}
