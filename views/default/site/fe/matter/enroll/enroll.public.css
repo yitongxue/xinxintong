@@ -777,6 +777,9 @@ body.enroll-repos .app .row .topic-view.wrapper {
   padding-right: 15px;
   display: flex;
 }
+.modal-md .current-task .info {
+  width: 154px;
+}
 .modal-md .current-task .info > p {
   color: #fff;
   letter-spacing: 4px;
@@ -806,7 +809,7 @@ body.enroll-repos .app .row .topic-view.wrapper {
   margin-bottom: 0;
 }
 .modal-md .current-task .img {
-  width: 100%;
+  width: 100px;
   height: 84px;
   background-image: url('/static/img/site_fe_task.png');
   background-repeat: no-repeat;

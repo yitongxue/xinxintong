@@ -1,4 +1,4 @@
-requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
+requirejs(['/static/js/tms.bootstrap.js'], function (tms) {
     define("frame/const", {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -10,7 +10,7 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
             url: '/rest/pl/fe/matter'
         }, {
             value: 'enroll',
-            title: '登记活动',
+            title: '记录活动',
             url: '/rest/pl/fe/matter'
         }],
         innerlink: [{
