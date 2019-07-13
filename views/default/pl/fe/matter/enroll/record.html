@@ -51,7 +51,7 @@
             <div class="btn-group text-control" uib-dropdown ng-if="coworkSchemas.length&&category==='record'">
                 <button type="button" class="btn btn-default" uib-dropdown-toggle>填写记录<i class="caret"></i></button>
                 <ul uib-dropdown-menu>
-                    <li ng-repeat="coworkSchema in coworkSchemas" ng-click="listCowork(coworkSchema)"><a href ng-bind="coworkSchema.title" title="{{coworkSchema.title}}"></a></li>
+                    <li ng-repeat="coworkSchema in coworkSchemas" ng-click="listCowork(coworkSchema,1)"><a href ng-bind="coworkSchema.title" title="{{coworkSchema.title}}"></a></li>
                 </ul>
             </div>
             <div class="btn-group text-control" ng-if="category==='cowork'">
