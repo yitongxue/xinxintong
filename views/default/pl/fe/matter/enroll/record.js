@@ -415,14 +415,14 @@ define(['frame'], function (ngApp) {
                 });
             });
         };
-        $scope.listCowork = function (schema, pageAt) {
+        $scope.listCowork = function (schema) {
             $scope.currentSchema = schema;
-            $scope.coworkSchemasExt.forEach(function(item, index) {
-                if(item.id === schema.id) {
+            $scope.coworkSchemasExt.forEach(function (item, index) {
+                if (item.id === schema.id) {
                     $scope.coworkSchemasExt.splice(index, 1);
                 }
             });
-            srvEnlRec.listCowork(schema, pageAt).then(function(data) {
+            srvEnlRec.listCowork(schema).then(function (data) {
                 $scope.coworks = data.recordDatas;
                 $scope.category = "cowork";
             });
