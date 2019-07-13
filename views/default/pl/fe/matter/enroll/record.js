@@ -425,7 +425,7 @@ define(['frame'], function (ngApp) {
         };
         $scope.toggleRecord = function () {
             $scope.category = "record";
-            $scope.doSearch();
+            $scope.doSearch(1);
             $scope.coworkSchemasExt.push($scope.currentSchema);
         };
         // 选中的记录
@@ -514,7 +514,7 @@ define(['frame'], function (ngApp) {
                 }
                 $scope.groupDataSchemas = groupDataSchemas;
                 $scope.tmsTableWrapReady = 'Y';
-                $scope.doSearch();
+                $scope.doSearch(1);
             });
         });
     }]);
