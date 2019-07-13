@@ -688,7 +688,7 @@ define(['require', 'frame/templates', 'schema', 'page'], function (require, Fram
 
                 http2.post(url, data).then(function (rsp) {
                     if (rsp.data) {
-                        if (rsp.dta.recordDatas)
+                        if (rsp.data.recordDatas)
                             rsp.data.recordDatas.forEach(function (oCowork) {
                                 oCowork._agreed = oAgreedLabel[oCowork.agreed] || '未表态';
                             });
