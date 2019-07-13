@@ -199,7 +199,7 @@
                                 <th style='width:80px'>获赞数</th>
                                 <th style='width:80px'>获踩数</th>
                                 <th style='width:80px'>获评论数</th>
-                                <th ng-repeat="schema in recordSchemasExt track by $index" ng-class="{'nickname':schema.id===app.assignedNickname.schema.id}">{{schema.title}}</th>
+                                <th ng-repeat="schema in coworkSchemasExt track by $index" ng-class="{'nickname':schema.id===app.assignedNickname.schema.id}">{{schema.title}}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -218,7 +218,7 @@
                                 <td>{{::c.like_num}}</td>
                                 <td>{{::c.dislike_num}}</td>
                                 <td>{{c.remark_num}}</td>
-                                <td ng-repeat="schema in coworkSchemasExt" ng-switch on="schema.type">
+                                <td ng-repeat="schema in coworkSchemasExt track by $index" ng-switch on="schema.type">
                                     <div ng-switch-when="image">
                                         <span><img ng-repeat="img in c.data[schema.id].split(',')" ng-src='{{img}}' /></span>
                                     </div>

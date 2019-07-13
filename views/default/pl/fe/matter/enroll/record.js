@@ -413,11 +413,6 @@ define(['frame'], function (ngApp) {
         };
         $scope.listCowork = function (oSchema, pageNumber) {
             $scope.currentSchema = oSchema;
-            $scope.coworkSchemasExt.forEach(function (oItem, index) {
-                if (oItem.id === oSchema.id) {
-                    $scope.coworkSchemasExt.splice(oItem, 1);
-                }
-            });
             srvEnlRec.listCowork(oSchema, pageNumber).then(function (data) {
                 $scope.coworks = data.recordDatas;
                 $scope.category = "cowork";
@@ -426,7 +421,6 @@ define(['frame'], function (ngApp) {
         $scope.toggleRecord = function () {
             $scope.category = "record";
             $scope.doSearch(1);
-            $scope.coworkSchemasExt.push($scope.currentSchema);
         };
         // 选中的记录
         $scope.rows = new tmsRowPicker();
@@ -447,6 +441,7 @@ define(['frame'], function (ngApp) {
                 // schemas
                 var recordSchemas = [],
                     recordSchemasExt = [],
+                    coworkSchemasExt = [],
                     enrollDataSchemas = [],
                     coworkSchemas = [],
                     bRequireSum = false,
@@ -454,13 +449,16 @@ define(['frame'], function (ngApp) {
                     groupDataSchemas = [];
 
                 rsp.data.forEach(function (oSchema) {
-                    if (!/html|image/.test(oSchema.type)) {
-                        recordSchemas.push(oSchema);
-                        recordSchemasExt.push(oSchema);
+                    if (/html|image/.test(oSchema.type)) {
+                        return
                     }
+                    recordSchemas.push(oSchema);
+                    recordSchemasExt.push(oSchema);
 
                     if (oSchema.type === 'multitext' && oSchema.cowork === 'Y') {
                         coworkSchemas.push(oSchema);
+                    } else {
+                        coworkSchemasExt.push(oSchema)
                     }
 
                     if (oSchema.supplement && oSchema.supplement === 'Y')
@@ -496,7 +494,7 @@ define(['frame'], function (ngApp) {
                 $scope.coworkSchemas = coworkSchemas;
                 $scope.recordSchemas = recordSchemas;
                 $scope.recordSchemasExt = recordSchemasExt;
-                $scope.coworkSchemasExt = recordSchemasExt;
+                $scope.coworkSchemasExt = coworkSchemasExt;
                 if (oApp._schemasFromEnrollApp) {
                     oApp._schemasFromEnrollApp.forEach(function (schema) {
                         if (schema.type !== 'html') {
