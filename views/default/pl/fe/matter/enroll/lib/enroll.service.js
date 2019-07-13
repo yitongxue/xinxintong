@@ -683,6 +683,8 @@ define(['require', 'frame/templates', 'schema', 'page'], function (require, Fram
                 url = '/rest/pl/fe/matter/enroll/record/listByCowork';
                 url += '?site=' + this._oApp.siteid;
                 url += '&app=' + this._oApp.id;
+                url += this._oPage.joinParams();
+
                 ids.push(cowork.id);
                 data.coworkSchemaIds = ids;
 
