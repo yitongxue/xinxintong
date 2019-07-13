@@ -191,10 +191,6 @@ define(['frame'], function (ngApp) {
             window.open(url);
         }
         $scope.syncMissionUser = function () {
-            //var oPosted = {};
-            //if ($scope.criteria.record && $scope.criteria.record.rid) {
-            //    oPosted.rid = $scope.criteria.record.rid;
-            //}
             http2.post('/rest/script/time', {
                 html: {
                     'rounds': '/views/default/pl/fe/matter/enroll/component/roundPicker'
@@ -429,8 +425,9 @@ define(['frame'], function (ngApp) {
         };
         $scope.toggleRecord = function () {
             $scope.category = "record";
+            $scope.doSearch();
             $scope.coworkSchemasExt.push($scope.currentSchema);
-        }
+        };
         // 选中的记录
         $scope.rows = new tmsRowPicker();
         $scope.$watch('rows.allSelected', function (checked) {
