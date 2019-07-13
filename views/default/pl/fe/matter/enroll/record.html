@@ -111,7 +111,7 @@
                                 <td ng-if="bRequireGroup"><span>{{::r.group.title}}</span> <span ng-if="r.group_id!==r.user.group.id" class='glyphicon glyphicon-exclamation-sign text-danger' uib-tooltip="用户分组和记录分组不一致，用户分组【{{r.user.group.title||'无'}}】"></span></td>
                                 <td>{{::(r.enroll_at*1000)|date:'MM-dd HH:mm'}}</td>
                                 <td>{{::r.round.title}}</td>
-                                <td ng-repeat="schema in recordSchemasExt" ng-switch on="schema.type">
+                                <td ng-repeat="schema in recordSchemasExt track by schema.id" ng-switch on=" schema.type">
                                     <div ng-switch-when="image">
                                         <span><img ng-repeat="img in r.data[schema.id].split(',')" ng-src='{{img}}' /></span>
                                     </div>
@@ -152,7 +152,7 @@
                                 <td ng-if="bRequireGroup"></td>
                                 <td></td>
                                 <td></td>
-                                <td ng-repeat="schema in recordSchemasExt">
+                                <td ng-repeat="schema in recordSchemasExt track by schema.id">
                                     <div ng-if="schema.format==='number'||schema.type==='score'">
                                         {{sum4SchemaAtPage[schema.id]}}/{{sum4Schema[schema.id]}}
                                     </div>
