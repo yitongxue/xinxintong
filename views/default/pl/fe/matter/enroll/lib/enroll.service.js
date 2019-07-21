@@ -575,6 +575,46 @@ define(['require', 'frame/templates', 'schema', 'page'], function (require, Fram
             });
             return defer.promise;
         };
+        this.pick = function (oApp, oOptions) {
+            var that = this;
+            var defer = $q.defer();
+            http2.post('/rest/script/time', {
+                html: {
+                    'rounds': '/views/default/pl/fe/matter/enroll/component/roundPicker'
+                }
+            }).then(function (rsp) {
+                $uibModal.open({
+                    templateUrl: '/views/default/pl/fe/matter/enroll/component/roundPicker.html?_=' + rsp.data.html.rounds.time,
+                    controller: ['$scope', '$uibModalInstance', function ($scope2, $mi) {
+                        var _oPage, _oResult;
+                        $scope2.options = oOptions || {
+                            single: true
+                        };
+                        $scope2.page = _oPage = {};
+                        $scope2.result = _oResult = {};
+                        $scope2.rounds = [];
+                        $scope2.doSearch = function () {
+                            that.list(oApp, _oPage).then(function (oResult) {
+                                $scope2.rounds.splice(0, $scope2.rounds.length);
+                                oResult.rounds.forEach(function (oRound) {
+                                    $scope2.rounds.push(oRound);
+                                });
+                            });
+                        };
+                        $scope2.dismiss = function () {
+                            $mi.dismiss();
+                        };
+                        $scope2.ok = function () {
+                            $mi.close(_oResult);
+                        };
+                        $scope2.doSearch();
+                    }]
+                }).result.then(function (oResult) {
+                    defer.resolve(oResult);
+                });
+            });
+            return defer.promise;
+        };
     }]);
     ngModule.provider('srvEnrollRound', function () {
         var _rounds, _oPage;
@@ -1010,13 +1050,15 @@ define(['require', 'frame/templates', 'schema', 'page'], function (require, Fram
                 url += '&filter=' + JSON.stringify(oCriteria);
                 window.open(url);
             };
-            _ins.exportImage = function () {
+            _ins.exportImage = function (rid) {
+                if (!rid) {
+                    noticebox.warn('没有指定导出轮次');
+                    return;
+                }
                 var url;
                 url = '/rest/pl/fe/matter/enroll/export/image';
                 url += '?site=' + _siteId + '&app=' + _appId;
-                if (_ins._oCriteria.record.rid && _ins._oCriteria.record.rid.length) {
-                    url += '&rid=' + _ins._oCriteria.record.rid.join(',');
-                }
+                url += '&rid=' + rid;
                 window.open(url);
             };
             _ins.chooseImage = function (imgFieldName) {
