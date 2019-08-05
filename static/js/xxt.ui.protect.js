@@ -3,11 +3,11 @@
  * 页面事件追踪
  */
 var ngMod = angular.module('protect.ui.xxt', ['http.ui.xxt']);
-ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function($q, $timeout, http2, $uibModal) {
+ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function ($q, $timeout, http2, $uibModal) {
     var modalEle;
     var ProtectKey = 'xxt.pl.protect.system';
     var StoreKey = 'xxt.pl.protect.event.trace';
-    var TraceStack = function() {
+    var TraceStack = function () {
         function storeTrace(time) {
             var oStorage, oCached;
             if (oStorage = window.localStorage) {
@@ -39,11 +39,13 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function(
             template += '</div>';
             $uibModal.open({
                 template: template,
-                controller: ['$scope', '$uibModalInstance', '$http', function($scope2, $mi, $http) {
-                    $scope2.user = { password: "" };
+                controller: ['$scope', '$uibModalInstance', '$http', function ($scope2, $mi, $http) {
+                    $scope2.user = {
+                        password: ""
+                    };
                     $scope2.msg = "";
-                    $scope2.ok = function() {
-                        $http.post("/rest/site/fe/user/login/validatePwd", $scope2.user).then(function(rsp) {
+                    $scope2.ok = function () {
+                        $http.post("/rest/site/fe/user/login/validatePwd", $scope2.user).then(function (rsp) {
                             if (!rsp.data.err_code) {
                                 $mi.close();
                             } else {
@@ -54,19 +56,19 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function(
                 }],
                 backdrop: 'static',
                 size: 'sm'
-            }).result.then(function() {
+            }).result.then(function () {
                 var confirmTime = new Date() * 1;
                 storeTrace(confirmTime);
             });
         };
 
-        this.occurEvent = function(timer) {
-            var currentTime = new Date() * 1;
-            var lasttime = getLastTime();
-            (currentTime - lasttime) > timer ? validPwd() : storeTrace(currentTime);
+        this.occurEvent = function (timer) {
+            // var currentTime = new Date() * 1;
+            // var lasttime = getLastTime();
+            // (currentTime - lasttime) > timer ? validPwd() : storeTrace(currentTime);
         };
 
-        this.getStorage = function() {
+        this.getStorage = function () {
             var oStorage, oCached, lasttime;
             if (oStorage = window.localStorage) {
                 oCached = oStorage.getItem(StoreKey);
@@ -89,7 +91,7 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function(
             $.ajax({
                 "url": "/tmsappconfig.php",
                 async: false,
-                success: function(result) {
+                success: function (result) {
                     intervaltime = result.noHookMaxTime * 60 * 1000;
                     oSeesionStorage.setItem(ProtectKey, JSON.stringify(result));
                 }
@@ -99,7 +101,7 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function(
 
     return {
         restrict: 'A',
-        link: function(scope, elem, attr) {
+        link: function (scope, elem, attr) {
             if (!oSessionCached.noHookMaxTime && oSessionCached.noHookMaxTime <= 0) {
                 return false;
             }
@@ -109,13 +111,13 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function(
             /* 打开页面 */
             oTraceStack.occurEvent(intervaltime);
             /* 用户点击页面 */
-            elem.on('click', function(event) {
+            elem.on('click', function (event) {
                 if (!document.getElementsByClassName('modal')[0]) {
                     oTraceStack.occurEvent(intervaltime);
                 }
             });
             /* 用户滚动页面 */
-            document.addEventListener('scroll', function(event) {
+            document.addEventListener('scroll', function (event) {
                 oTraceStack.occurEvent(intervaltime);
             });
         }
