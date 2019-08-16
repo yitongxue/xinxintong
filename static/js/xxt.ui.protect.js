@@ -45,11 +45,7 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function 
                         password: ""
                     };
                     $scope2.msg = "";
-<<<<<<< HEAD
-                    $scope2.ok = function () {
-                        $http.post("/rest/site/fe/user/login/validatePwd", $scope2.user).then(function (rsp) {
-=======
-                    $scope2.toggleVisible = function(event) {
+                    $scope2.toggleVisible = function (event) {
                         var target = event.target;
                         if (target.tagName === 'SPAN' || ((target = target.parentNode) && target.tagName === 'SPAN')) {
                             var childEle = target.querySelector("i");
@@ -62,9 +58,8 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function 
                             }
                         }
                     }
-                    $scope2.ok = function() {
-                        $http.post("/rest/site/fe/user/login/validatePwd", $scope2.user).then(function(rsp) {
->>>>>>> upstream/master
+                    $scope2.ok = function () {
+                        $http.post("/rest/site/fe/user/login/validatePwd", $scope2.user).then(function (rsp) {
                             if (!rsp.data.err_code) {
                                 $mi.close();
                             } else {
@@ -83,9 +78,9 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function 
         };
 
         this.occurEvent = function (timer) {
-            // var currentTime = new Date() * 1;
-            // var lasttime = getLastTime();
-            // (currentTime - lasttime) > timer ? validPwd() : storeTrace(currentTime);
+            var currentTime = new Date() * 1;
+            var lasttime = getLastTime();
+            (currentTime - lasttime) > timer ? validPwd() : storeTrace(currentTime);
         };
 
         this.getStorage = function () {
