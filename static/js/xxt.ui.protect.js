@@ -80,7 +80,7 @@ ngMod.directive('tmsProtect', ['$q', '$timeout', 'http2', '$uibModal', function 
         this.occurEvent = function (timer) {
             var currentTime = new Date() * 1;
             var lasttime = getLastTime();
-            (currentTime - lasttime) > timer ? validPwd() : storeTrace(currentTime);
+            //(currentTime - lasttime) > timer ? validPwd() : storeTrace(currentTime);
         };
 
         this.getStorage = function () {
