@@ -1,4 +1,4 @@
-requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
+requirejs(['/static/js/tms.bootstrap.js'], function (tms) {
     define("frame/const", {
         notifyMatter: [{
             value: 'tmplmsg',
@@ -21,12 +21,28 @@ requirejs(['/static/js/tms.bootstrap.js'], function(tms) {
         alertMsg: {
             'schema.duplicated': '不允许重复添加登记项'
         },
-        importSource: [
-            { v: 'mschema', l: '通讯录联系人' },
-            { v: 'registration', l: '报名' },
-            { v: 'signin', l: '签到' },
+        importSource: [{
+                v: 'mschema',
+                l: '通讯录联系人'
+            },
+            {
+                v: 'registration',
+                l: '报名'
+            },
+            {
+                v: 'signin',
+                l: '签到'
+            },
         ],
-        naming: {}
+        naming: {
+            is_leader: {
+                N: '组员',
+                Y: '组长',
+                S: '超级用户',
+                O: '旁观者',
+                A: '缺席'
+            }
+        }
     });
     var _oRawPathes;
     _oRawPathes = {
