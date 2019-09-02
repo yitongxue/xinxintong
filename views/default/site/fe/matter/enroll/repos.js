@@ -157,7 +157,7 @@ ngApp.controller('ctrlRepos', ['$scope', '$uibModal', 'http2', 'tmsLocation', 'e
         var tasks, popActs;
         _oApp = params.app;
         if (window.sessionStorage && window.sessionStorage.getItem("listStorage")) {
-            var cacheData;
+            var cacheData, _cPage;
             cacheData = JSON.parse(window.sessionStorage.getItem("listStorage"));
             $scope.schemaCounter = cacheData.schemaCounter;
             $scope.tasks = cacheData.tasks;
@@ -328,7 +328,6 @@ ngApp.controller('ctrlReposRecord', ['$scope', '$timeout', '$q', 'http2', 'notic
         });
     };
     // 处理需要异步加载的图片数据
-    console.log('iii', $scope.imageSchemas)
     if ($scope.imageSchemas && $scope.imageSchemas.length) {
         var AsyncImage = (function () {
             function loadOneImage(urls, defer) {
@@ -352,7 +351,6 @@ ngApp.controller('ctrlReposRecord', ['$scope', '$timeout', '$q', 'http2', 'notic
                     })
                 },
                 loadImage: function (defer) {
-                    console.log('AsyncImage...', cachedImages)
                     var aImageData = cachedImages.shift();
                     if (aImageData) {
                         var imageUrls = aImageData[1].split(',');
@@ -391,7 +389,6 @@ ngApp.controller('ctrlReposRecord', ['$scope', '$timeout', '$q', 'http2', 'notic
             }
             if (AsyncImage)
                 $timeout(function () {
-                    console.log('AsyncImage...')
                     var defer = $q.defer();
                     AsyncImage.loadImage(defer)
                     defer.promise.then(function () {
