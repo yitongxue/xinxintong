@@ -3,7 +3,6 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$q', '$http', '$location', '$a
         sitePageAt = 1,
         appPageAt = 1,
         matterPageAt = 1,
-        templatePageAt = 1,
         channelMatterPageAt = 1;
     $scope.width = width;
     $scope.moreMatters = function (type, matter) {
@@ -41,29 +40,15 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$q', '$http', '$location', '$a
     };
 
     function dealImgSrc(item) {
-        if (Object.keys(item).indexOf('pic') !== -1 && item.pic == null) {
+        if (item.pic !== undefined && item.pic == null) {
             item.src = item.pic = '';
-        } else if (Object.keys(item).indexOf('thumbnail') !== -1 && item.thumbnail == null) {
+        } else if (item.thumbnail !== undefined && item.thumbnail == null) {
             item.src = item.thumnail = '';
         } else {
             item.src = item.pic ? item.pic : item.thumbnail;
         }
         return item;
     }
-    var _templates = [];
-
-    function listTemplates() {
-        $http.get('/rest/home/listTemplate?page=' + templatePageAt + '&size=10').success(function (rsp) {
-            if (rsp.data.length) {
-                rsp.data.forEach(function (data) {
-                    dealImgSrc(data);
-                    _templates.push(data);
-                });
-            }
-            $scope.templates = _templates;
-            $scope.templates.total = rsp.data.total;
-        });
-    };
     var _sites = [];
 
     function listSites() {
@@ -94,7 +79,7 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$q', '$http', '$location', '$a
     $scope.listMatters = function () {
         $http.get('/rest/home/listMatter?page=' + matterPageAt + '&size=10').success(function (rsp) {
             if (rsp.data.matters.length) {
-                rsp.data.matters.forEach(function (item) {
+                rsp.data.matters.forEach(function (item, index) {
                     dealImgSrc(item);
                     item.id = item.matter_id;
                     _matters.push(item);
@@ -200,13 +185,17 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$q', '$http', '$location', '$a
     };
     $scope.slideOnload = function (index) {
         if (index === 0) {
-            _loadAll();
+            //listSites();
+            //$scope.listApps();
+            $scope.listMatters();
+            //$scope.getCenterChannels();
+            // $scope.getRightChannels();
+            // $scope.checked(0);
         }
     };
 
     function _loadAll() {
         listSites();
-        listTemplates();
         $scope.listApps();
         $scope.listMatters();
         $scope.getCenterChannels();
@@ -226,12 +215,17 @@ ngApp.provider.controller('ctrlHome', ['$scope', '$q', '$http', '$location', '$a
 ngApp.provider.controller('ctrlCarousel', function ($scope) {
     $scope.myInterval = 5000;
     $scope.noWrapSlides = false;
-    $scope.active = 0;
+    //$scope.active = 0;
+    $scope.slides = [];
 
     $scope.$watch('platform', function (platform) {
         if (platform === undefined) return;
         if (platform.home_carousel.length) {
-            $scope.slides = platform.home_carousel;
+            platform.home_carousel.forEach(function (c) {
+                $scope.slides.push({
+                    picUrl: c.picUrl
+                });
+            });
         }
     });
 });
@@ -239,8 +233,7 @@ ngApp.provider.controller('ctrlSlider', function ($scope) {
     var meuns = angular.element('#arrow').find('a'),
         lis = document.querySelector('#slider_extends > ul').children,
         as = [meuns[0], meuns[1]];
-    var stop = true,
-        flag = true;
+    var stop = true;
     var json = [{
         width: 169,
         top: 40,
