@@ -1,4 +1,4 @@
-define(['require'], function() {
+define(['require'], function () {
     'use strict';
     var ngApp = angular.module('app', ['ngRoute', 'ui.tms', 'tinymce.ui.xxt', 'ui.xxt', 'http.ui.xxt', 'notice.ui.xxt', 'member.xxt', 'service.matter', 'service.article', 'thumbnail.ui.xxt']);
     ngApp.constant('cstApp', {
@@ -37,16 +37,16 @@ define(['require'], function() {
             url: '/rest/pl/fe/matter'
         }],
     });
-    ngApp.config(['$routeProvider', '$locationProvider', '$controllerProvider', 'srvSiteProvider', 'srvAppProvider', 'srvTagProvider', function($routeProvider, $locationProvider, $controllerProvider, srvSiteProvider, srvAppProvider, srvTagProvider) {
-        var RouteParam = function(name, htmlBase, jsBase) {
+    ngApp.config(['$routeProvider', '$locationProvider', '$controllerProvider', 'srvSiteProvider', 'srvAppProvider', 'srvTagProvider', function ($routeProvider, $locationProvider, $controllerProvider, srvSiteProvider, srvAppProvider, srvTagProvider) {
+        var RouteParam = function (name, htmlBase, jsBase) {
             var baseURL = '/views/default/pl/fe/matter/article/';
             this.templateUrl = (htmlBase || baseURL) + name + '.html?_=' + (new Date * 1);
             this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1);
             this.reloadOnSearch = false;
             this.resolve = {
-                load: function($q) {
+                load: function ($q) {
                     var defer = $q.defer();
-                    require([(jsBase || baseURL) + name + '.js'], function() {
+                    require([(jsBase || baseURL) + name + '.js'], function () {
                         defer.resolve();
                     });
                     return defer.promise;
@@ -64,7 +64,7 @@ define(['require'], function() {
             .otherwise(new RouteParam('main', '/views/ytx/pl/fe/matter/article/'));
         $locationProvider.html5Mode(true);
         //设置服务参数
-        (function() {
+        (function () {
             var ls, siteId, articleId;
             ls = location.search;
             siteId = ls.match(/[\?&]site=([^&]*)/)[1];
@@ -76,9 +76,9 @@ define(['require'], function() {
             srvAppProvider.setAppId(articleId);
         })();
     }]);
-    ngApp.controller('ctrlArticle', ['$scope', '$location', 'srvSite', 'srvApp', function($scope, $location, srvSite, srvApp) {
+    ngApp.controller('ctrlArticle', ['$scope', '$location', 'srvSite', 'srvApp', function ($scope, $location, srvSite, srvApp) {
         $scope.subView = '';
-        $scope.$on('$locationChangeSuccess', function(event, currentRoute) {
+        $scope.$on('$locationChangeSuccess', function (event, currentRoute) {
             var subView = currentRoute.match(/([^\/]+?)\?/);
             $scope.subView = subView[1] === 'article' ? 'main' : subView[1];
             switch ($scope.subView) {
@@ -97,51 +97,63 @@ define(['require'], function() {
                     $scope.opened = '';
             }
         });
-        $scope.switchTo = function(subView) {
+        $scope.switchTo = function (subView) {
             var url = '/rest/pl/fe/matter/article/' + subView;
             $location.path(url);
         };
-        $scope.update = function(names) {
+        $scope.update = function (names) {
             return srvApp.update(names);
         };
-        srvSite.get().then(function(oSite) {
+        srvSite.get().then(function (oSite) {
             $scope.site = oSite;
         });
-        srvSite.tagList().then(function(oTag) {
+        srvSite.tagList().then(function (oTag) {
             $scope.oTag = oTag;
         });
-        srvSite.tagList('C').then(function(oTag) {
+        srvSite.tagList('C').then(function (oTag) {
             $scope.oTagC = oTag;
         });
-        srvApp.get().then(function(editing) {
-            $scope.editing = editing;
-            !editing.attachments && (editing.attachments = []);
-            $scope.entry = {
-                url: editing.entryUrl,
-                qrcode: '/rest/site/fe/matter/article/qrcode?site=' + $scope.editing.siteid + '&url=' + encodeURIComponent(editing.entryUrl),
-            };
-            if ($scope.editing.matter_cont_tag !== '') {
-                $scope.editing.matter_cont_tag.forEach(function(cTag, index) {
-                    $scope.oTagC.forEach(function(oTag) {
-                        if (oTag.id === cTag) {
-                            $scope.editing.matter_cont_tag[index] = oTag;
-                        }
+        srvSite.snsList().then(function (oSns) {
+            $scope.sns = oSns;
+            $scope.snsNames = oSns.names;
+            $scope.snsCount = oSns.count;
+            srvApp.get().then(function (editing) {
+                $scope.editing = editing;
+                !editing.attachments && (editing.attachments = []);
+                $scope.entry = {
+                    url: editing.entryUrl,
+                    qrcode: '/rest/site/fe/matter/article/qrcode?site=' + $scope.editing.siteid + '&url=' + encodeURIComponent(editing.entryUrl),
+                };
+                if ($scope.editing.matter_cont_tag !== '') {
+                    $scope.editing.matter_cont_tag.forEach(function (cTag, index) {
+                        $scope.oTagC.forEach(function (oTag) {
+                            if (oTag.id === cTag) {
+                                $scope.editing.matter_cont_tag[index] = oTag;
+                            }
+                        });
+                    });
+                }
+                if ($scope.editing.matter_mg_tag !== '') {
+                    $scope.editing.matter_mg_tag.forEach(function (cTag, index) {
+                        $scope.oTag.forEach(function (oTag) {
+                            if (oTag.id === cTag) {
+                                $scope.editing.matter_mg_tag[index] = oTag;
+                            }
+                        });
+                    });
+                }
+                srvSite.memberSchemaList($scope.editing).then(function (aMemberSchemas) {
+                    $scope.memberSchemas = aMemberSchemas;
+                    $scope.mschemasById = {};
+                    $scope.memberSchemas.forEach(function (mschema) {
+                        $scope.mschemasById[mschema.id] = mschema;
                     });
                 });
-            }
-            if ($scope.editing.matter_mg_tag !== '') {
-                $scope.editing.matter_mg_tag.forEach(function(cTag, index) {
-                    $scope.oTag.forEach(function(oTag) {
-                        if (oTag.id === cTag) {
-                            $scope.editing.matter_mg_tag[index] = oTag;
-                        }
-                    });
-                });
-            }
+            });
         });
     }]);
     /***/
-    require(['domReady!'], function(document) {
+    require(['domReady!'], function (document) {
         angular.bootstrap(document, ["app"]);
     });
     /***/
