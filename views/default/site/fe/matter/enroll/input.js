@@ -145,11 +145,11 @@ ngApp.directive('tmsImageInput', ['$q', function ($q) {
 
             function onWxSubmit(defer, imgs, index) {
                 window.xxt.image.wxUpload($q.defer(), imgs[index]).then(() => {
-                    if (index = imgs.length - 1) {
-                        defer.resolve('ok')
-                    } else {
-                        onWxSubmit(defer, imgs, ++index)
-                    }
+                    //if (index = imgs.length - 1) {
+                    defer.resolve('ok')
+                    // } else {
+                    //     onWxSubmit(defer, imgs, ++index)
+                    // }
                 })
             };
             $scope.beforeSubmit(function () {
