@@ -157,10 +157,9 @@ ngApp.directive('tmsImageInput', ['$q', function ($q) {
                 let defer = $q.defer()
                 if (window.wx) {
                     let imgs = []
-                    let imgSchemas = $scope.app.dynaDataSchemas.filter(s => s.type = 'image')
+                    let imgSchemas = $scope.app.dynaDataSchemas.filter(s => s.type === 'image')
                     imgSchemas.forEach(s => {
                         if ($scope.data[s.id] && $scope.data[s.id].length) {
-                            console.log('sss', $scope.data[s.id])
                             $scope.data[s.id].forEach(img => imgs.push(img))
                         }
                     })
