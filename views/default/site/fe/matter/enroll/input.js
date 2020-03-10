@@ -1296,7 +1296,7 @@ ngApp.controller('ctrlInput', ['$scope', '$parse', '$q', '$uibModal', '$timeout'
                 var oSchema, html, $html;
                 oSchema = schemasById[pastecontain.getAttribute('name')];
                 html = '<li class="img-picker img-edit">';
-                html += '<button class="btn btn-default" ng-click="pasteImage(\'' + oSchema.id + '\',$event,' + (oSchema.count || 1) + ')">点击按钮<br>Ctrl+V<br>粘贴截图';
+                html += '<button class="btn btn-default" ng-click="pasteImage(\'' + oSchema.id + '\',$event,' + (parseInt(oSchema.count) || 1) + ')">点击按钮<br>Ctrl+V<br>粘贴截图';
                 html += '<div contenteditable="true" tabindex="-1" style="width:1px;height:1px;position:fixed;left:-100px;overflow:hidden;"></div>';
                 html += '</button>';
                 html += '</li>';
