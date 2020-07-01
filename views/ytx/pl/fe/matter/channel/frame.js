@@ -94,7 +94,8 @@ define(['require'], function () {
         .otherwise(new RouteParam('main', '/views/ytx/pl/fe/matter/channel/'))
       $locationProvider.html5Mode(true)
       ;(function () {
-        var siteId = location.search.match(/[\?&]site=([^&]*)/)[1]
+        var siteId = location.search.match(/[\?&]site=([^&]*)/)[1],
+          id = location.search.match(/[\?&]id=([^&]*)/)[1]
         srvSiteProvider.config(siteId)
         srvTagProvider.config(siteId)
         srvInviteProvider.config('channel', id)
@@ -153,10 +154,6 @@ define(['require'], function () {
             $scope.opened = ''
         }
       })
-      $scope.switchTo = function (subView) {
-        var url = '/rest/pl/fe/matter/channel/' + subView
-        $location.path(url)
-      }
       $scope.switchTo = function (subView) {
         var url = '/rest/pl/fe/matter/channel/' + subView
         $location.path(url)
