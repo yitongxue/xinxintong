@@ -80,7 +80,7 @@ define(['require'], function () {
         }
       }
       var RouteParam = function (name, htmlBase, jsBase) {
-        var baseURL = '/views/default/pl/fe/matter/article/'
+        var baseURL = '/views/default/pl/fe/matter/channel/'
         this.templateUrl =
           (htmlBase || baseURL) + name + '.html?_=' + new Date() * 1
         this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1)
