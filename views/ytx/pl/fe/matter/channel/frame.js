@@ -8,6 +8,7 @@ define(['require'], function () {
     'http.ui.xxt',
     'notice.ui.xxt',
     'service.matter',
+    'protect.ui.xxt',
   ])
   ngApp.constant('cstApp', {
     matterTypes: [
@@ -24,6 +25,11 @@ define(['require'], function () {
       {
         value: 'signin',
         title: '签到活动',
+        url: '/rest/pl/fe/matter',
+      },
+      {
+        value: 'link',
+        title: '链接',
         url: '/rest/pl/fe/matter',
       },
       {
@@ -49,12 +55,14 @@ define(['require'], function () {
     '$controllerProvider',
     'srvSiteProvider',
     'srvTagProvider',
+    'srvInviteProvider',
     function (
       $routeProvider,
       $locationProvider,
       $controllerProvider,
       srvSiteProvider,
-      srvTagProvider
+      srvTagProvider,
+      srvInviteProvider
     ) {
       var RouteParam = function (name, htmlBase) {
         var baseURL = '/views/default/pl/fe/matter/channel/'
@@ -89,7 +97,7 @@ define(['require'], function () {
         var siteId = location.search.match(/[\?&]site=([^&]*)/)[1]
         srvSiteProvider.config(siteId)
         srvTagProvider.config(siteId)
-        $locationProvider.html5Mode(true)
+        srvInviteProvider.config('channel', id)
       })()
     },
   ])
@@ -126,6 +134,33 @@ define(['require'], function () {
       var ls = $location.search()
       $scope.id = ls.id
       $scope.siteId = ls.site
+      $scope.$on('$locationChangeSuccess', function (event, currentRoute) {
+        var subView = currentRoute.match(/([^\/]+?)\?/)
+        $scope.subView = subView[1] === 'channel' ? 'main' : subView[1]
+        switch ($scope.subView) {
+          case 'main':
+          case 'matter':
+            $scope.opened = 'edit'
+            break
+          case 'preview':
+          case 'invite':
+            $scope.opened = 'publish'
+            break
+          case 'log':
+            $scope.opened = 'other'
+            break
+          default:
+            $scope.opened = ''
+        }
+      })
+      $scope.switchTo = function (subView) {
+        var url = '/rest/pl/fe/matter/channel/' + subView
+        $location.path(url)
+      }
+      $scope.switchTo = function (subView) {
+        var url = '/rest/pl/fe/matter/channel/' + subView
+        $location.path(url)
+      }
       srvSite.get().then(function (oSite) {
         $scope.site = oSite
       })
