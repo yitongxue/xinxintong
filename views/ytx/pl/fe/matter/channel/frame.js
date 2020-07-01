@@ -64,10 +64,9 @@ define(['require'], function () {
       srvTagProvider,
       srvInviteProvider
     ) {
-      var RouteParam = function (name, htmlBase) {
-        var baseURL = '/views/default/pl/fe/matter/channel/'
-        this.templateUrl =
-          (htmlBase || baseURL) + name + '.html?_=' + new Date() * 1
+      var RouteParam = function (name, baseURL) {
+        !baseURL && (baseURL = '/views/default/pl/fe/matter/channel/')
+        this.templateUrl = baseURL + name + '.html?_=' + new Date() * 1
         this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1)
         this.reloadOnSearch = false
         this.resolve = {
@@ -92,6 +91,7 @@ define(['require'], function () {
         )
         .when('/rest/pl/fe/matter/channel/log', new RouteParam('log'))
         .otherwise(new RouteParam('main', '/views/ytx/pl/fe/matter/channel/'))
+
       $locationProvider.html5Mode(true)
       ;(function () {
         var siteId = location.search.match(/[\?&]site=([^&]*)/)[1],
