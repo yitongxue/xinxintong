@@ -79,6 +79,22 @@ define(['require'], function () {
           },
         }
       }
+      var RouteParam = function (name, htmlBase, jsBase) {
+        var baseURL = '/views/default/pl/fe/matter/article/'
+        this.templateUrl =
+          (htmlBase || baseURL) + name + '.html?_=' + new Date() * 1
+        this.controller = 'ctrl' + name[0].toUpperCase() + name.substr(1)
+        this.reloadOnSearch = false
+        this.resolve = {
+          load: function ($q) {
+            var defer = $q.defer()
+            require([(jsBase || baseURL) + name + '.js'], function () {
+              defer.resolve()
+            })
+            return defer.promise
+          },
+        }
+      }
       ngApp.provider = {
         controller: $controllerProvider.register,
       }
@@ -87,7 +103,11 @@ define(['require'], function () {
         .when('/rest/pl/fe/matter/channel/preview', new RouteParam('preview'))
         .when(
           '/rest/pl/fe/matter/channel/invite',
-          new RouteParam('invite', '/views/default/pl/fe/_module/')
+          new RouteParam(
+            'invite',
+            '/views/default/pl/fe/_module/',
+            '/views/default/pl/fe/_module/'
+          )
         )
         .when('/rest/pl/fe/matter/channel/log', new RouteParam('log'))
         .otherwise(new RouteParam('main', '/views/ytx/pl/fe/matter/channel/'))
