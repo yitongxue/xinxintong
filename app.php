@@ -84,7 +84,7 @@ function show_error($message)
   $msg = $modelLog->escape($msg);
 
   /* 记录24小时内的报错信息 */
-  $logfilename = 'error.log';
+  $logfilename = 'logs/error.log';
   if (file_exists($logfilename)) {
     $mtime = filemtime($logfilename);
     if ($mtime < time() - 86400) {
@@ -102,7 +102,7 @@ function show_error($message)
   if ($message instanceof SiteUserException) {
     $modelLog->log($message->getUserid(), $method, $msg);
   } else {
-    $modelLog->log('errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror', $method, $msg);
+    $modelLog->log('error', $method, $msg);
   }
 
   exit;
